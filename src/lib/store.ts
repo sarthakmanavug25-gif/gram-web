@@ -166,6 +166,8 @@ type Actions = {
     phone: string,
     password: string
   ) => { ok: true } | { ok: false; error: string };
+  /** Device-only fallback when an SMS provider has not been connected yet. */
+  demoOtpSignIn: (phone: string, name: string) => void;
   signOut: () => void;
   setSession: (s: Session) => void;
   updateProfile: (patch: Partial<Profile>) => void;
@@ -245,6 +247,26 @@ export const useApp = create<State & Actions>()(
           profile: { ...s.profile, name: account.name, phone: clean },
         }));
         return { ok: true };
+      },
+
+      demoOtpSignIn: (phone, name) => {
+        const clean = phone.replace(/\s+/g, "");
+        const existing = get().accounts.find((a) => a.phone === clean);
+        const account =
+          existing ??
+          ({
+            id: `local-${Date.now()}`,
+            name,
+            phone: clean,
+            password: "",
+          } satisfies Account);
+
+        set((s) => ({
+          accounts: existing ? s.accounts : [...s.accounts, account],
+          session: { id: account.id, name, phone: clean },
+          profile: { ...s.profile, name, phone: clean },
+          hasSeenGuide: false,
+        }));
       },
 
       signOut: () => set({ session: null, chat: [] }),

@@ -55,8 +55,12 @@ SUPABASE_SERVICE_ROLE_KEY=<service-role-key> npm run db:seed
 
 ### Enable real SMS OTP
 
-The default **Login with OTP** tab uses Supabase Phone Auth and sends a real
-six-digit SMS; it no longer displays or accepts a demo code.
+The **Login with OTP** tab uses Supabase Phone Auth and sends a real six-digit
+SMS when the Supabase environment variables and phone provider are configured.
+For a hackathon/local demo without those credentials, it visibly shows a
+device-only **Demo OTP** instead, so the complete login flow remains usable.
+The demo code is not sent as an SMS and must never be used for a production
+deployment.
 
 1. In Supabase, open **Authentication → Providers → Phone** and enable it.
 2. Add an SMS provider. For development, configure a Twilio account; for

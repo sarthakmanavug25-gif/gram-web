@@ -13,6 +13,7 @@ import {
 } from "@/lib/repo";
 import { useApp } from "@/lib/store";
 import { useT } from "@/lib/i18n";
+import { supabaseConfigured } from "@/lib/supabase/client";
 import FarmIllustration from "@/components/FarmIllustration";
 import OtpInput from "@/components/OtpInput";
 
@@ -87,6 +88,7 @@ function OtpFlow() {
   const [step, setStep] = useState<OtpStep>("phone");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
+  const [demoCode, setDemoCode] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -117,12 +119,24 @@ function OtpFlow() {
     }
     setError("");
     setBusy(true);
+    if (!supabaseConfigured) {
+      const generated = String(Math.floor(100000 + Math.random() * 900000));
+      window.setTimeout(() => {
+        setDemoCode(generated);
+        setCode("");
+        setStep("code");
+        setBusy(false);
+        startCountdown();
+      }, 450);
+      return;
+    }
     const result = await sendPhoneOtp(phone);
     setBusy(false);
     if (!result.ok) {
       setError(result.error);
       return;
     }
+    setDemoCode("");
     setCode("");
     setStep("code");
     startCountdown();
@@ -131,6 +145,15 @@ function OtpFlow() {
   async function verify(entered: string) {
     if (entered.length < 6) {
       setError(t("login.err.otpShort"));
+      return;
+    }
+    if (!supabaseConfigured) {
+      if (entered !== demoCode) {
+        setError(t("login.err.otpWrong"));
+        return;
+      }
+      setError("");
+      setStep("name");
       return;
     }
     setError("");
@@ -155,7 +178,11 @@ function OtpFlow() {
       return;
     }
     setBusy(true);
-    await saveProfile({ name: name.trim(), phone });
+    if (supabaseConfigured) {
+      await saveProfile({ name: name.trim(), phone });
+    } else {
+      useApp.getState().demoOtpSignIn(phone, name.trim());
+    }
     setBusy(false);
     markWelcomeSeen();
     router.replace("/");
@@ -219,6 +246,12 @@ function OtpFlow() {
           </div>
 
           <OtpInput value={code} onChange={setCode} onComplete={verify} />
+
+          {!supabaseConfigured && (
+            <p className="rounded-xl border border-amber/30 bg-amber/10 px-3 py-2 text-center text-[12.5px] text-amber">
+              {t("login.demoOtp", { code: demoCode })}
+            </p>
+          )}
 
           {error && <ErrorNote>{error}</ErrorNote>}
 
