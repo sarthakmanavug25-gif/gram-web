@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 
 export const metadata: Metadata = {
   title: "GramConnect — Smart Farming Assistant",
@@ -27,7 +28,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-dvh text-text-primary antialiased">{children}</body>
+      <body className="min-h-dvh text-text-primary antialiased">
+        <ServiceWorkerRegistration />
+        {children}
+      </body>
     </html>
   );
 }

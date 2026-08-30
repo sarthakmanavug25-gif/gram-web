@@ -7,6 +7,7 @@ import {
   BellRing,
   ChevronRight,
   CircleHelp,
+  CalendarDays,
   Database,
   Info,
   Map,
@@ -76,6 +77,11 @@ function MoreContent() {
 
       <Card className="p-0">
         <Row href="/settings" icon={<User size={18} />} label={t("more.profile")} />
+        <Row
+          href="/crop-calendar"
+          icon={<CalendarDays size={18} />}
+          label={t("more.calendar")}
+        />
         <Row href="/market" icon={<Store size={18} />} label={t("more.marketPrices")} />
         <ToggleRow
           icon={<BellRing size={18} />}

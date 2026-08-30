@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { MessageCircle, Send, Sparkles, X } from "lucide-react";
+import { MessageCircle, Mic, MicOff, Send, Sparkles, X } from "lucide-react";
 import { useApp } from "@/lib/store";
 import { isThisMonth } from "@/lib/format";
 import { useT, type StringKey } from "@/lib/i18n";
@@ -10,10 +10,30 @@ import { offlineReply } from "@/lib/assistant";
 
 const SUGGESTIONS: StringKey[] = ["chat.s1", "chat.s2", "chat.s3", "chat.s4"];
 
+type Recognition = {
+  start: () => void;
+  stop: () => void;
+  onresult: ((event: { results: { 0: { transcript: string } }[] }) => void) | null;
+  onend: (() => void) | null;
+  onerror: (() => void) | null;
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+};
+
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => Recognition;
+    webkitSpeechRecognition?: new () => Recognition;
+  }
+}
+
 export default function ChatAssistant() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
+  const [listening, setListening] = useState(false);
+  const recognitionRef = useRef<Recognition | null>(null);
   const { t } = useT();
   const chat = useApp((s) => s.chat);
   const pushChat = useApp((s) => s.pushChat);
@@ -26,6 +46,29 @@ export default function ChatAssistant() {
       behavior: "smooth",
     });
   }, [chat, open, pending]);
+
+  function toggleVoice() {
+    if (listening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+    const BrowserSpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!BrowserSpeechRecognition) {
+      setInput("Voice input is not supported in this browser.");
+      return;
+    }
+    const recognition = new BrowserSpeechRecognition();
+    recognition.lang = useApp.getState().language === "hi" ? "hi-IN" : "en-IN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onresult = (event) => setInput(event.results[0][0].transcript);
+    recognition.onend = () => setListening(false);
+    recognition.onerror = () => setListening(false);
+    recognitionRef.current = recognition;
+    setListening(true);
+    recognition.start();
+  }
 
   async function send(text: string) {
     const message = text.trim();
@@ -210,6 +253,18 @@ export default function ChatAssistant() {
                     placeholder={t("chat.placeholder")}
                     className="h-11 flex-1 rounded-full hairline surface px-4 text-[14px] outline-none focus:border-green-primary/50"
                   />
+                  <button
+                    type="button"
+                    aria-label={listening ? "Stop voice input" : "Start voice input"}
+                    onClick={toggleVoice}
+                    className={`flex h-11 w-11 items-center justify-center rounded-full transition ${
+                      listening
+                        ? "bg-red-500 text-white animate-pulse"
+                        : "hairline surface text-green-bright"
+                    }`}
+                  >
+                    {listening ? <MicOff size={18} /> : <Mic size={18} />}
+                  </button>
                   <button
                     type="submit"
                     aria-label={t("chat.title")}

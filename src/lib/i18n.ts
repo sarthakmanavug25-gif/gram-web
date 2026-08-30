@@ -248,6 +248,7 @@ const EN = {
   "more.guide": "Feature guide",
   "more.guideSub": "See a quick tour of GramConnect's main features.",
   "more.guideAction": "View",
+  "more.calendar": "Crop Calendar",
 
   "settings.title": "Settings",
   "settings.name": "Name",
@@ -257,7 +258,14 @@ const EN = {
   "settings.primaryCrops": "Primary crops",
   "settings.season": "Season",
   "settings.location": "Location for weather",
+  "settings.addFarmPhoto": "Add farm photo",
   "settings.geoNote": "The advisor also uses browser geolocation when you allow it.",
+  "calendar.title": "Crop Calendar",
+  "calendar.plan": "Plan your season",
+  "calendar.planBody": "Timely reminders for planting, care and harvest.",
+  "calendar.checklist": "Season checklist",
+  "calendar.now": "Do this now",
+  "calendar.thisMonth": "This month",
 
   "market.title": "Market",
   "market.mspNote":
@@ -552,6 +560,7 @@ const HI: Record<keyof typeof EN, string> = {
   "more.guide": "फीचर गाइड",
   "more.guideSub": "ग्रामकनेक्ट के मुख्य फीचरों का छोटा परिचय देखें।",
   "more.guideAction": "देखें",
+  "more.calendar": "फसल कैलेंडर",
 
   "settings.title": "सेटिंग",
   "settings.name": "नाम",
@@ -561,8 +570,15 @@ const HI: Record<keyof typeof EN, string> = {
   "settings.primaryCrops": "मुख्य फसलें",
   "settings.season": "मौसम",
   "settings.location": "मौसम के लिए जगह",
+  "settings.addFarmPhoto": "खेत की फ़ोटो जोड़ें",
   "settings.geoNote":
     "अनुमति देने पर सलाह पेज आपके फ़ोन की लोकेशन भी इस्तेमाल करता है।",
+  "calendar.title": "फसल कैलेंडर",
+  "calendar.plan": "मौसम की योजना बनाएँ",
+  "calendar.planBody": "बुवाई, देखभाल और कटाई के लिए समय पर याद दिलाने वाले काम।",
+  "calendar.checklist": "मौसम की सूची",
+  "calendar.now": "यह काम अभी करें",
+  "calendar.thisMonth": "इस महीने",
 
   "market.title": "मंडी",
   "market.mspNote":

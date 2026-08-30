@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { ArrowLeft, Check, Loader2, MapPin } from "lucide-react";
+import { useRef, useState } from "react";
+import { ArrowLeft, Camera, Check, Loader2, MapPin } from "lucide-react";
 import AppShell from "@/components/AppShell";
 import { Card, Chip, PrimaryButton, SectionLabel } from "@/components/ui/primitives";
 import { useApp } from "@/lib/store";
@@ -40,11 +40,20 @@ function SettingsContent() {
   const [location, setLocation] = useState(profile.locationName);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const profilePhotoRef = useRef<HTMLInputElement>(null);
+  const farmPhotoRef = useRef<HTMLInputElement>(null);
 
   function toggleCrop(c: string) {
     setCrops((prev) =>
       prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
     );
+  }
+
+  function readPhoto(file: File | undefined, field: "profilePhoto" | "farmPhoto") {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => useApp.getState().updateProfile({ [field]: String(reader.result) });
+    reader.readAsDataURL(file);
   }
 
   async function save() {
@@ -80,6 +89,48 @@ function SettingsContent() {
       </div>
 
       <Card className="space-y-4">
+        <div className="flex gap-3">
+          <input
+            ref={profilePhotoRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => readPhoto(e.target.files?.[0], "profilePhoto")}
+          />
+          <input
+            ref={farmPhotoRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => readPhoto(e.target.files?.[0], "farmPhoto")}
+          />
+          <button
+            type="button"
+            onClick={() => profilePhotoRef.current?.click()}
+            className="relative flex h-[70px] w-[70px] shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-green-primary/15 text-green-bright"
+          >
+            {profile.profilePhoto ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={profile.profilePhoto} alt="Farmer profile" className="h-full w-full object-cover" />
+            ) : (
+              <Camera size={22} />
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => farmPhotoRef.current?.click()}
+            className="relative flex h-[70px] flex-1 items-center justify-center overflow-hidden rounded-2xl hairline surface text-[12px] font-semibold text-text-secondary"
+          >
+            {profile.farmPhoto ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={profile.farmPhoto} alt="Farm" className="h-full w-full object-cover" />
+            ) : (
+              <span className="flex items-center gap-2">
+                <Camera size={16} /> {t("settings.addFarmPhoto")}
+              </span>
+            )}
+          </button>
+        </div>
         <Field label={t("settings.name")}>
           <input
             value={name}

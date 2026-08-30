@@ -297,6 +297,7 @@ function ScanTab() {
         crop: result.crop,
         confidence: result.confidence,
         createdAt: new Date().toISOString(),
+        imageDataUrl: dataUrl,
       });
     } catch {
       setState({
@@ -440,7 +441,20 @@ function ScanTab() {
                   i > 0 ? "divider-t" : ""
                 }`}
               >
-                <div>
+                <div className="flex min-w-0 items-center gap-2">
+                  {s.imageDataUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={s.imageDataUrl}
+                      alt=""
+                      className="h-9 w-9 shrink-0 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-primary/15 text-green-bright">
+                      <Camera size={16} />
+                    </div>
+                  )}
+                  <div className="min-w-0">
                   <p className="text-[14px] font-semibold">{s.diseaseName}</p>
                   <p className="text-[12px] text-text-muted">
                     {tCrop(s.crop)} ·{" "}
@@ -448,6 +462,7 @@ function ScanTab() {
                       lang === "hi" ? "hi-IN" : "en-IN"
                     )}
                   </p>
+                  </div>
                 </div>
                 <span className="text-[12px] font-semibold text-green-bright">
                   {s.confidence}%

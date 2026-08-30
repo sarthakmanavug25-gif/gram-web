@@ -6,6 +6,7 @@ import {
   BarChart3,
   CircleDollarSign,
   CloudRain,
+  Download,
   Lightbulb,
   Minus,
   Plus,
@@ -120,14 +121,24 @@ function ExpensesContent() {
       <ScreenHeader
         title={t("expenses.title")}
         action={
-          <button
-            type="button"
-            aria-label={t("expenses.add")}
-            onClick={() => setShowAdd(true)}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-green-primary text-white shadow-glow transition hover:bg-green-dark"
-          >
-            <Plus size={20} />
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              aria-label="Export expenses"
+              onClick={() => exportExpenses(expenses)}
+              className="flex h-10 w-10 items-center justify-center rounded-full hairline surface text-green-bright"
+            >
+              <Download size={18} />
+            </button>
+            <button
+              type="button"
+              aria-label={t("expenses.add")}
+              onClick={() => setShowAdd(true)}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-green-primary text-white shadow-glow transition hover:bg-green-dark"
+            >
+              <Plus size={20} />
+            </button>
+          </div>
         }
       />
 
@@ -395,6 +406,30 @@ function ExpensesContent() {
       </AnimatePresence>
     </div>
   );
+}
+
+function exportExpenses(expenses: import("@/lib/store").Expense[]) {
+  const rows = [
+    ["Date", "Crop", "Category", "Amount (INR)", "Payment method", "Notes"],
+    ...expenses.map((e) => [
+      e.date,
+      e.crop,
+      e.category,
+      String(e.amount),
+      e.paymentMethod,
+      e.notes,
+    ]),
+  ];
+  const csv = rows
+    .map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(","))
+    .join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `gramconnect-expenses-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 function StepperButton({

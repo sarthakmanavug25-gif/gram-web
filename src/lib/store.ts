@@ -24,6 +24,8 @@ export type Profile = {
   latitude: number;
   longitude: number;
   monthlyBudget: number;
+  profilePhoto?: string;
+  farmPhoto?: string;
 };
 
 export type ScanRecord = {
