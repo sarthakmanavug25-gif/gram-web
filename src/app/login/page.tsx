@@ -119,7 +119,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={busy}
-            className="mt-1 flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-green-primary text-[16px] font-bold text-white shadow-glow transition hover:bg-green-dark disabled:opacity-60"
+            className="mt-1 flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-green-primary text-[16px] font-bold text-white shadow-glow transition hover:bg-green-dark disabled:opacity-60"
           >
             {busy && <Loader2 size={18} className="animate-spin" />}
             {mode === "login" ? "Login" : "Create account"}
@@ -175,7 +175,7 @@ function Field({
         type={type}
         inputMode={inputMode}
         autoComplete={autoComplete}
-        className="h-[52px] w-full rounded-2xl border border-white/10 bg-[#101410] px-4 text-[15px] text-white outline-none transition focus:border-green-primary/60"
+        className="h-[52px] w-full rounded-xl border border-white/10 bg-[#0d100d] px-4 text-[15px] text-white outline-none transition focus:border-green-primary/60"
       />
     </label>
   );

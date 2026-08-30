@@ -27,16 +27,20 @@ export default function BottomNav() {
               key={href}
               href={href}
               aria-current={active ? "page" : undefined}
-              className={clsx(
-                "flex flex-1 flex-col items-center gap-1 rounded-2xl px-1 py-1.5 transition",
-                active ? "bg-white/[0.07]" : "hover:bg-white/[0.04]"
-              )}
+              className="flex flex-1 flex-col items-center gap-1 px-1 py-0.5"
             >
-              <Icon
-                size={20}
-                strokeWidth={2.2}
-                className={active ? "text-green-bright" : "text-text-secondary"}
-              />
+              <span
+                className={clsx(
+                  "flex h-8 w-10 items-center justify-center rounded-xl transition",
+                  active ? "bg-green-primary/20" : "hover:bg-white/[0.06]"
+                )}
+              >
+                <Icon
+                  size={19}
+                  strokeWidth={2.2}
+                  className={active ? "text-green-bright" : "text-text-secondary"}
+                />
+              </span>
               <span
                 className={clsx(
                   "text-[10px] font-semibold leading-none",

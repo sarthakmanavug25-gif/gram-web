@@ -318,7 +318,7 @@ function AdvisorContent() {
           </ResponsiveContainer>
         </div>
         <div className="mt-3 space-y-1.5">
-          {CLIMATE_CALENDAR.slice(0, 3).map((m) => (
+          {CLIMATE_CALENDAR.map((m) => (
             <div key={m.month} className="flex items-center gap-3">
               <span className="w-8 text-[12px] text-text-muted">{m.month}</span>
               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.07]">

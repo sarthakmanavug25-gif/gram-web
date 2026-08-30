@@ -5,10 +5,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   BarChart3,
   CircleDollarSign,
+  CloudRain,
   Lightbulb,
   Minus,
   Plus,
   Search,
+  Sprout,
   Trash2,
   X,
 } from "lucide-react";
@@ -153,13 +155,16 @@ function ExpensesContent() {
               {rupees(monthTotal)}
             </p>
             <p className="mt-1 text-[13px] text-text-secondary">Spent this month</p>
-            <div className="mt-3 flex gap-2">
-              <Tag color="#4ade80" tint="rgba(34,197,94,0.16)">
+            <div className="mt-3 flex items-center gap-2 text-[12.5px] font-semibold">
+              <span className="flex items-center gap-1.5 text-green-bright">
+                <Sprout size={13} />
                 {profile.farmSizeAcres.toFixed(1)} acres
-              </Tag>
-              <Tag color="#93c5fd" tint="rgba(59,130,246,0.16)">
+              </span>
+              <span className="text-text-muted">·</span>
+              <span className="flex items-center gap-1.5 text-[#93c5fd]">
+                <CloudRain size={13} />
                 {profile.season}
-              </Tag>
+              </span>
             </div>
           </div>
           <BudgetRing percent={budgetPct} over={overBudget} />
