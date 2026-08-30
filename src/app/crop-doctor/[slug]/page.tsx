@@ -14,6 +14,7 @@ import {
 import AppShell from "@/components/AppShell";
 import { Card, IconTile, SectionLabel, Tag } from "@/components/ui/primitives";
 import { DISEASES, getDisease, severityStyle } from "@/lib/seed/diseases";
+import { DISEASES_HI } from "@/lib/seed/diseases.hi";
 import { useT } from "@/lib/i18n";
 
 export default function DiseaseDetailPage() {
@@ -27,12 +28,15 @@ export default function DiseaseDetailPage() {
 function DiseaseDetail() {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
-  const { t, tSeverity, tSeason, tDisease } = useT();
+  const { t, lang, tSeverity, tSeason, tCrop } = useT();
   const disease = getDisease(params.slug);
 
   if (!disease) notFound();
 
-  const view = tDisease(disease);
+  const view =
+    lang === "hi" && DISEASES_HI[disease.slug]
+      ? { ...disease, ...DISEASES_HI[disease.slug], crop: tCrop(disease.crop) }
+      : disease;
   const s = severityStyle[disease.severity];
   const related = DISEASES.filter(
     (d) => d.crop === disease.crop && d.slug !== disease.slug
@@ -154,7 +158,9 @@ function DiseaseDetail() {
                     style={{ backgroundColor: rs.color }}
                   />
                   <span className="flex-1 text-[14px] font-medium">
-                    {tDisease(r).name}
+                    {lang === "hi" && DISEASES_HI[r.slug]
+                      ? DISEASES_HI[r.slug].name
+                      : r.name}
                   </span>
                   <ChevronRight size={16} className="text-text-muted" />
                 </Link>

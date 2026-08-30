@@ -34,6 +34,7 @@ import {
   severityStyle,
   type Disease,
 } from "@/lib/seed/diseases";
+import { DISEASES_HI } from "@/lib/seed/diseases.hi";
 import { useApp } from "@/lib/store";
 import { useT } from "@/lib/i18n";
 
@@ -49,7 +50,7 @@ export default function CropDoctorPage() {
 }
 
 function CropDoctorContent() {
-  const { t, tCrop, tSeverity, tDisease } = useT();
+  const { t, lang, tCrop, tSeverity } = useT();
   const [tab, setTab] = useState<Tab>("Scan");
   const [query, setQuery] = useState("");
   const [crop, setCrop] = useState("All Crops");
@@ -185,7 +186,11 @@ function CropDoctorContent() {
                     <DiseaseRow
                       key={d.slug}
                       disease={d}
-                      view={tDisease(d)}
+                      view={
+                        lang === "hi" && DISEASES_HI[d.slug]
+                          ? { ...d, ...DISEASES_HI[d.slug], crop: tCrop(d.crop) }
+                          : d
+                      }
                       severityLabel={tSeverity(d.severity)}
                     />
                   ))

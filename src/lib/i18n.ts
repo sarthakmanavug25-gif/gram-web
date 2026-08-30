@@ -1,8 +1,6 @@
 "use client";
 
 import { useApp } from "./store";
-import { DISEASES_HI } from "./seed/diseases.hi";
-import type { Disease } from "./seed/diseases";
 
 export type Lang = "en" | "hi";
 
@@ -751,11 +749,5 @@ export function useT() {
     tWeather: (condition: string) => lookup(WEATHER_HI, condition, lang),
     tSeverity: (severity: string) =>
       translate(lang, `level.${severity}` as StringKey),
-    /** Localised view of a disease record. */
-    tDisease: (disease: Disease) => {
-      const hi = DISEASES_HI[disease.slug];
-      if (lang !== "hi" || !hi) return disease;
-      return { ...disease, ...hi, crop: CROP_HI[disease.crop] ?? disease.crop };
-    },
   };
 }
