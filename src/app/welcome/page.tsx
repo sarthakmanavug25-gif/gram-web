@@ -18,7 +18,7 @@ export default function WelcomePage() {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center bg-[#050a12] px-6">
+    <main className="welcome-bg flex min-h-dvh flex-col items-center justify-center px-6">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}

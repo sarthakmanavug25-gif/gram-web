@@ -58,6 +58,19 @@ body {
   );
 }
 
+/* Welcome screen: deep navy with a cool glow behind the heading. */
+.welcome-bg {
+  background-color: #050a14;
+  background-image:
+    radial-gradient(
+      90% 45% at 50% 22%,
+      rgba(37, 68, 122, 0.55) 0%,
+      rgba(20, 38, 72, 0.3) 45%,
+      rgba(5, 10, 20, 0) 75%
+    ),
+    linear-gradient(180deg, #070d1a 0%, #050a14 55%, #03060d 100%);
+}
+
 .card {
   border-radius: 22px;
   background-color: rgba(28, 31, 28, 0.66);
