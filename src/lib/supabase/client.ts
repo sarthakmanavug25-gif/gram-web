@@ -24,3 +24,11 @@ export function getSupabase(): SupabaseClient | null {
 export function phoneToEmail(phone: string) {
   return `${phone.replace(/\D/g, "")}@phone.gramconnect.app`;
 }
+
+/** Normalizes an Indian ten-digit number for Supabase Phone Auth. */
+export function phoneToE164(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  return digits.startsWith("91") && digits.length === 12
+    ? `+${digits}`
+    : `+91${digits}`;
+}

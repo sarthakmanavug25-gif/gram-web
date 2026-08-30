@@ -53,9 +53,25 @@ Assistant.
 SUPABASE_SERVICE_ROLE_KEY=<service-role-key> npm run db:seed
 ```
 
-Phone numbers map onto Supabase email auth as `<digits>@phone.gramconnect.app`, so
-no SMS provider is needed. Turn off "Confirm email" in Authentication → Providers →
-Email so signup logs the farmer straight in.
+### Enable real SMS OTP
+
+The default **Login with OTP** tab uses Supabase Phone Auth and sends a real
+six-digit SMS; it no longer displays or accepts a demo code.
+
+1. In Supabase, open **Authentication → Providers → Phone** and enable it.
+2. Add an SMS provider. For development, configure a Twilio account; for
+   production, use a provider supported in your region and approved sender
+   details. Add the provider credentials in the Phone provider configuration.
+3. In **Authentication → URL Configuration**, add your local URL and Vercel
+   deployment URL to the redirect allow list.
+4. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to
+   `.env.local`, restart `npm run dev`, then request an OTP with a real
+   phone number in international format (the UI adds India's `+91`).
+5. Add those same public variables in Vercel before deploying.
+
+The Password tab remains available for existing accounts created with the
+email-backed password flow. New SMS users are created by Supabase after they
+verify the OTP; the migration trigger creates their profile and farm status.
 
 ## Optional: connect Anthropic
 

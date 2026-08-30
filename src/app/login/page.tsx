@@ -4,7 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, Loader2, ShieldCheck, Smartphone, Sprout } from "lucide-react";
-import { signIn, signUp } from "@/lib/repo";
+import {
+  saveProfile,
+  sendPhoneOtp,
+  signIn,
+  signUp,
+  verifyPhoneOtp,
+} from "@/lib/repo";
 import { useApp } from "@/lib/store";
 import { useT } from "@/lib/i18n";
 import FarmIllustration from "@/components/FarmIllustration";
@@ -76,14 +82,11 @@ export default function LoginPage() {
 function OtpFlow() {
   const router = useRouter();
   const { t } = useT();
-  const otpSignIn = useApp((s) => s.otpSignIn);
-  const accounts = useApp((s) => s.accounts);
   const markWelcomeSeen = useApp((s) => s.markWelcomeSeen);
 
   const [step, setStep] = useState<OtpStep>("phone");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
-  const [sentCode, setSentCode] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -107,53 +110,53 @@ function OtpFlow() {
     }, 1000);
   }
 
-  /**
-   * No SMS provider is wired up, so the code is generated on device and shown
-   * on screen. Swapping in Supabase phone auth only changes this function.
-   */
-  function sendOtp() {
+  async function sendOtp() {
     if (!/^\d{10}$/.test(phone)) {
       setError(t("login.err.phone"));
       return;
     }
     setError("");
     setBusy(true);
-    const generated = String(Math.floor(100000 + Math.random() * 900000));
-    setTimeout(() => {
-      setSentCode(generated);
-      setCode("");
-      setStep("code");
-      setBusy(false);
-      startCountdown();
-    }, 600);
+    const result = await sendPhoneOtp(phone);
+    setBusy(false);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setCode("");
+    setStep("code");
+    startCountdown();
   }
 
-  function verify(entered: string) {
+  async function verify(entered: string) {
     if (entered.length < 6) {
       setError(t("login.err.otpShort"));
       return;
     }
-    if (entered !== sentCode) {
-      setError(t("login.err.otpWrong"));
+    setError("");
+    setBusy(true);
+    const result = await verifyPhoneOtp(phone, entered);
+    setBusy(false);
+    if (!result.ok) {
+      setError(result.error);
       return;
     }
-    setError("");
-    const known = accounts.some((a) => a.phone === phone);
-    if (!known) {
+    if (result.requiresName) {
       setStep("name");
       return;
     }
-    otpSignIn(phone);
     markWelcomeSeen();
     router.replace("/");
   }
 
-  function finishSignup() {
+  async function finishSignup() {
     if (name.trim().length < 2) {
       setError(t("login.err.name"));
       return;
     }
-    otpSignIn(phone, name.trim());
+    setBusy(true);
+    await saveProfile({ name: name.trim(), phone });
+    setBusy(false);
     markWelcomeSeen();
     router.replace("/");
   }
@@ -217,17 +220,15 @@ function OtpFlow() {
 
           <OtpInput value={code} onChange={setCode} onComplete={verify} />
 
-          <p className="rounded-xl border border-amber/30 bg-amber/10 px-3 py-2 text-center text-[12.5px] text-amber">
-            {t("login.demoOtp", { code: sentCode })}
-          </p>
-
           {error && <ErrorNote>{error}</ErrorNote>}
 
           <button
             type="button"
             onClick={() => verify(code)}
+            disabled={busy || code.length !== 6}
             className="flex h-[52px] w-full items-center justify-center rounded-xl bg-green-primary text-[16px] font-bold text-white shadow-glow transition hover:bg-green-dark"
           >
+            {busy && <Loader2 size={18} className="animate-spin" />}
             {t("login.verify")}
           </button>
 
@@ -260,9 +261,11 @@ function OtpFlow() {
           {error && <ErrorNote>{error}</ErrorNote>}
           <button
             type="button"
-            onClick={finishSignup}
+            onClick={() => void finishSignup()}
+            disabled={busy}
             className="flex h-[52px] w-full items-center justify-center rounded-xl bg-green-primary text-[16px] font-bold text-white shadow-glow transition hover:bg-green-dark"
           >
+            {busy && <Loader2 size={18} className="animate-spin" />}
             {t("login.continue")}
           </button>
         </>

@@ -1,9 +1,17 @@
 "use client";
 
-import { getSupabase, phoneToEmail, supabaseConfigured } from "./supabase/client";
+import {
+  getSupabase,
+  phoneToE164,
+  phoneToEmail,
+  supabaseConfigured,
+} from "./supabase/client";
 import { useApp, type Expense, type Profile } from "./store";
 
 export type Result = { ok: true } | { ok: false; error: string };
+export type PhoneOtpResult =
+  | { ok: true; requiresName: boolean; name: string }
+  | { ok: false; error: string };
 
 const store = () => useApp.getState();
 
@@ -12,6 +20,16 @@ function friendlyAuthError(message: string) {
     return "An account with this number already exists.";
   if (/invalid login credentials/i.test(message))
     return "Incorrect phone number or password.";
+  return message;
+}
+
+function friendlyOtpError(message: string) {
+  if (/sms.*not enabled|provider.*not enabled|unsupported phone provider/i.test(message))
+    return "Phone login is not enabled yet. Ask the farm owner to enable Phone Auth in Supabase.";
+  if (/invalid.*otp|token.*expired|otp.*expired/i.test(message))
+    return "That OTP is incorrect or has expired. Request a new one and try again.";
+  if (/rate limit|too many requests/i.test(message))
+    return "Too many OTP attempts. Please wait a few minutes before trying again.";
   return message;
 }
 
@@ -52,6 +70,68 @@ export async function signIn(phone: string, password: string): Promise<Result> {
   store().setSession({ id: data.user!.id, name, phone });
   await loadRemoteData();
   return { ok: true };
+}
+
+/** Sends a real SMS through the configured Supabase Phone Auth provider. */
+export async function sendPhoneOtp(phone: string): Promise<Result> {
+  const sb = getSupabase();
+  if (!sb) {
+    return {
+      ok: false,
+      error:
+        "Phone OTP is not configured in this deployment. Use Password login, or add Supabase credentials and enable Phone Auth.",
+    };
+  }
+
+  const { error } = await sb.auth.signInWithOtp({
+    phone: phoneToE164(phone),
+    options: { shouldCreateUser: true },
+  });
+  if (error) return { ok: false, error: friendlyOtpError(error.message) };
+  return { ok: true };
+}
+
+/** Verifies the SMS code and loads the farmer's cloud profile. */
+export async function verifyPhoneOtp(
+  phone: string,
+  token: string
+): Promise<PhoneOtpResult> {
+  const sb = getSupabase();
+  if (!sb) {
+    return {
+      ok: false,
+      error:
+        "Phone OTP is not configured in this deployment. Use Password login instead.",
+    };
+  }
+
+  const { data, error } = await sb.auth.verifyOtp({
+    phone: phoneToE164(phone),
+    token,
+    type: "sms",
+  });
+  if (error || !data.user) {
+    return {
+      ok: false,
+      error: friendlyOtpError(error?.message ?? "Could not verify this OTP."),
+    };
+  }
+
+  const { data: profile } = await sb
+    .from("profiles")
+    .select("name")
+    .eq("id", data.user.id)
+    .maybeSingle();
+  const name =
+    (profile?.name as string | undefined) ??
+    (data.user.user_metadata?.name as string | undefined) ??
+    "Farmer";
+
+  store().setSession({ id: data.user.id, name, phone });
+  store().updateProfile({ name, phone });
+  await loadRemoteData();
+
+  return { ok: true, requiresName: !name || name === "Farmer", name };
 }
 
 export async function signOut() {
