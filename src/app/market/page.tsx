@@ -117,22 +117,24 @@ function MarketContent() {
       <Card>
         <div className="mb-3 flex items-center justify-between">
           <SectionLabel icon={<TrendingUp size={14} />} color="var(--green-bright)">
-            Live mandi rates
+            {t("market.liveRates")}
           </SectionLabel>
           <button
             type="button"
             onClick={() => void loadLivePrices()}
-            aria-label="Refresh live mandi rates"
+            aria-label={t("market.refreshRates")}
             className="rounded-full p-1.5 text-green-bright hover-surface"
           >
             <RefreshCw size={15} className={loadingLive ? "animate-spin" : ""} />
           </button>
         </div>
         {loadingLive ? (
-          <p className="py-3 text-center text-[13px] text-text-secondary">Loading latest rates…</p>
+          <p className="py-3 text-center text-[13px] text-text-secondary">
+            {t("market.loading")}
+          </p>
         ) : livePrices.length === 0 ? (
           <p className="py-3 text-center text-[13px] text-text-secondary">
-            {liveMessage || "No mandi rates available right now."}
+            {liveMessage || t("market.noRates")}
           </p>
         ) : (
           <div className="space-y-3">
@@ -163,8 +165,8 @@ function MarketContent() {
         )}
         <p className="mt-3 text-[11px] text-text-muted">
           {liveSource === "AGMARKNET"
-            ? "Source: AGMARKNET / data.gov.in · modal price per quintal"
-            : `${liveMessage} Showing recent reference rates.`}
+            ? t("market.sourceLive")
+            : t("market.sourceFallback", { message: liveMessage })}
         </p>
       </Card>
 

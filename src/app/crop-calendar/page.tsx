@@ -5,7 +5,7 @@ import { ArrowLeft, CalendarDays, CheckCircle2, Sprout } from "lucide-react";
 import { useRouter } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import { Card, Chip, IconTile, SectionLabel } from "@/components/ui/primitives";
-import { CROP_CALENDAR } from "@/lib/seed/cropCalendar";
+import { CALENDAR_TASK_HI, CROP_CALENDAR } from "@/lib/seed/cropCalendar";
 import { useApp } from "@/lib/store";
 import { useT } from "@/lib/i18n";
 
@@ -13,7 +13,7 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 
 export default function CropCalendarPage() {
   const router = useRouter();
-  const { t } = useT();
+  const { t, lang, tCrop } = useT();
   const profile = useApp((s) => s.profile);
   const [crop, setCrop] = useState(profile.crops[0] ?? "Rice");
   const plan = CROP_CALENDAR.find((item) => item.crop === crop) ?? CROP_CALENDAR[0];
@@ -53,14 +53,14 @@ export default function CropCalendarPage() {
               active={crop === item.crop}
               onClick={() => setCrop(item.crop)}
             >
-              {item.emoji} {item.crop}
+              {item.emoji} {tCrop(item.crop)}
             </Chip>
           ))}
         </div>
 
         <Card>
           <SectionLabel icon={<Sprout size={14} />}>
-            {plan.emoji} {plan.crop} · {plan.season}
+            {plan.emoji} {tCrop(plan.crop)} · {plan.season}
           </SectionLabel>
           <div className="mt-4 grid grid-cols-6 gap-1">
             {MONTHS.map((month) => {
@@ -103,7 +103,9 @@ export default function CropCalendarPage() {
                     <CheckCircle2 size={18} />
                   </IconTile>
                   <div className="flex-1">
-                    <p className="text-[14px] font-semibold">{stage.task}</p>
+                    <p className="text-[14px] font-semibold">
+                      {lang === "hi" ? CALENDAR_TASK_HI[stage.task] ?? stage.task : stage.task}
+                    </p>
                     <p className="text-[12px] text-text-secondary">
                       {stage.month} {active ? `· ${t("calendar.now")}` : ""}
                     </p>

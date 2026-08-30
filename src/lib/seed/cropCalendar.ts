@@ -59,3 +59,28 @@ export const CROP_CALENDAR: CropCalendarPlan[] = [
   },
 ];
 
+export const CALENDAR_TASK_HI: Record<string, string> = {
+  "Prepare nursery": "नर्सरी तैयार करें",
+  "Transplant seedlings": "पौध रोपें",
+  "Weed + first top-dress": "निराई + पहली टॉप-ड्रेस",
+  "Scout blast weekly": "हर हफ़्ते ब्लास्ट जाँचें",
+  "Drain before harvest": "कटाई से पहले पानी निकालें",
+  "Harvest & dry grain": "कटाई करके दाना सुखाएँ",
+  "Prepare field": "खेत तैयार करें",
+  "Sow treated seed": "उपचारित बीज बोएँ",
+  "First irrigation + urea": "पहली सिंचाई + यूरिया",
+  "Watch for yellow rust": "पीले रतुए की जाँच करें",
+  "Final irrigation": "आख़िरी सिंचाई",
+  "Harvest at full maturity": "पूरी पकने पर कटाई करें",
+  "Sow on ridges": "मेड़ों पर बुवाई करें",
+  "Gap fill + first weeding": "खाली जगह भरें + पहली निराई",
+  "Install pheromone traps": "फेरोमोन ट्रैप लगाएँ",
+  "Scout whitefly & bollworm": "सफ़ेद मक्खी और सुंडी जाँचें",
+  "Begin picking": "पहली तुड़ाई शुरू करें",
+  "Final picking": "अंतिम तुड़ाई करें",
+  "Weed + earth up": "निराई + मिट्टी चढ़ाएँ",
+  "Top-dress nitrogen": "नाइट्रोजन टॉप-ड्रेस करें",
+  "Scout stalk rot": "तना सड़न की जाँच करें",
+  "Harvest dry cobs": "सूखे भुट्टे काटें",
+};
+
