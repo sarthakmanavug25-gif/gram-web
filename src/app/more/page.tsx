@@ -9,6 +9,7 @@ import {
   CircleHelp,
   Database,
   Info,
+  Map,
   Languages,
   LogOut,
   Moon,
@@ -40,6 +41,7 @@ function MoreContent() {
   const theme = useApp((s) => s.theme);
   const setTheme = useApp((s) => s.setTheme);
   const seedDemoData = useApp((s) => s.seedDemoData);
+  const replayGuide = useApp((s) => s.replayGuide);
   const { t } = useT();
   const [alerts, setAlerts] = useState(true);
   const [notifications, setNotifications] = useState(true);
@@ -137,6 +139,23 @@ function MoreContent() {
         />
         <Row href="/help" icon={<CircleHelp size={18} />} label={t("more.help")} />
         <Row href="/about" icon={<Info size={18} />} label={t("more.about")} />
+      </Card>
+
+      <Card className="flex items-center gap-3">
+        <IconTile color="var(--blue-info)" tint="rgba(59,130,246,0.14)" size={36}>
+          <Map size={18} />
+        </IconTile>
+        <div className="min-w-0 flex-1">
+          <p className="text-[14px] font-semibold">{t("more.guide")}</p>
+          <p className="text-[12px] text-text-secondary">{t("more.guideSub")}</p>
+        </div>
+        <button
+          type="button"
+          onClick={replayGuide}
+          className="rounded-full hairline surface px-3 py-1.5 text-[12px] font-semibold"
+        >
+          {t("more.guideAction")}
+        </button>
       </Card>
 
       <Card className="flex items-center gap-3">

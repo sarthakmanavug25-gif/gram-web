@@ -8,6 +8,7 @@ import ChatAssistant from "./ChatAssistant";
 import { useApp } from "@/lib/store";
 import { restoreSession } from "@/lib/repo";
 import { Skeleton } from "./ui/primitives";
+import OnboardingGuide from "./OnboardingGuide";
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -61,6 +62,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </motion.main>
       <ChatAssistant />
       <BottomNav />
+      <OnboardingGuide />
     </div>
   );
 }

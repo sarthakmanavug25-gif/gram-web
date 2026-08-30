@@ -152,6 +152,7 @@ type State = {
   language: "en" | "hi";
   theme: "dark" | "light";
   hasSeenWelcome: boolean;
+  hasSeenGuide: boolean;
 };
 
 type Actions = {
@@ -165,6 +166,7 @@ type Actions = {
     phone: string,
     password: string
   ) => { ok: true } | { ok: false; error: string };
+  otpSignIn: (phone: string, name?: string) => { created: boolean };
   signOut: () => void;
   setSession: (s: Session) => void;
   updateProfile: (patch: Partial<Profile>) => void;
@@ -181,6 +183,8 @@ type Actions = {
   setTheme: (t: "dark" | "light") => void;
   seedDemoData: () => void;
   markWelcomeSeen: () => void;
+  markGuideSeen: () => void;
+  replayGuide: () => void;
 };
 
 export const useApp = create<State & Actions>()(
@@ -198,6 +202,7 @@ export const useApp = create<State & Actions>()(
       language: "en",
       theme: "dark",
       hasSeenWelcome: false,
+      hasSeenGuide: false,
 
       setHydrated: () => set({ hydrated: true }),
 
@@ -227,6 +232,12 @@ export const useApp = create<State & Actions>()(
         if (!account) {
           return { ok: false, error: "No account found for this number. Create one first." };
         }
+        if (!account.password) {
+          return {
+            ok: false,
+            error: "This number was registered with OTP. Use the OTP tab to sign in.",
+          };
+        }
         if (account.password !== password) {
           return { ok: false, error: "Incorrect password. Please try again." };
         }
@@ -235,6 +246,32 @@ export const useApp = create<State & Actions>()(
           profile: { ...s.profile, name: account.name, phone: clean },
         }));
         return { ok: true };
+      },
+
+      /** Signs in after a verified OTP, creating the account on first use. */
+      otpSignIn: (phone, name) => {
+        const clean = phone.replace(/\s+/g, "");
+        const existing = get().accounts.find((a) => a.phone === clean);
+        if (existing) {
+          set((s) => ({
+            session: { id: existing.id, name: existing.name, phone: clean },
+            profile: { ...s.profile, name: existing.name, phone: clean },
+          }));
+          return { created: false };
+        }
+        const account: Account = {
+          id: `local-${Date.now()}`,
+          name: name?.trim() || "Farmer",
+          phone: clean,
+          password: "",
+        };
+        set((s) => ({
+          accounts: [...s.accounts, account],
+          session: { id: account.id, name: account.name, phone: clean },
+          profile: { ...s.profile, name: account.name, phone: clean },
+          hasSeenGuide: false,
+        }));
+        return { created: true };
       },
 
       signOut: () => set({ session: null, chat: [] }),
@@ -276,10 +313,14 @@ export const useApp = create<State & Actions>()(
       seedDemoData: () => set({ expenses: demoExpenses() }),
 
       markWelcomeSeen: () => set({ hasSeenWelcome: true }),
+
+      markGuideSeen: () => set({ hasSeenGuide: true }),
+
+      replayGuide: () => set({ hasSeenGuide: false }),
     }),
     {
       name: "gramconnect-state",
-      version: 2,
+      version: 3,
       onRehydrateStorage: () => (state) => state?.setHydrated(),
     }
   )
