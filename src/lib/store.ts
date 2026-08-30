@@ -166,7 +166,6 @@ type Actions = {
     phone: string,
     password: string
   ) => { ok: true } | { ok: false; error: string };
-  otpSignIn: (phone: string, name?: string) => { created: boolean };
   signOut: () => void;
   setSession: (s: Session) => void;
   updateProfile: (patch: Partial<Profile>) => void;
@@ -246,32 +245,6 @@ export const useApp = create<State & Actions>()(
           profile: { ...s.profile, name: account.name, phone: clean },
         }));
         return { ok: true };
-      },
-
-      /** Signs in after a verified OTP, creating the account on first use. */
-      otpSignIn: (phone, name) => {
-        const clean = phone.replace(/\s+/g, "");
-        const existing = get().accounts.find((a) => a.phone === clean);
-        if (existing) {
-          set((s) => ({
-            session: { id: existing.id, name: existing.name, phone: clean },
-            profile: { ...s.profile, name: existing.name, phone: clean },
-          }));
-          return { created: false };
-        }
-        const account: Account = {
-          id: `local-${Date.now()}`,
-          name: name?.trim() || "Farmer",
-          phone: clean,
-          password: "",
-        };
-        set((s) => ({
-          accounts: [...s.accounts, account],
-          session: { id: account.id, name: account.name, phone: clean },
-          profile: { ...s.profile, name: account.name, phone: clean },
-          hasSeenGuide: false,
-        }));
-        return { created: true };
       },
 
       signOut: () => set({ session: null, chat: [] }),
