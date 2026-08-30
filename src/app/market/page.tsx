@@ -6,6 +6,7 @@ import { ArrowLeft, MapPin, Phone, Store, TrendingUp } from "lucide-react";
 import AppShell from "@/components/AppShell";
 import { Card, Chip, IconTile, SectionLabel, Tag } from "@/components/ui/primitives";
 import { MSP_PRICES } from "@/lib/seed/reference";
+import { useT } from "@/lib/i18n";
 
 type Buyer = {
   name: string;
@@ -35,6 +36,7 @@ export default function MarketPage() {
 
 function MarketContent() {
   const router = useRouter();
+  const { t, tCrop } = useT();
   const [crop, setCrop] = useState("All");
   const crops = ["All", ...Array.from(new Set(BUYERS.map((b) => b.crop)))];
   const rows = BUYERS.filter((b) => crop === "All" || b.crop === crop).sort(
@@ -47,25 +49,25 @@ function MarketContent() {
         <button
           type="button"
           onClick={() => router.back()}
-          aria-label="Go back"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06]"
+          aria-label={t("common.back")}
+          className="flex h-10 w-10 items-center justify-center rounded-full hairline surface"
         >
           <ArrowLeft size={18} />
         </button>
-        <h1 className="text-[26px] font-bold">Market</h1>
+        <h1 className="text-[26px] font-bold">{t("market.title")}</h1>
       </div>
 
       <Card>
-        <SectionLabel icon={<Store size={14} />}>MSP Reference 2024-25</SectionLabel>
+        <SectionLabel icon={<Store size={14} />}>{t("home.msp")}</SectionLabel>
         <div className="space-y-2.5">
           {MSP_PRICES.map((m) => (
             <div key={m.crop} className="flex items-center justify-between">
-              <span className="text-[14px]">{m.crop}</span>
+              <span className="text-[14px]">{tCrop(m.crop)}</span>
               <span className="flex items-center gap-2">
                 <span className="text-[14px] font-bold text-green-bright">
                   ₹{m.price.toLocaleString("en-IN")}/{m.unit}
                 </span>
-                <Tag color="#4ade80" tint="rgba(34,197,94,0.14)">
+                <Tag color="var(--green-bright)" tint="rgba(34,197,94,0.14)">
                   +{m.change}%
                 </Tag>
               </span>
@@ -73,21 +75,20 @@ function MarketContent() {
           ))}
         </div>
         <p className="mt-3 text-[12px] text-text-muted">
-          Minimum Support Price announced by the Government of India. Mandi rates
-          below can be higher or lower on the day.
+          {t("market.mspNote")}
         </p>
       </Card>
 
       <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
         {crops.map((c) => (
           <Chip key={c} active={crop === c} onClick={() => setCrop(c)}>
-            {c}
+            {c === "All" ? t("expenses.all") : tCrop(c)}
           </Chip>
         ))}
       </div>
 
       <SectionLabel icon={<TrendingUp size={14} />} color="var(--blue-info)">
-        Buyers near you
+        {t("market.buyers")}
       </SectionLabel>
 
       <div className="space-y-2.5">
@@ -102,8 +103,8 @@ function MarketContent() {
                 <MapPin size={12} /> {b.mandi} · {b.distanceKm} km
               </p>
               <div className="mt-1.5 flex gap-1.5">
-                <Tag color="#4ade80" tint="rgba(34,197,94,0.14)">
-                  {b.crop}
+                <Tag color="var(--green-bright)" tint="rgba(34,197,94,0.14)">
+                  {tCrop(b.crop)}
                 </Tag>
               </div>
             </div>
@@ -113,9 +114,9 @@ function MarketContent() {
               </p>
               <a
                 href={`tel:${b.phone}`}
-                className="mt-1 inline-flex items-center gap-1 rounded-full border border-white/12 bg-white/[0.06] px-2.5 py-1 text-[11px] font-semibold"
+                className="mt-1 inline-flex items-center gap-1 rounded-full hairline surface px-2.5 py-1 text-[11px] font-semibold"
               >
-                <Phone size={11} /> Call
+                <Phone size={11} /> {t("market.call")}
               </a>
             </div>
           </Card>

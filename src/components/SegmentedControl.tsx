@@ -6,13 +6,15 @@ export default function SegmentedControl<T extends string>({
   options,
   value,
   onChange,
+  labels,
 }: {
   options: readonly T[];
   value: T;
   onChange: (v: T) => void;
+  labels?: Partial<Record<T, string>>;
 }) {
   return (
-    <div className="flex rounded-full border border-white/8 bg-white/[0.05] p-1">
+    <div className="flex rounded-full hairline surface p-1">
       {options.map((opt) => (
         <button
           key={opt}
@@ -21,11 +23,11 @@ export default function SegmentedControl<T extends string>({
           className={clsx(
             "flex-1 rounded-full py-2 text-[13.5px] font-semibold transition",
             value === opt
-              ? "bg-white/[0.14] text-white"
-              : "text-text-secondary hover:text-white"
+              ? "surface-2 text-text-primary"
+              : "text-text-secondary hover:text-text-primary"
           )}
         >
-          {opt}
+          {labels?.[opt] ?? opt}
         </button>
       ))}
     </div>

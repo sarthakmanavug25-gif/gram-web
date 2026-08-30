@@ -1,43 +1,661 @@
 "use client";
 
 import { useApp } from "./store";
+import { DISEASES_HI } from "./seed/diseases.hi";
+import type { Disease } from "./seed/diseases";
 
-const STRINGS = {
-  en: {
-    "nav.home": "Home",
-    "nav.cropDoctor": "Crop Doctor",
-    "nav.advisor": "Advisor",
-    "nav.expenses": "Expenses",
-    "nav.more": "More",
-    "home.priorities": "Today's Priorities",
-    "home.quickActions": "Quick Actions",
-    "home.recentExpenses": "Recent Expenses",
-    "home.seeAll": "See all",
-    "home.fieldTip": "Today's Field Tip",
-    "home.thisMonth": "This month",
-    "home.autoSprinkler": "Auto sprinkler",
-    "home.buyers": "Buyers",
-  },
-  hi: {
-    "nav.home": "होम",
-    "nav.cropDoctor": "फसल डॉक्टर",
-    "nav.advisor": "सलाह",
-    "nav.expenses": "खर्च",
-    "nav.more": "और",
-    "home.priorities": "आज की प्राथमिकताएँ",
-    "home.quickActions": "तुरंत कार्य",
-    "home.recentExpenses": "हाल के खर्च",
-    "home.seeAll": "सभी देखें",
-    "home.fieldTip": "आज की खेती सलाह",
-    "home.thisMonth": "इस महीने",
-    "home.autoSprinkler": "ऑटो स्प्रिंकलर",
-    "home.buyers": "खरीदार",
-  },
-} as const;
+export type Lang = "en" | "hi";
 
-export type StringKey = keyof (typeof STRINGS)["en"];
+const EN = {
+  "app.name": "GramConnect",
+  "common.back": "Back",
+  "common.seeAll": "See all",
+  "common.edit": "Edit",
+  "common.save": "Save changes",
+  "common.saving": "Saving…",
+  "common.saved": "Saved",
+  "common.close": "Close",
+  "common.settings": "Settings",
+  "common.refresh": "Refresh",
+  "common.guest": "Guest session",
+  "common.acres": "{n} acres",
+  "common.comingSoon": "Coming soon",
+
+  "nav.home": "Home",
+  "nav.cropDoctor": "Crop Doctor",
+  "nav.advisor": "Advisor",
+  "nav.expenses": "Expenses",
+  "nav.more": "More",
+
+  "welcome.title": "Welcome Farmer 🌾",
+  "welcome.subtitle": "Continue to your dashboard or sign in to sync data.",
+  "welcome.continue": "Continue",
+  "welcome.or": "or",
+  "welcome.apple": "Sign in with Apple",
+  "welcome.phone": "Login with Phone",
+  "welcome.note": "Apple sign-in is coming soon. Continue works offline with local data.",
+
+  "login.name": "Full Name",
+  "login.phone": "Phone Number",
+  "login.password": "Password",
+  "login.confirm": "Confirm Password",
+  "login.login": "Login",
+  "login.create": "Create account",
+  "login.toSignup": "Don't have an account? Create one",
+  "login.toLogin": "Already have an account? Login",
+  "login.note":
+    "New here? Create an account — your data stays on this device unless a Supabase project is connected.",
+  "login.err.phone": "Enter a valid 10-digit phone number.",
+  "login.err.password": "Password must be at least 6 characters.",
+  "login.err.name": "Please enter your name.",
+  "login.err.mismatch": "Passwords do not match.",
+  "login.err.exists": "An account with this number already exists.",
+  "login.err.noAccount": "No account found for this number. Create one first.",
+  "login.err.wrongPassword": "Incorrect password. Please try again.",
+
+  "home.title": "Home",
+  "greeting.morning": "Good morning",
+  "greeting.afternoon": "Good afternoon",
+  "greeting.evening": "Good evening",
+  "greeting.night": "Good night",
+  "home.guides": "{n} guides",
+  "home.rainHumidity": "Rain {rain}% · Humidity {humidity}%",
+  "home.advisor": "Advisor",
+  "home.autoSprinkler": "Auto sprinkler",
+  "home.thisMonth": "This month",
+  "home.buyers": "Buyers",
+  "home.priorities": "Today's Priorities",
+  "home.quickActions": "Quick Actions",
+  "home.weather": "Weather",
+  "home.market": "Market",
+  "home.cropsToGrow": "{season} crops to grow",
+  "home.climateLine": "Avg 31°C · 165 mm rain this month",
+  "home.msp": "MSP Reference 2024-25",
+  "home.govt": "Govt. of India",
+  "home.compareBuyers": "Compare mandi buyers",
+  "home.recentExpenses": "Recent Expenses",
+  "home.noExpenses": "No expenses yet. Add your first entry from the Expenses tab.",
+  "home.fieldTip": "Today's Field Tip",
+
+  "cropDoctor.title": "Crop Doctor",
+  "cropDoctor.search": "Search disease, crop, or symptoms",
+  "cropDoctor.scan": "Scan",
+  "cropDoctor.diseases": "Diseases",
+  "cropDoctor.scanHint": "Scan a leaf to check crop health",
+  "cropDoctor.camera": "Camera",
+  "cropDoctor.gallery": "Library",
+  "cropDoctor.analyzing": "Analyzing leaf…",
+  "cropDoctor.match": "{n}% match",
+  "cropDoctor.aiNote": "AI estimate — confirm with local agri officer.",
+  "cropDoctor.viewTreatment": "View treatment",
+  "cropDoctor.rescan": "Rescan",
+  "cropDoctor.recentScans": "Recent scans",
+  "cropDoctor.scanFailed": "Scan failed",
+  "cropDoctor.scanFailedBody":
+    "Could not analyse this photo. Check your connection and try again.",
+  "cropDoctor.libraryLabel": "Disease Library",
+  "cropDoctor.headline": "Identify symptoms and act early",
+  "cropDoctor.statDiseases": "Diseases",
+  "cropDoctor.statCrops": "Crops",
+  "cropDoctor.statHighRisk": "High Risk",
+  "cropDoctor.allCrops": "All Crops",
+  "cropDoctor.allLevels": "All Levels",
+  "cropDoctor.count": "{n} diseases",
+  "cropDoctor.noMatch": "No matching disease",
+  "cropDoctor.noMatchBody":
+    "Try a different crop, severity level or search word — for example “blight” or “curl”.",
+
+  "disease.affects": "Affects: {part}",
+  "disease.why": "Why it happens",
+  "disease.treatment": "Treatment",
+  "disease.prevention": "Prevention",
+  "disease.confirmNote":
+    "Always confirm the dose with your local agri officer before spraying.",
+  "disease.seasonNote":
+    "Most active in the {season} season — scout this crop weekly during that window.",
+  "disease.other": "Other {crop} problems",
+
+  "advisor.title": "Smart Advisory",
+  "advisor.fieldWeather": "Field Weather",
+  "advisor.liveAdvisory": "Live advisory for your farm",
+  "advisor.updated": "Updated {time}",
+  "advisor.liveWeather": "Live Weather",
+  "advisor.humidity": "Humidity",
+  "advisor.rainChance": "Rain chance",
+  "advisor.wind": "Wind",
+  "advisor.highLow": "High / Low",
+  "advisor.fallback": "Showing typical seasonal values — live feed unreachable.",
+  "advisor.autoSprinkler": "Auto Sprinkler",
+  "advisor.automatic": "AUTOMATIC",
+  "advisor.manual": "MANUAL",
+  "advisor.sliderHint":
+    "Drag the slider to set runtime yourself — this switches the sprinkler to manual.",
+  "advisor.seasonAdvisory": "Season Advisory",
+  "advisor.seasonHeadline": "Monsoon season — crop & irrigation tips",
+  "advisor.climate": "India Climate Calendar",
+  "advisor.climateSub": "Average monthly rainfall and mean temperature",
+  "advisor.rainfall": "Rainfall (mm)",
+  "advisor.avgTemp": "Avg temp (°C)",
+
+  "level.Low": "Low",
+  "level.Medium": "Medium",
+  "level.High": "High",
+  "level.Critical": "Critical",
+  "sprinkler.high": "Hot and dry — increase sprinkler runtime.",
+  "sprinkler.medium": "Moderate demand — keep the usual schedule.",
+  "sprinkler.low": "Cool and humid — cut back irrigation to save water.",
+  "sprinkler.note.temp": "High temperature ({n}°C)",
+  "sprinkler.note.humidity": "Low humidity ({n}%)",
+  "sprinkler.note.rain": "Rain likely ({n}%)",
+  "sprinkler.note.wind": "Windy ({n} km/h)",
+  "sprinkler.note.steady": "Conditions are steady today",
+
+  "expenses.title": "Farm Expenses",
+  "expenses.search": "Search crop, category, or notes",
+  "expenses.ledger": "Farm Ledger",
+  "expenses.spentThisMonth": "Spent this month",
+  "expenses.perAcre": "Per acre",
+  "expenses.budget": "Budget",
+  "expenses.entries": "Entries",
+  "expenses.seasonBudget": "Season Budget",
+  "expenses.onTrack": "On track",
+  "expenses.watchSpend": "Watch spend",
+  "expenses.overBudget": "Over budget",
+  "expenses.within": "Spending is well within your seasonal budget. {left} left.",
+  "expenses.over": "You are {amount} over the seasonal budget.",
+  "expenses.farmSize": "Farm size: {n} acres",
+  "expenses.byCategory": "Spend by Category",
+  "expenses.noSpend": "No spending recorded yet.",
+  "expenses.all": "All",
+  "expenses.allCrops": "All crops",
+  "expenses.count": "{n} entries",
+  "expenses.count_one": "1 entry",
+  "expenses.emptyTitle": "No expenses yet",
+  "expenses.emptyBody": "Tap the green + button to record your first farm expense.",
+  "expenses.noMatchTitle": "Nothing matches",
+  "expenses.noMatchBody":
+    "Clear the search or pick a different filter to see your entries.",
+  "expenses.add": "Add expense",
+  "expenses.amount": "Amount (₹)",
+  "expenses.category": "Category",
+  "expenses.crop": "Crop",
+  "expenses.payment": "Payment method",
+  "expenses.date": "Date",
+  "expenses.notes": "Notes",
+  "expenses.notesHint": "e.g. Urea top-dress, 2 bags",
+  "expenses.saveExpense": "Save expense",
+  "expenses.amountError": "Enter an amount greater than zero.",
+  "expenses.insight.fertilizer":
+    "Fertilizer is {pct}% of spend — consider soil testing to optimize urea usage.",
+  "expenses.insight.labor":
+    "Labor is {pct}% of spend — machine hire for one operation could bring this down.",
+  "expenses.insight.fuel":
+    "Diesel & Fuel is {pct}% of spend — check pump efficiency and irrigation timing.",
+  "expenses.insight.generic":
+    "{category} is {pct}% of spend — review whether that share fits your plan for this season.",
+  "expenses.insight.empty":
+    "Add a few entries and this box will show where your money is going.",
+
+  "more.title": "More",
+  "more.profile": "Profile",
+  "more.marketPrices": "Market Prices",
+  "more.weatherAlerts": "Weather Alerts",
+  "more.language": "Language",
+  "more.theme": "Appearance",
+  "more.themeLight": "Light",
+  "more.themeDark": "Dark",
+  "more.notifications": "Notifications",
+  "more.help": "Help & Support",
+  "more.about": "About GramConnect",
+  "more.logout": "Logout",
+  "more.demoData": "Demo data",
+  "more.demoLocal": "Running on local device storage — no Supabase keys set.",
+  "more.demoCloud": "Connected to Supabase.",
+  "more.reseed": "Reseed",
+
+  "settings.title": "Settings",
+  "settings.name": "Name",
+  "settings.phone": "Phone (read-only)",
+  "settings.farmSize": "Farm size (acres)",
+  "settings.budget": "Monthly budget (₹)",
+  "settings.primaryCrops": "Primary crops",
+  "settings.season": "Season",
+  "settings.location": "Location for weather",
+  "settings.geoNote": "The advisor also uses browser geolocation when you allow it.",
+
+  "market.title": "Market",
+  "market.mspNote":
+    "Minimum Support Price announced by the Government of India. Mandi rates below can be higher or lower on the day.",
+  "market.buyers": "Buyers near you",
+  "market.call": "Call",
+
+  "help.title": "Help & Support",
+  "help.kisanCall": "Kisan Call Centre",
+  "help.kisanCallSub": "Free farm advice in your language, 6 am - 10 pm",
+  "help.chatNote":
+    "Tap the green chat bubble on any screen to ask the in-app assistant in English, हिंदी or Hinglish.",
+  "help.faq": "Common questions",
+  "help.q1": "How do I scan a crop?",
+  "help.a1":
+    "Open Crop Doctor, stay on the Scan tab and tap Camera to take a leaf photo, or Library to pick an existing one. You get the closest disease match with treatment steps.",
+  "help.q2": "Where does the weather come from?",
+  "help.a2":
+    "Live readings come from Open-Meteo for your saved location, refined by browser geolocation when you allow it.",
+  "help.q3": "How is auto sprinkler calculated?",
+  "help.a3":
+    "Temperature, humidity, wind and rain chance are combined into a runtime demand percentage. Drag the slider or switch off AUTOMATIC to set it yourself.",
+  "help.q4": "Is my expense data private?",
+  "help.a4":
+    "Without Supabase keys everything stays in this browser. With Supabase connected, row level security limits every row to your own account.",
+
+  "about.title": "About",
+  "about.tagline":
+    "A smart farming assistant for Indian farmers — disease guides, live weather advisory and a simple farm ledger in one place.",
+  "about.version": "Version 1.1.0",
+  "about.cropDoctorBody":
+    "{n} disease guides across {crops} crops, plus photo-based scanning.",
+  "about.advisorBody":
+    "Live weather, an auto sprinkler recommendation and season-wise field tips.",
+  "about.expensesBody":
+    "Track spend by category and crop against a seasonal budget.",
+  "about.dataNote":
+    "Weather data from Open-Meteo. MSP figures from the Government of India 2024-25 announcement. Disease information is for guidance only — confirm dosage with your local agriculture officer before spraying.",
+
+  "chat.title": "GramConnect Assistant",
+  "chat.subtitle": "Ask in English, हिंदी or Hinglish",
+  "chat.placeholder": "Ask about your farm...",
+  "chat.welcome":
+    "Namaste! I can help with the app, your expenses and crop problems. Try a question below.",
+  "chat.s1": "How do I scan a crop?",
+  "chat.s2": "What's my spend this month?",
+  "chat.s3": "Any disease alerts today?",
+  "chat.s4": "Motivate me today",
+};
+
+const HI: Record<keyof typeof EN, string> = {
+  "app.name": "ग्रामकनेक्ट",
+  "common.back": "वापस",
+  "common.seeAll": "सभी देखें",
+  "common.edit": "बदलें",
+  "common.save": "सेव करें",
+  "common.saving": "सेव हो रहा है…",
+  "common.saved": "सेव हो गया",
+  "common.close": "बंद करें",
+  "common.settings": "सेटिंग",
+  "common.refresh": "ताज़ा करें",
+  "common.guest": "मेहमान सत्र",
+  "common.acres": "{n} एकड़",
+  "common.comingSoon": "जल्द आ रहा है",
+
+  "nav.home": "होम",
+  "nav.cropDoctor": "फसल डॉक्टर",
+  "nav.advisor": "सलाह",
+  "nav.expenses": "खर्च",
+  "nav.more": "और",
+
+  "welcome.title": "स्वागत है किसान 🌾",
+  "welcome.subtitle":
+    "अपने डैशबोर्ड पर जाएँ या डेटा सेव रखने के लिए लॉगिन करें।",
+  "welcome.continue": "आगे बढ़ें",
+  "welcome.or": "या",
+  "welcome.apple": "एप्पल से साइन इन",
+  "welcome.phone": "फ़ोन से लॉगिन",
+  "welcome.note":
+    "एप्पल साइन-इन जल्द आ रहा है। ‘आगे बढ़ें’ बिना इंटरनेट के भी काम करता है।",
+
+  "login.name": "पूरा नाम",
+  "login.phone": "मोबाइल नंबर",
+  "login.password": "पासवर्ड",
+  "login.confirm": "पासवर्ड दोबारा",
+  "login.login": "लॉगिन",
+  "login.create": "खाता बनाएँ",
+  "login.toSignup": "खाता नहीं है? नया बनाएँ",
+  "login.toLogin": "पहले से खाता है? लॉगिन करें",
+  "login.note":
+    "नए हैं? खाता बनाएँ — सुपाबेस जुड़ा न हो तो आपका डेटा इसी फ़ोन में सुरक्षित रहता है।",
+  "login.err.phone": "10 अंकों का सही मोबाइल नंबर डालें।",
+  "login.err.password": "पासवर्ड कम से कम 6 अक्षर का होना चाहिए।",
+  "login.err.name": "कृपया अपना नाम लिखें।",
+  "login.err.mismatch": "दोनों पासवर्ड एक जैसे नहीं हैं।",
+  "login.err.exists": "इस नंबर से खाता पहले से मौजूद है।",
+  "login.err.noAccount": "इस नंबर का खाता नहीं मिला। पहले खाता बनाएँ।",
+  "login.err.wrongPassword": "पासवर्ड ग़लत है। दोबारा कोशिश करें।",
+
+  "home.title": "होम",
+  "greeting.morning": "सुप्रभात",
+  "greeting.afternoon": "नमस्कार",
+  "greeting.evening": "शुभ संध्या",
+  "greeting.night": "शुभ रात्रि",
+  "home.guides": "{n} रोग जानकारी",
+  "home.rainHumidity": "बारिश {rain}% · नमी {humidity}%",
+  "home.advisor": "सलाह",
+  "home.autoSprinkler": "ऑटो स्प्रिंकलर",
+  "home.thisMonth": "इस महीने",
+  "home.buyers": "खरीदार",
+  "home.priorities": "आज के ज़रूरी काम",
+  "home.quickActions": "तुरंत काम",
+  "home.weather": "मौसम",
+  "home.market": "मंडी",
+  "home.cropsToGrow": "{season} में लगाने लायक फसलें",
+  "home.climateLine": "औसत 31°C · इस महीने 165 मिमी बारिश",
+  "home.msp": "एमएसपी सूची 2024-25",
+  "home.govt": "भारत सरकार",
+  "home.compareBuyers": "मंडी खरीदार देखें",
+  "home.recentExpenses": "हाल के खर्च",
+  "home.noExpenses": "अभी कोई खर्च नहीं। खर्च टैब से पहली एंट्री जोड़ें।",
+  "home.fieldTip": "आज की खेती सलाह",
+
+  "cropDoctor.title": "फसल डॉक्टर",
+  "cropDoctor.search": "रोग, फसल या लक्षण खोजें",
+  "cropDoctor.scan": "स्कैन",
+  "cropDoctor.diseases": "रोग सूची",
+  "cropDoctor.scanHint": "फसल की सेहत जाँचने के लिए पत्ती स्कैन करें",
+  "cropDoctor.camera": "कैमरा",
+  "cropDoctor.gallery": "गैलरी",
+  "cropDoctor.analyzing": "पत्ती जाँची जा रही है…",
+  "cropDoctor.match": "{n}% मिलान",
+  "cropDoctor.aiNote": "यह एआई अनुमान है — कृषि अधिकारी से पुष्टि ज़रूर करें।",
+  "cropDoctor.viewTreatment": "उपचार देखें",
+  "cropDoctor.rescan": "दोबारा स्कैन",
+  "cropDoctor.recentScans": "हाल के स्कैन",
+  "cropDoctor.scanFailed": "स्कैन नहीं हो पाया",
+  "cropDoctor.scanFailedBody":
+    "यह फ़ोटो जाँची नहीं जा सकी। इंटरनेट देखकर दोबारा कोशिश करें।",
+  "cropDoctor.libraryLabel": "रोग पुस्तिका",
+  "cropDoctor.headline": "लक्षण पहचानें और समय रहते कदम उठाएँ",
+  "cropDoctor.statDiseases": "रोग",
+  "cropDoctor.statCrops": "फसलें",
+  "cropDoctor.statHighRisk": "अधिक जोखिम",
+  "cropDoctor.allCrops": "सभी फसलें",
+  "cropDoctor.allLevels": "सभी स्तर",
+  "cropDoctor.count": "{n} रोग",
+  "cropDoctor.noMatch": "कोई रोग नहीं मिला",
+  "cropDoctor.noMatchBody":
+    "दूसरी फसल, दूसरा स्तर या दूसरा शब्द आज़माएँ — जैसे “झुलसा” या “मरोड़”।",
+
+  "disease.affects": "प्रभावित भाग: {part}",
+  "disease.why": "क्यों होता है",
+  "disease.treatment": "उपचार",
+  "disease.prevention": "रोकथाम",
+  "disease.confirmNote":
+    "छिड़काव से पहले मात्रा की पुष्टि अपने कृषि अधिकारी से ज़रूर करें।",
+  "disease.seasonNote":
+    "{season} मौसम में सबसे ज़्यादा सक्रिय — उस दौरान हर हफ़्ते खेत देखें।",
+  "disease.other": "{crop} की अन्य समस्याएँ",
+
+  "advisor.title": "स्मार्ट सलाह",
+  "advisor.fieldWeather": "खेत का मौसम",
+  "advisor.liveAdvisory": "आपके खेत के लिए ताज़ा सलाह",
+  "advisor.updated": "{time} पर अपडेट",
+  "advisor.liveWeather": "मौजूदा मौसम",
+  "advisor.humidity": "नमी",
+  "advisor.rainChance": "बारिश की संभावना",
+  "advisor.wind": "हवा",
+  "advisor.highLow": "अधिकतम / न्यूनतम",
+  "advisor.fallback":
+    "लाइव मौसम नहीं मिला — मौसम के सामान्य आँकड़े दिखाए जा रहे हैं।",
+  "advisor.autoSprinkler": "ऑटो स्प्रिंकलर",
+  "advisor.automatic": "स्वचालित",
+  "advisor.manual": "मैनुअल",
+  "advisor.sliderHint":
+    "स्लाइडर खिसकाकर खुद समय तय करें — इससे स्प्रिंकलर मैनुअल हो जाएगा।",
+  "advisor.seasonAdvisory": "मौसमी सलाह",
+  "advisor.seasonHeadline": "मानसून — फसल और सिंचाई की सलाह",
+  "advisor.climate": "भारत मौसम कैलेंडर",
+  "advisor.climateSub": "महीनेवार औसत बारिश और औसत तापमान",
+  "advisor.rainfall": "बारिश (मिमी)",
+  "advisor.avgTemp": "औसत तापमान (°C)",
+
+  "level.Low": "कम",
+  "level.Medium": "मध्यम",
+  "level.High": "अधिक",
+  "level.Critical": "गंभीर",
+  "sprinkler.high": "गर्मी और सूखा — स्प्रिंकलर का समय बढ़ाएँ।",
+  "sprinkler.medium": "सामान्य ज़रूरत — तय समय पर ही सिंचाई रखें।",
+  "sprinkler.low": "ठंडा और नम — पानी बचाने के लिए सिंचाई घटाएँ।",
+  "sprinkler.note.temp": "तापमान अधिक ({n}°C)",
+  "sprinkler.note.humidity": "नमी कम ({n}%)",
+  "sprinkler.note.rain": "बारिश की संभावना ({n}%)",
+  "sprinkler.note.wind": "तेज़ हवा ({n} किमी/घंटा)",
+  "sprinkler.note.steady": "आज मौसम सामान्य है",
+
+  "expenses.title": "खेती के खर्च",
+  "expenses.search": "फसल, श्रेणी या नोट खोजें",
+  "expenses.ledger": "खेत का बही-खाता",
+  "expenses.spentThisMonth": "इस महीने खर्च",
+  "expenses.perAcre": "प्रति एकड़",
+  "expenses.budget": "बजट",
+  "expenses.entries": "एंट्री",
+  "expenses.seasonBudget": "मौसमी बजट",
+  "expenses.onTrack": "सही राह पर",
+  "expenses.watchSpend": "खर्च पर ध्यान दें",
+  "expenses.overBudget": "बजट से ज़्यादा",
+  "expenses.within": "खर्च आपके मौसमी बजट के भीतर है। {left} बाकी हैं।",
+  "expenses.over": "आप मौसमी बजट से {amount} ज़्यादा खर्च कर चुके हैं।",
+  "expenses.farmSize": "खेत का आकार: {n} एकड़",
+  "expenses.byCategory": "श्रेणी के हिसाब से खर्च",
+  "expenses.noSpend": "अभी कोई खर्च दर्ज नहीं है।",
+  "expenses.all": "सभी",
+  "expenses.allCrops": "सभी फसलें",
+  "expenses.count": "{n} एंट्री",
+  "expenses.count_one": "1 एंट्री",
+  "expenses.emptyTitle": "अभी कोई खर्च नहीं",
+  "expenses.emptyBody": "पहला खर्च जोड़ने के लिए हरे + बटन पर टैप करें।",
+  "expenses.noMatchTitle": "कुछ नहीं मिला",
+  "expenses.noMatchBody": "खोज हटाएँ या दूसरा फ़िल्टर चुनें।",
+  "expenses.add": "खर्च जोड़ें",
+  "expenses.amount": "रकम (₹)",
+  "expenses.category": "श्रेणी",
+  "expenses.crop": "फसल",
+  "expenses.payment": "भुगतान का तरीका",
+  "expenses.date": "तारीख़",
+  "expenses.notes": "नोट",
+  "expenses.notesHint": "जैसे: यूरिया टॉप-ड्रेस, 2 बोरी",
+  "expenses.saveExpense": "खर्च सेव करें",
+  "expenses.amountError": "शून्य से ज़्यादा रकम डालें।",
+  "expenses.insight.fertilizer":
+    "कुल खर्च का {pct}% खाद पर है — मिट्टी जाँच कराकर यूरिया की मात्रा घटाई जा सकती है।",
+  "expenses.insight.labor":
+    "कुल खर्च का {pct}% मज़दूरी पर है — एक काम मशीन से कराने पर यह घट सकता है।",
+  "expenses.insight.fuel":
+    "कुल खर्च का {pct}% डीज़ल पर है — पंप की कार्यक्षमता और सिंचाई का समय जाँचें।",
+  "expenses.insight.generic":
+    "कुल खर्च का {pct}% {category} पर है — देखें कि यह हिस्सा आपकी योजना से मेल खाता है या नहीं।",
+  "expenses.insight.empty":
+    "कुछ एंट्री जोड़ें, फिर यहाँ दिखेगा कि पैसा कहाँ जा रहा है।",
+
+  "more.title": "और",
+  "more.profile": "प्रोफ़ाइल",
+  "more.marketPrices": "मंडी भाव",
+  "more.weatherAlerts": "मौसम चेतावनी",
+  "more.language": "भाषा",
+  "more.theme": "रंग-रूप",
+  "more.themeLight": "उजला",
+  "more.themeDark": "गहरा",
+  "more.notifications": "सूचनाएँ",
+  "more.help": "मदद और सहायता",
+  "more.about": "ग्रामकनेक्ट के बारे में",
+  "more.logout": "लॉग आउट",
+  "more.demoData": "डेमो डेटा",
+  "more.demoLocal": "डेटा इसी डिवाइस में सुरक्षित है — सुपाबेस जुड़ा नहीं है।",
+  "more.demoCloud": "सुपाबेस से जुड़ा है।",
+  "more.reseed": "दोबारा भरें",
+
+  "settings.title": "सेटिंग",
+  "settings.name": "नाम",
+  "settings.phone": "मोबाइल (बदल नहीं सकते)",
+  "settings.farmSize": "खेत का आकार (एकड़)",
+  "settings.budget": "महीने का बजट (₹)",
+  "settings.primaryCrops": "मुख्य फसलें",
+  "settings.season": "मौसम",
+  "settings.location": "मौसम के लिए जगह",
+  "settings.geoNote":
+    "अनुमति देने पर सलाह पेज आपके फ़ोन की लोकेशन भी इस्तेमाल करता है।",
+
+  "market.title": "मंडी",
+  "market.mspNote":
+    "यह भारत सरकार का न्यूनतम समर्थन मूल्य है। नीचे दिए मंडी भाव उस दिन कम या ज़्यादा हो सकते हैं।",
+  "market.buyers": "आपके पास के खरीदार",
+  "market.call": "कॉल",
+
+  "help.title": "मदद और सहायता",
+  "help.kisanCall": "किसान कॉल सेंटर",
+  "help.kisanCallSub": "अपनी भाषा में मुफ़्त सलाह, सुबह 6 से रात 10 बजे",
+  "help.chatNote":
+    "किसी भी स्क्रीन पर हरे चैट बटन से सहायक से अंग्रेज़ी, हिंदी या हिंग्लिश में पूछें।",
+  "help.faq": "आम सवाल",
+  "help.q1": "फसल कैसे स्कैन करें?",
+  "help.a1":
+    "फसल डॉक्टर खोलें, स्कैन टैब पर रहें और कैमरा दबाकर पत्ती की फ़ोटो लें या गैलरी से चुनें। सबसे मिलता-जुलता रोग और उपचार दिख जाएगा।",
+  "help.q2": "मौसम की जानकारी कहाँ से आती है?",
+  "help.a2":
+    "आपकी सेव की गई जगह के लिए ओपन-मीटियो से लाइव आँकड़े आते हैं, और अनुमति देने पर फ़ोन की लोकेशन से और सटीक हो जाते हैं।",
+  "help.q3": "ऑटो स्प्रिंकलर कैसे तय होता है?",
+  "help.a3":
+    "तापमान, नमी, हवा और बारिश की संभावना मिलाकर सिंचाई की ज़रूरत प्रतिशत में निकाली जाती है। स्लाइडर खिसकाकर या स्वचालित बंद करके आप खुद भी तय कर सकते हैं।",
+  "help.q4": "क्या मेरा खर्च डेटा निजी है?",
+  "help.a4":
+    "सुपाबेस के बिना सब कुछ इसी ब्राउज़र में रहता है। सुपाबेस जुड़ा हो तो रो-लेवल सिक्योरिटी हर पंक्ति को सिर्फ़ आपके खाते तक सीमित रखती है।",
+
+  "about.title": "परिचय",
+  "about.tagline":
+    "भारतीय किसानों के लिए स्मार्ट खेती सहायक — रोग जानकारी, मौसम सलाह और आसान बही-खाता, सब एक जगह।",
+  "about.version": "संस्करण 1.1.0",
+  "about.cropDoctorBody":
+    "{crops} फसलों के {n} रोगों की जानकारी, साथ में फ़ोटो से जाँच।",
+  "about.advisorBody":
+    "लाइव मौसम, ऑटो स्प्रिंकलर सुझाव और मौसम के हिसाब से खेती सलाह।",
+  "about.expensesBody":
+    "श्रेणी और फसल के हिसाब से खर्च को मौसमी बजट के सामने देखें।",
+  "about.dataNote":
+    "मौसम डेटा ओपन-मीटियो से। एमएसपी आँकड़े भारत सरकार की 2024-25 घोषणा से। रोग की जानकारी सिर्फ़ मार्गदर्शन है — छिड़काव से पहले कृषि अधिकारी से मात्रा की पुष्टि करें।",
+
+  "chat.title": "ग्रामकनेक्ट सहायक",
+  "chat.subtitle": "अंग्रेज़ी, हिंदी या हिंग्लिश में पूछें",
+  "chat.placeholder": "अपने खेत के बारे में पूछें...",
+  "chat.welcome":
+    "नमस्ते! मैं ऐप, आपके खर्च और फसल की समस्याओं में मदद कर सकता हूँ। नीचे से कोई सवाल चुनें।",
+  "chat.s1": "फसल कैसे स्कैन करें?",
+  "chat.s2": "इस महीने कितना खर्च हुआ?",
+  "chat.s3": "आज कोई रोग चेतावनी है?",
+  "chat.s4": "आज मुझे प्रेरित करें",
+};
+
+const DICT: Record<Lang, Record<string, string>> = { en: EN, hi: HI };
+
+export type StringKey = keyof typeof EN;
+
+function interpolate(text: string, vars?: Record<string, string | number>) {
+  if (!vars) return text;
+  return text.replace(/\{(\w+)\}/g, (m, key) =>
+    key in vars ? String(vars[key]) : m
+  );
+}
+
+export function translate(
+  lang: Lang,
+  key: StringKey,
+  vars?: Record<string, string | number>
+) {
+  return interpolate(DICT[lang][key] ?? DICT.en[key] ?? key, vars);
+}
+
+const CROP_HI: Record<string, string> = {
+  Rice: "धान",
+  Wheat: "गेहूँ",
+  Maize: "मक्का",
+  Cotton: "कपास",
+  Sugarcane: "गन्ना",
+  Potato: "आलू",
+  Tomato: "टमाटर",
+  Chili: "मिर्च",
+  Grapes: "अंगूर",
+  Mustard: "सरसों",
+  Bajra: "बाजरा",
+  Groundnut: "मूँगफली",
+  Soybean: "सोयाबीन",
+  Onion: "प्याज़",
+  Banana: "केला",
+  Brinjal: "बैंगन",
+  Okra: "भिंडी",
+  Gram: "चना",
+  "Pigeon Pea": "अरहर",
+  Mango: "आम",
+  Paddy: "धान",
+  Vegetables: "सब्ज़ियाँ",
+  General: "सामान्य",
+  All: "सभी",
+};
+
+const CATEGORY_HI: Record<string, string> = {
+  Fertilizer: "खाद",
+  Seeds: "बीज",
+  Labor: "मज़दूरी",
+  Pesticides: "कीटनाशक",
+  "Diesel & Fuel": "डीज़ल व ईंधन",
+  Irrigation: "सिंचाई",
+  Transport: "ढुलाई",
+  Machinery: "मशीनरी",
+  Other: "अन्य",
+};
+
+const PAYMENT_HI: Record<string, string> = {
+  Cash: "नकद",
+  UPI: "यूपीआई",
+  Bank: "बैंक",
+  Credit: "उधार",
+};
+
+const SEASON_HI: Record<string, string> = {
+  Monsoon: "मानसून",
+  Winter: "सर्दी",
+  Summer: "गर्मी",
+};
+
+const WEATHER_HI: Record<string, string> = {
+  "Clear sky": "साफ़ आसमान",
+  "Mainly clear": "ज़्यादातर साफ़",
+  "Partly cloudy": "हल्के बादल",
+  Overcast: "घने बादल",
+  Fog: "कोहरा",
+  "Rime fog": "घना कोहरा",
+  "Light drizzle": "हल्की बूँदाबाँदी",
+  Drizzle: "बूँदाबाँदी",
+  "Heavy drizzle": "तेज़ बूँदाबाँदी",
+  "Light rain": "हल्की बारिश",
+  Rain: "बारिश",
+  "Heavy rain": "तेज़ बारिश",
+  "Light snow": "हल्की बर्फ़",
+  "Rain showers": "बौछारें",
+  "Violent showers": "तेज़ बौछारें",
+  Thunderstorm: "आँधी-तूफ़ान",
+  "Storm with hail": "ओलावृष्टि के साथ तूफ़ान",
+  Clear: "साफ़",
+};
+
+function lookup(map: Record<string, string>, value: string, lang: Lang) {
+  return lang === "hi" ? (map[value] ?? value) : value;
+}
 
 export function useT() {
-  const language = useApp((s) => s.language);
-  return (key: StringKey) => STRINGS[language][key] ?? STRINGS.en[key];
+  const lang = useApp((s) => s.language) as Lang;
+
+  return {
+    lang,
+    t: (key: StringKey, vars?: Record<string, string | number>) =>
+      translate(lang, key, vars),
+    tCrop: (crop: string) => lookup(CROP_HI, crop, lang),
+    tCategory: (category: string) => lookup(CATEGORY_HI, category, lang),
+    tPayment: (method: string) => lookup(PAYMENT_HI, method, lang),
+    tSeason: (season: string) => lookup(SEASON_HI, season, lang),
+    tWeather: (condition: string) => lookup(WEATHER_HI, condition, lang),
+    tSeverity: (severity: string) =>
+      translate(lang, `level.${severity}` as StringKey),
+    /** Localised view of a disease record. */
+    tDisease: (disease: Disease) => {
+      const hi = DISEASES_HI[disease.slug];
+      if (lang !== "hi" || !hi) return disease;
+      return { ...disease, ...hi, crop: CROP_HI[disease.crop] ?? disease.crop };
+    },
+  };
 }

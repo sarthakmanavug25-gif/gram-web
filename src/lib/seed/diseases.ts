@@ -505,6 +505,267 @@ export const DISEASES: Disease[] = [
     season: "Winter",
   },
   {
+    slug: "rice-false-smut",
+    name: "False Smut",
+    crop: "Rice",
+    severity: "Medium",
+    affectedPart: "Grains",
+    symptom: "Individual grains turn into velvety yellow-green balls",
+    description:
+      "Ustilaginoidea virens converts single grains into velvety balls that start orange-yellow and darken to olive green. Only a few grains per panicle are hit, but the spore dust lowers seed quality and grade.",
+    causes: [
+      "Rain and high humidity at flowering",
+      "Heavy nitrogen dose close to panicle initiation",
+    ],
+    treatment: [
+      "Spray Propiconazole 1 ml/litre at the boot leaf stage",
+      "Cut and bag affected panicles rather than shaking them in the field",
+    ],
+    prevention: [
+      "Split nitrogen instead of one heavy late dose",
+      "Use clean seed and treat before sowing",
+    ],
+    season: "Monsoon",
+  },
+  {
+    slug: "wheat-brown-rust",
+    name: "Brown Rust",
+    crop: "Wheat",
+    severity: "Medium",
+    affectedPart: "Leaves",
+    symptom: "Scattered orange-brown pustules on the upper leaf",
+    description:
+      "Puccinia triticina scatters round orange-brown pustules across the upper leaf surface. It arrives later than yellow rust and mainly cuts grain weight rather than killing the crop.",
+    causes: [
+      "Warm 15-22°C days with dew",
+      "Late-sown crop still green when spores arrive",
+    ],
+    treatment: ["Spray Propiconazole 25 EC at 1 ml/litre at first pustules"],
+    prevention: [
+      "Sow on time so the crop matures ahead of the rust window",
+      "Prefer rust-resistant recommended varieties",
+    ],
+    season: "Winter",
+  },
+  {
+    slug: "soybean-yellow-mosaic",
+    name: "Yellow Mosaic Virus",
+    crop: "Soybean",
+    severity: "High",
+    affectedPart: "Leaves",
+    symptom: "Bright yellow patches mixed with green on leaves",
+    description:
+      "A whitefly-borne begomovirus. Leaves show bright yellow mosaic patches, pods stay small and poorly filled, and early infection can halve the yield.",
+    causes: [
+      "Whitefly moving in from nearby pulses",
+      "Susceptible variety sown late",
+    ],
+    treatment: [
+      "Rogue out mosaic plants as soon as they appear",
+      "Spray Thiamethoxam 25 WG at 0.2 g/litre to check whitefly",
+    ],
+    prevention: [
+      "Grow resistant varieties such as JS 20-116",
+      "Sow within the recommended window with the rest of the block",
+    ],
+    season: "Monsoon",
+  },
+  {
+    slug: "soybean-rust",
+    name: "Soybean Rust",
+    crop: "Soybean",
+    severity: "Medium",
+    affectedPart: "Leaves",
+    symptom: "Tiny brown pustules on the leaf underside",
+    description:
+      "Phakopsora pachyrhizi forms small tan-brown pustules on the lower leaf surface that cause early leaf drop. Severe attacks before pod filling cut seed size sharply.",
+    causes: ["Extended wet spells at 20-28°C", "Dense canopy holding moisture"],
+    treatment: [
+      "Spray Hexaconazole 5 EC at 2 ml/litre at first pustules",
+      "Repeat after 15 days if wet weather continues",
+    ],
+    prevention: ["Keep recommended row spacing", "Avoid excess nitrogen"],
+    season: "Monsoon",
+  },
+  {
+    slug: "onion-purple-blotch",
+    name: "Purple Blotch",
+    crop: "Onion",
+    severity: "High",
+    affectedPart: "Leaves & seed stalk",
+    symptom: "Purple centred spots with a yellow ring",
+    description:
+      "Alternaria porri starts as small white sunken spots that widen into purple lesions with a yellow halo. Infected seed stalks snap over and the bulb stops sizing.",
+    causes: [
+      "Humidity above 80% with warm days",
+      "Overhead irrigation late in the evening",
+    ],
+    treatment: [
+      "Spray Mancozeb 2.5 g/litre with a sticker every 10-12 days",
+      "Add Difenoconazole 0.5 ml/litre in heavy attacks",
+    ],
+    prevention: [
+      "Irrigate in the morning so leaves dry by night",
+      "Rotate away from onion and garlic for a season",
+    ],
+    season: "Winter",
+  },
+  {
+    slug: "banana-panama-wilt",
+    name: "Panama Wilt",
+    crop: "Banana",
+    severity: "Critical",
+    affectedPart: "Whole plant",
+    symptom: "Older leaves yellow and collapse around the pseudostem",
+    description:
+      "Fusarium oxysporum f.sp. cubense blocks the water channels. Older leaves yellow from the margin, collapse and hang like a skirt, and the split pseudostem shows reddish-brown streaks.",
+    causes: [
+      "Infected suckers brought from another field",
+      "Soil-borne inoculum that survives for years",
+    ],
+    treatment: [
+      "Uproot and burn affected plants with the corm",
+      "Drench the pit with Carbendazim 2 g/litre and apply Trichoderma",
+    ],
+    prevention: [
+      "Plant tissue-culture suckers from a certified nursery",
+      "Avoid replanting banana in a wilt-affected block",
+    ],
+    season: "Summer",
+  },
+  {
+    slug: "brinjal-shoot-fruit-borer",
+    name: "Shoot & Fruit Borer",
+    crop: "Brinjal",
+    severity: "High",
+    affectedPart: "Shoots & fruit",
+    symptom: "Drooping shoot tips and bore holes plugged with excreta",
+    description:
+      "Leucinodes orbonalis larvae bore into tender shoots, making them droop and dry, then move into the fruit. Bored fruit is unmarketable and the damage builds through the season.",
+    causes: [
+      "Overlapping plantings that keep a host available",
+      "Infested fruit left in the field after picking",
+    ],
+    treatment: [
+      "Clip and destroy drooping shoots twice a week",
+      "Spray Chlorantraniliprole 18.5 SC at 0.3 ml/litre",
+    ],
+    prevention: [
+      "Install pheromone traps at 10 per acre",
+      "Grow a resistant hybrid and rotate with a non-solanaceous crop",
+    ],
+    season: "Summer",
+  },
+  {
+    slug: "okra-yellow-vein-mosaic",
+    name: "Yellow Vein Mosaic",
+    crop: "Okra",
+    severity: "High",
+    affectedPart: "Leaves & fruit",
+    symptom: "Net-like yellow veins with pale, twisted fruit",
+    description:
+      "A whitefly-transmitted virus that turns the vein network bright yellow until the whole leaf looks yellow. Fruit stays small, pale and hard, and is rejected at the market.",
+    causes: ["High whitefly pressure", "Susceptible local varieties"],
+    treatment: [
+      "Remove infected plants at first sight",
+      "Spray Diafenthiuron 50 WP at 1.2 g/litre for whitefly",
+    ],
+    prevention: [
+      "Sow tolerant varieties such as Arka Anamika",
+      "Keep the field and bunds free of weed hosts",
+    ],
+    season: "Summer",
+  },
+  {
+    slug: "gram-wilt",
+    name: "Chickpea Wilt",
+    crop: "Gram",
+    severity: "High",
+    affectedPart: "Whole plant",
+    symptom: "Drooping petioles with a straw-coloured drying plant",
+    description:
+      "Fusarium oxysporum f.sp. ciceris causes plants to droop and dry in patches. The root, when split, shows dark brown internal discolouration while the outside looks normal.",
+    causes: [
+      "Soil-borne inoculum in short rotations",
+      "Warm dry soil at the seedling stage",
+    ],
+    treatment: [
+      "No cure for a wilted plant — remove it with the root",
+      "Drench nearby plants with Carbendazim 1 g/litre",
+    ],
+    prevention: [
+      "Treat seed with Trichoderma viride at 4 g/kg",
+      "Rotate with cereals for two seasons",
+    ],
+    season: "Winter",
+  },
+  {
+    slug: "pigeonpea-sterility-mosaic",
+    name: "Sterility Mosaic",
+    crop: "Pigeon Pea",
+    severity: "Medium",
+    affectedPart: "Leaves & flowers",
+    symptom: "Bushy pale plants that flower very little",
+    description:
+      "Spread by the eriophyid mite. Plants turn pale and bushy with small mosaic-marked leaves and produce almost no flowers or pods, which is why it is called green plague.",
+    causes: ["Mite carried by wind from nearby infected plots", "Perennial ratoon plants acting as a reservoir"],
+    treatment: [
+      "Remove diseased bushes early in the season",
+      "Spray wettable sulphur 3 g/litre against the mite vector",
+    ],
+    prevention: [
+      "Grow resistant varieties such as Asha (ICPL 87119)",
+      "Do not keep ratoon pigeon pea near a new crop",
+    ],
+    season: "Monsoon",
+  },
+  {
+    slug: "potato-black-scurf",
+    name: "Black Scurf",
+    crop: "Potato",
+    severity: "Medium",
+    affectedPart: "Tubers & stems",
+    symptom: "Hard black crusty specks stuck on the tuber skin",
+    description:
+      "Rhizoctonia solani leaves black sclerotia stuck to the tuber like dirt that will not wash off. It also girdles young sprouts, giving patchy, uneven emergence.",
+    causes: [
+      "Infected seed tubers",
+      "Cold wet soil that slows emergence",
+    ],
+    treatment: [
+      "Treat seed tubers with Pencycuron 0.25% before planting",
+      "Harvest promptly once the haulm is mature",
+    ],
+    prevention: [
+      "Use certified seed and rotate with cereals",
+      "Plant when soil has warmed so sprouts emerge fast",
+    ],
+    season: "Winter",
+  },
+  {
+    slug: "mango-powdery-mildew",
+    name: "Powdery Mildew",
+    crop: "Mango",
+    severity: "High",
+    affectedPart: "Flower panicles",
+    symptom: "White powder on panicles with heavy flower drop",
+    description:
+      "Oidium mangiferae coats the flower panicle in white powder. The flowers dry and drop before setting, and a bad attack at bloom can cost most of the season's fruit.",
+    causes: [
+      "Cloudy humid weather during flowering",
+      "Dense unpruned canopy",
+    ],
+    treatment: [
+      "Dust wettable sulphur at bud burst",
+      "Spray Hexaconazole 2 ml/litre at 15 day intervals through bloom",
+    ],
+    prevention: [
+      "Prune for an open canopy after harvest",
+      "Start the protective schedule before panicles open",
+    ],
+    season: "Summer",
+  },
+  {
     slug: "groundnut-tikka",
     name: "Tikka Leaf Spot",
     crop: "Groundnut",

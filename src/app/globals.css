@@ -17,11 +17,49 @@
   --text-primary: #ffffff;
   --text-secondary: #9ca3af;
   --text-muted: #6b7280;
+
+  /* Theme surfaces — overridden by [data-theme="light"] below. */
+  --page-bg: #0a0d0a;
+  --page-glow: rgba(22, 101, 52, 0.55);
+  --page-glow-mid: rgba(20, 83, 45, 0.28);
+  --card-bg: rgba(28, 31, 28, 0.66);
+  --card-blur: blur(14px);
+  --hairline: rgba(255, 255, 255, 0.08);
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-2: rgba(255, 255, 255, 0.1);
+  --surface-hover: rgba(255, 255, 255, 0.09);
+  --nav-bg: rgba(18, 20, 18, 0.88);
+  --sheet-bg: rgba(16, 19, 16, 0.97);
+  --overlay: rgba(0, 0, 0, 0.62);
+  --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --input-bg: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] {
+  --text-primary: #0f1a12;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --green-bright: #15803d;
+
+  --page-bg: #f2f5ef;
+  --page-glow: rgba(34, 197, 94, 0.3);
+  --page-glow-mid: rgba(34, 197, 94, 0.12);
+  --card-bg: rgba(255, 255, 255, 0.92);
+  --card-blur: blur(8px);
+  --hairline: rgba(15, 26, 18, 0.1);
+  --surface: rgba(15, 60, 25, 0.05);
+  --surface-2: rgba(15, 60, 25, 0.11);
+  --surface-hover: rgba(15, 60, 25, 0.09);
+  --nav-bg: rgba(255, 255, 255, 0.93);
+  --sheet-bg: #ffffff;
+  --overlay: rgba(15, 26, 18, 0.35);
+  --card-shadow: 0 8px 24px rgba(15, 26, 18, 0.1);
+  --input-bg: #ffffff;
 }
 
 html,
 body {
-  background: var(--bg-black);
+  background: var(--page-bg);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
 }
@@ -31,14 +69,14 @@ body {
     "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Near-black app background with a dark-green glow behind the header area only. */
+/* App background with a green glow behind the header area only. */
 .app-bg {
-  background-color: var(--bg-black);
+  background-color: var(--page-bg);
   background-image: radial-gradient(
     120% 40% at 50% -8%,
-    rgba(22, 101, 52, 0.55) 0%,
-    rgba(20, 83, 45, 0.28) 35%,
-    rgba(10, 13, 10, 0) 70%
+    var(--page-glow) 0%,
+    var(--page-glow-mid) 35%,
+    transparent 70%
   );
   background-repeat: no-repeat;
   background-size: 100% 55vh;
@@ -73,10 +111,47 @@ body {
 
 .card {
   border-radius: 22px;
-  background-color: rgba(28, 31, 28, 0.66);
-  border: 1px solid var(--bg-card-border);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  background-color: var(--card-bg);
+  border: 1px solid var(--hairline);
+  backdrop-filter: var(--card-blur);
+  box-shadow: var(--card-shadow);
+}
+
+.surface {
+  background-color: var(--surface);
+}
+.surface-2 {
+  background-color: var(--surface-2);
+}
+.hover-surface:hover {
+  background-color: var(--surface-hover);
+}
+.hairline {
+  border: 1px solid var(--hairline);
+}
+.divider-t {
+  border-top: 1px solid var(--hairline);
+}
+.divider-b {
+  border-bottom: 1px solid var(--hairline);
+}
+.nav-surface {
+  background-color: var(--nav-bg);
+}
+.sheet-surface {
+  background-color: var(--sheet-bg);
+}
+.overlay-bg {
+  background-color: var(--overlay);
+}
+.field {
+  background-color: var(--input-bg);
+  border: 1px solid var(--hairline);
+  color: var(--text-primary);
+}
+.field:focus {
+  border-color: rgba(34, 197, 94, 0.55);
+  outline: none;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -93,6 +168,12 @@ select {
   color-scheme: dark;
 }
 
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  color-scheme: light;
+}
+
 input::placeholder,
 textarea::placeholder {
   color: var(--text-muted);
@@ -107,7 +188,7 @@ textarea::placeholder {
 .skeleton {
   position: relative;
   overflow: hidden;
-  background-color: rgba(255, 255, 255, 0.06);
+  background-color: var(--surface-2);
 }
 .skeleton::after {
   content: "";

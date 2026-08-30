@@ -76,6 +76,18 @@ export async function fetchWeather(
   }
 }
 
+export type SprinklerNoteKey =
+  | "sprinkler.note.temp"
+  | "sprinkler.note.humidity"
+  | "sprinkler.note.rain"
+  | "sprinkler.note.wind"
+  | "sprinkler.note.steady";
+
+export type SprinklerSummaryKey =
+  | "sprinkler.high"
+  | "sprinkler.medium"
+  | "sprinkler.low";
+
 /**
  * Sprinkler demand derived from live weather: hotter, drier and windier
  * conditions push runtime up, a wet forecast pulls it down.
@@ -91,33 +103,46 @@ export function sprinklerAdvice(w: Weather) {
   );
 
   const level = percent >= 65 ? "High" : percent >= 35 ? "Medium" : "Low";
-  const notes: { text: string; color: string }[] = [];
+
+  type Note = {
+    key: SprinklerNoteKey;
+    vars?: Record<string, number>;
+    color: string;
+  };
+  const notes: Note[] = [];
   if (w.temperature >= 32)
     notes.push({
-      text: `High temperature (${w.temperature}°C)`,
+      key: "sprinkler.note.temp",
+      vars: { n: w.temperature },
       color: "var(--amber)",
     });
   if (w.humidity < 50)
-    notes.push({ text: `Low humidity (${w.humidity}%)`, color: "var(--orange)" });
+    notes.push({
+      key: "sprinkler.note.humidity",
+      vars: { n: w.humidity },
+      color: "var(--orange)",
+    });
   if (w.rainChance >= 50)
     notes.push({
-      text: `Rain likely (${w.rainChance}%)`,
+      key: "sprinkler.note.rain",
+      vars: { n: w.rainChance },
       color: "var(--blue-info)",
     });
   if (w.windKph >= 20)
-    notes.push({ text: `Windy (${w.windKph} km/h)`, color: "var(--text-secondary)" });
-  if (notes.length === 0)
     notes.push({
-      text: "Conditions are steady today",
-      color: "var(--green-primary)",
+      key: "sprinkler.note.wind",
+      vars: { n: w.windKph },
+      color: "var(--text-secondary)",
     });
+  if (notes.length === 0)
+    notes.push({ key: "sprinkler.note.steady", color: "var(--green-primary)" });
 
-  const summary =
+  const summaryKey: SprinklerSummaryKey =
     percent >= 65
-      ? "Hot and dry — increase sprinkler runtime."
+      ? "sprinkler.high"
       : percent >= 35
-        ? "Moderate demand — keep the usual schedule."
-        : "Cool and humid — cut back irrigation to save water.";
+        ? "sprinkler.medium"
+        : "sprinkler.low";
 
-  return { percent, level, summary, notes };
+  return { percent, level, summaryKey, notes };
 }

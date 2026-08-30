@@ -14,7 +14,12 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const hydrated = useApp((s) => s.hydrated);
   const session = useApp((s) => s.session);
+  const theme = useApp((s) => s.theme);
   const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   useEffect(() => {
     if (!hydrated) return;

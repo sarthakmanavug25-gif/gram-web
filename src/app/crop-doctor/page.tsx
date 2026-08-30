@@ -35,6 +35,7 @@ import {
   type Disease,
 } from "@/lib/seed/diseases";
 import { useApp } from "@/lib/store";
+import { useT } from "@/lib/i18n";
 
 const TABS = ["Scan", "Diseases"] as const;
 type Tab = (typeof TABS)[number];
@@ -48,6 +49,7 @@ export default function CropDoctorPage() {
 }
 
 function CropDoctorContent() {
+  const { t, tCrop, tSeverity, tDisease } = useT();
   const [tab, setTab] = useState<Tab>("Scan");
   const [query, setQuery] = useState("");
   const [crop, setCrop] = useState("All Crops");
@@ -74,7 +76,7 @@ function CropDoctorContent() {
 
   return (
     <div className="space-y-4">
-      <ScreenHeader title="Crop Doctor" />
+      <ScreenHeader title={t("cropDoctor.title")} />
 
       {tab === "Diseases" && (
         <div className="relative">
@@ -85,13 +87,18 @@ function CropDoctorContent() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search disease, crop, or symptoms"
-            className="h-[46px] w-full rounded-full border border-white/8 bg-white/[0.05] pl-10 pr-4 text-[14px] outline-none focus:border-green-primary/50"
+            placeholder={t("cropDoctor.search")}
+            className="h-[46px] w-full rounded-full hairline surface pl-10 pr-4 text-[14px] outline-none focus:border-green-primary/50"
           />
         </div>
       )}
 
-      <SegmentedControl options={TABS} value={tab} onChange={setTab} />
+      <SegmentedControl
+        options={TABS}
+        labels={{ Scan: t("cropDoctor.scan"), Diseases: t("cropDoctor.diseases") }}
+        value={tab}
+        onChange={setTab}
+      />
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -109,10 +116,10 @@ function CropDoctorContent() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <SectionLabel icon={<Camera size={14} />}>
-                      Disease Library
+                      {t("cropDoctor.libraryLabel")}
                     </SectionLabel>
                     <h2 className="max-w-[220px] text-[20px] font-bold leading-tight">
-                      Identify symptoms and act early
+                      {t("cropDoctor.headline")}
                     </h2>
                   </div>
                   <IconTile
@@ -124,19 +131,19 @@ function CropDoctorContent() {
                   </IconTile>
                 </div>
                 <div className="mt-4 grid grid-cols-3 gap-2.5">
-                  <MiniStat value={DISEASES.length} label="Diseases" />
-                  <MiniStat value={CROPS.length} label="Crops" />
-                  <MiniStat value={highRisk} label="High Risk" />
+                  <MiniStat value={DISEASES.length} label={t("cropDoctor.statDiseases")} />
+                  <MiniStat value={CROPS.length} label={t("cropDoctor.statCrops")} />
+                  <MiniStat value={highRisk} label={t("cropDoctor.statHighRisk")} />
                 </div>
               </Card>
 
               <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
                 <Chip active={crop === "All Crops"} onClick={() => setCrop("All Crops")}>
-                  All Crops
+                  {t("cropDoctor.allCrops")}
                 </Chip>
                 {CROPS.map((c) => (
                   <Chip key={c} active={crop === c} onClick={() => setCrop(c)}>
-                    {c}
+                    {tCrop(c)}
                   </Chip>
                 ))}
               </div>
@@ -146,7 +153,7 @@ function CropDoctorContent() {
                   active={severity === "All Levels"}
                   onClick={() => setSeverity("All Levels")}
                 >
-                  All Levels
+                  {t("cropDoctor.allLevels")}
                 </Chip>
                 {SEVERITIES.map((s) => (
                   <Chip
@@ -155,13 +162,13 @@ function CropDoctorContent() {
                     onClick={() => setSeverity(s)}
                     color={severityStyle[s].color}
                   >
-                    {s}
+                    {tSeverity(s)}
                   </Chip>
                 ))}
               </div>
 
               <p className="text-[13px] text-text-secondary">
-                {filtered.length} disease{filtered.length === 1 ? "" : "s"}
+                {t("cropDoctor.count", { n: filtered.length })}
               </p>
 
               <div className="space-y-2.5">
@@ -169,12 +176,19 @@ function CropDoctorContent() {
                   <Card>
                     <EmptyState
                       icon={<Search size={28} />}
-                      title="No matching disease"
-                      body="Try a different crop, severity level or search word — for example “blight” or “curl”."
+                      title={t("cropDoctor.noMatch")}
+                      body={t("cropDoctor.noMatchBody")}
                     />
                   </Card>
                 ) : (
-                  filtered.map((d) => <DiseaseRow key={d.slug} disease={d} />)
+                  filtered.map((d) => (
+                    <DiseaseRow
+                      key={d.slug}
+                      disease={d}
+                      view={tDisease(d)}
+                      severityLabel={tSeverity(d.severity)}
+                    />
+                  ))
                 )}
               </div>
             </div>
@@ -187,14 +201,22 @@ function CropDoctorContent() {
 
 function MiniStat({ value, label }: { value: number; label: string }) {
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.05] px-3 py-3 text-center">
+    <div className="rounded-2xl hairline surface px-3 py-3 text-center">
       <p className="text-[20px] font-bold leading-none">{value}</p>
       <p className="mt-1 text-[11px] text-text-muted">{label}</p>
     </div>
   );
 }
 
-function DiseaseRow({ disease }: { disease: Disease }) {
+function DiseaseRow({
+  disease,
+  view,
+  severityLabel,
+}: {
+  disease: Disease;
+  view: Disease;
+  severityLabel: string;
+}) {
   const s = severityStyle[disease.severity];
   const Icon =
     disease.severity === "Low"
@@ -206,24 +228,24 @@ function DiseaseRow({ disease }: { disease: Disease }) {
           : ShieldAlert;
 
   return (
-    <Link href={`/crop-doctor/${disease.slug}`} className="card flex items-center gap-3 p-3.5 transition hover:bg-white/[0.04]">
+    <Link href={`/crop-doctor/${disease.slug}`} className="card flex items-center gap-3 p-3.5 transition hover:surface">
       <IconTile color={s.color} tint={s.bg} size={44}>
         <Icon size={21} />
       </IconTile>
       <div className="min-w-0 flex-1">
-        <p className="text-[15px] font-bold leading-tight">{disease.name}</p>
+        <p className="text-[15px] font-bold leading-tight">{view.name}</p>
         <div className="mt-1.5 flex gap-1.5">
-          <Tag color="#4ade80" tint="rgba(34,197,94,0.16)">
-            {disease.crop}
+          <Tag color="var(--green-bright)" tint="rgba(34,197,94,0.16)">
+            {view.crop}
           </Tag>
           <Tag color={s.text} tint={s.bg}>
-            {disease.severity}
+            {severityLabel}
           </Tag>
         </div>
         <p className="mt-1.5 text-[12px] text-text-secondary">
-          {disease.affectedPart}
+          {view.affectedPart}
         </p>
-        <p className="truncate text-[12px] text-text-muted">{disease.symptom}</p>
+        <p className="truncate text-[12px] text-text-muted">{view.symptom}</p>
       </div>
       <ChevronRight size={18} className="shrink-0 text-text-muted" />
     </Link>
@@ -241,6 +263,7 @@ type ScanState =
   | { status: "error"; message: string };
 
 function ScanTab() {
+  const { t, tCrop, lang } = useT();
   const cameraRef = useRef<HTMLInputElement>(null);
   const libraryRef = useRef<HTMLInputElement>(null);
   const addScan = useApp((s) => s.addScan);
@@ -305,15 +328,19 @@ function ScanTab() {
         <div className="flex flex-col items-center justify-center py-16">
           <ScanFrame />
           <p className="mt-6 text-[14px] text-text-secondary">
-            Scan a leaf to check crop health
+            {t("cropDoctor.scanHint")}
           </p>
         </div>
       )}
 
       {state.status === "error" && (
         <Card className="border-red-400/30 bg-red-500/10">
-          <p className="text-[14px] font-semibold text-red-300">Scan failed</p>
-          <p className="mt-1 text-[13px] text-text-secondary">{state.message}</p>
+          <p className="text-[14px] font-semibold text-red-400">
+            {t("cropDoctor.scanFailed")}
+          </p>
+          <p className="mt-1 text-[13px] text-text-secondary">
+            {t("cropDoctor.scanFailedBody")}
+          </p>
         </Card>
       )}
 
@@ -331,7 +358,7 @@ function ScanTab() {
             {state.status === "analyzing" ? (
               <div className="flex items-center gap-2 text-[14px] text-text-secondary">
                 <Loader2 size={16} className="animate-spin text-green-bright" />
-                Analyzing leaf…
+                {t("cropDoctor.analyzing")}
               </div>
             ) : (
               <>
@@ -346,11 +373,11 @@ function ScanTab() {
                   <div className="min-w-0 flex-1">
                     <p className="text-[16px] font-bold">{state.result.name}</p>
                     <div className="mt-1 flex gap-1.5">
-                      <Tag color="#4ade80" tint="rgba(34,197,94,0.16)">
-                        {state.result.crop}
+                      <Tag color="var(--green-bright)" tint="rgba(34,197,94,0.16)">
+                        {tCrop(state.result.crop)}
                       </Tag>
-                      <Tag color="#fdba74" tint="rgba(251,146,60,0.16)">
-                        {state.result.confidence}% match
+                      <Tag color="#c2410c" tint="rgba(251,146,60,0.16)">
+                        {t("cropDoctor.match", { n: state.result.confidence })}
                       </Tag>
                     </div>
                   </div>
@@ -359,21 +386,21 @@ function ScanTab() {
                   {state.result.note}
                 </p>
                 <p className="mt-2 text-[12px] text-text-muted">
-                  AI estimate — confirm with local agri officer.
+                  {t("cropDoctor.aiNote")}
                 </p>
                 <div className="mt-3 flex gap-2">
                   <Link
                     href={`/crop-doctor/${state.result.slug}`}
                     className="flex-1 rounded-full bg-green-primary py-2.5 text-center text-[13px] font-bold text-white"
                   >
-                    View treatment
+                    {t("cropDoctor.viewTreatment")}
                   </Link>
                   <button
                     type="button"
                     onClick={() => setState({ status: "idle" })}
-                    className="flex items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.06] px-4 text-[13px] font-semibold"
+                    className="flex items-center gap-1.5 rounded-full hairline surface px-4 text-[13px] font-semibold"
                   >
-                    <RotateCcw size={14} /> Rescan
+                    <RotateCcw size={14} /> {t("cropDoctor.rescan")}
                   </button>
                 </div>
               </>
@@ -388,33 +415,38 @@ function ScanTab() {
           onClick={() => cameraRef.current?.click()}
           className="flex flex-1 items-center justify-center gap-2 rounded-full bg-green-primary py-3.5 text-[15px] font-bold text-white shadow-glow transition hover:bg-green-dark"
         >
-          <Camera size={18} /> Camera
+          <Camera size={18} /> {t("cropDoctor.camera")}
         </button>
         <button
           type="button"
           onClick={() => libraryRef.current?.click()}
-          className="flex flex-1 items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.06] py-3.5 text-[15px] font-semibold transition hover:bg-white/10"
+          className="flex flex-1 items-center justify-center gap-2 rounded-full hairline surface py-3.5 text-[15px] font-semibold transition hover-surface"
         >
-          <ImageIcon size={18} /> Library
+          <ImageIcon size={18} /> {t("cropDoctor.gallery")}
         </button>
       </div>
 
       {scans.length > 0 && (
         <section>
-          <SectionLabel icon={<Stethoscope size={14} />}>Recent scans</SectionLabel>
+          <SectionLabel icon={<Stethoscope size={14} />}>
+            {t("cropDoctor.recentScans")}
+          </SectionLabel>
           <Card className="p-0">
             {scans.slice(0, 4).map((s, i) => (
               <Link
                 key={s.id}
                 href={`/crop-doctor/${s.diseaseSlug}`}
                 className={`flex items-center justify-between px-4 py-3 ${
-                  i > 0 ? "border-t border-white/[0.06]" : ""
+                  i > 0 ? "divider-t" : ""
                 }`}
               >
                 <div>
                   <p className="text-[14px] font-semibold">{s.diseaseName}</p>
                   <p className="text-[12px] text-text-muted">
-                    {s.crop} · {new Date(s.createdAt).toLocaleDateString("en-IN")}
+                    {tCrop(s.crop)} ·{" "}
+                    {new Date(s.createdAt).toLocaleDateString(
+                      lang === "hi" ? "hi-IN" : "en-IN"
+                    )}
                   </p>
                 </div>
                 <span className="text-[12px] font-semibold text-green-bright">

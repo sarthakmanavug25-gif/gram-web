@@ -40,6 +40,7 @@ import { sprinklerAdvice } from "@/lib/weather";
 import { CLIMATE_CALENDAR, SEASON_ADVISORY } from "@/lib/seed/reference";
 import { saveFarmStatus } from "@/lib/repo";
 import { timeAgoLabel } from "@/lib/format";
+import { useT } from "@/lib/i18n";
 
 export default function AdvisorPage() {
   return (
@@ -56,6 +57,7 @@ function AdvisorContent() {
   const setSprinkler = useApp((s) => s.setSprinkler);
   const toggleAuto = useApp((s) => s.toggleSprinklerAuto);
   const { weather, loading, updatedAt, refresh } = useWeather();
+  const { t, lang, tCrop, tWeather } = useT();
   const [tipCrop, setTipCrop] = useState("All");
 
   const advice = useMemo(
@@ -72,6 +74,13 @@ function AdvisorContent() {
 
   const percent = sprinklerAuto ? (advice?.percent ?? storedPercent) : storedPercent;
   const level = percent >= 65 ? "High" : percent >= 35 ? "Medium" : "Low";
+
+  /** Dragging the slider hands control to the farmer. */
+  function setManualPercent(value: number) {
+    if (sprinklerAuto) toggleAuto();
+    setSprinkler(value);
+    void saveFarmStatus(value, false);
+  }
   const levelColor =
     level === "High"
       ? "var(--orange)"
@@ -82,22 +91,27 @@ function AdvisorContent() {
   return (
     <div className="space-y-4">
       <ScreenHeader
-        title="Smart Advisory"
+        title={t("advisor.title")}
         action={
-          <HeaderIconButton label="Refresh advisory" onClick={() => refresh()}>
+          <HeaderIconButton label={t("common.refresh")} onClick={() => refresh()}>
             <RefreshCw size={17} className={loading ? "animate-spin" : ""} />
           </HeaderIconButton>
         }
       />
 
       <div>
-        <SectionLabel icon={<Sparkles size={14} />}>Field Weather</SectionLabel>
-        <p className="text-[17px] font-bold">Live advisory for your farm</p>
+        <SectionLabel icon={<Sparkles size={14} />}>
+          {t("advisor.fieldWeather")}
+        </SectionLabel>
+        <p className="text-[17px] font-bold">{t("advisor.liveAdvisory")}</p>
         <div className="mt-1.5 flex items-center gap-1.5 text-[12px] text-text-secondary">
           <MapPin size={13} className="text-green-bright" />
           {profile.locationName}
           <span className="text-text-muted">
-            · Updated {updatedAt ? timeAgoLabel(updatedAt) : "—"}
+            ·{" "}
+            {t("advisor.updated", {
+              time: updatedAt ? timeAgoLabel(updatedAt, lang) : "—",
+            })}
           </span>
         </div>
       </div>
@@ -107,7 +121,7 @@ function AdvisorContent() {
       ) : (
         <Card>
           <SectionLabel icon={<Thermometer size={14} />} color="var(--orange)">
-            Live Weather
+            {t("advisor.liveWeather")}
           </SectionLabel>
           <div className="flex items-center gap-3">
             <IconTile color="var(--amber)" tint="rgba(245,158,11,0.14)" size={50}>
@@ -118,37 +132,37 @@ function AdvisorContent() {
                 {weather.temperature}°C
               </p>
               <p className="mt-1 text-[13px] text-text-secondary">
-                {weather.condition}
+                {tWeather(weather.condition)}
               </p>
             </div>
           </div>
           {weather.fallback && (
             <p className="mt-2 text-[11px] text-text-muted">
-              Showing typical seasonal values — live feed unreachable.
+              {t("advisor.fallback")}
             </p>
           )}
           <div className="mt-4 grid grid-cols-2 gap-2.5">
             <WeatherStat
               icon={<Droplets size={15} />}
-              label="Humidity"
+              label={t("advisor.humidity")}
               value={`${weather.humidity}%`}
               color="var(--blue-info)"
             />
             <WeatherStat
               icon={<CloudRain size={15} />}
-              label="Rain chance"
+              label={t("advisor.rainChance")}
               value={`${weather.rainChance}%`}
               color="#60a5fa"
             />
             <WeatherStat
               icon={<Wind size={15} />}
-              label="Wind"
+              label={t("advisor.wind")}
               value={`${weather.windKph} km/h`}
               color="var(--text-secondary)"
             />
             <WeatherStat
               icon={<Thermometer size={15} />}
-              label="High / Low"
+              label={t("advisor.highLow")}
               value={`${weather.high}° / ${weather.low}°`}
               color="var(--orange)"
             />
@@ -158,7 +172,9 @@ function AdvisorContent() {
 
       <Card>
         <div className="flex items-start justify-between">
-          <SectionLabel icon={<Droplets size={14} />}>Auto Sprinkler</SectionLabel>
+          <SectionLabel icon={<Droplets size={14} />}>
+            {t("advisor.autoSprinkler")}
+          </SectionLabel>
           <button
             type="button"
             onClick={() => {
@@ -168,17 +184,17 @@ function AdvisorContent() {
             className={`rounded-full px-3 py-1 text-[11px] font-bold tracking-wide transition ${
               sprinklerAuto
                 ? "bg-green-primary text-white"
-                : "border border-white/12 bg-white/[0.06] text-text-secondary"
+                : "hairline surface text-text-secondary"
             }`}
           >
-            {sprinklerAuto ? "AUTOMATIC" : "MANUAL"}
+            {sprinklerAuto ? t("advisor.automatic") : t("advisor.manual")}
           </button>
         </div>
 
         <div className="flex items-baseline gap-2">
           <span className="text-[38px] font-bold leading-none">{percent}%</span>
           <span className="text-[15px] font-semibold" style={{ color: levelColor }}>
-            {level}
+            {t(`level.${level}` as "level.Low")}
           </span>
         </div>
 
@@ -190,33 +206,38 @@ function AdvisorContent() {
           </div>
         </div>
 
-        {!sprinklerAuto && (
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={percent}
-            onChange={(e) => {
-              const v = Number(e.target.value);
-              setSprinkler(v);
-              void saveFarmStatus(v, false);
-            }}
-            className="mt-3 w-full accent-[var(--green-primary)]"
-            aria-label="Sprinkler runtime"
-          />
-        )}
+        <input
+          type="range"
+          min={0}
+          max={100}
+          step={1}
+          value={percent}
+          onChange={(e) => setManualPercent(Number(e.target.value))}
+          className="mt-3 w-full accent-[var(--green-primary)]"
+          aria-label={t("advisor.autoSprinkler")}
+        />
+        <p className="mt-1 text-[11px] text-text-muted">{t("advisor.sliderHint")}</p>
 
         <p className="mt-3 text-[13px] text-text-secondary">
-          {advice?.summary ?? "Set the runtime that suits your field today."}
+          {t(
+            percent >= 65
+              ? "sprinkler.high"
+              : percent >= 35
+                ? "sprinkler.medium"
+                : "sprinkler.low"
+          )}
         </p>
         <ul className="mt-2 space-y-1.5">
           {(advice?.notes ?? []).map((n) => (
-            <li key={n.text} className="flex items-center gap-2 text-[12.5px] text-text-secondary">
+            <li
+              key={n.key}
+              className="flex items-center gap-2 text-[12.5px] text-text-secondary"
+            >
               <span
                 className="h-2 w-2 rounded-full"
                 style={{ backgroundColor: n.color }}
               />
-              {n.text}
+              {t(n.key, n.vars)}
             </li>
           ))}
         </ul>
@@ -224,9 +245,9 @@ function AdvisorContent() {
 
       <Card>
         <SectionLabel icon={<CloudRain size={14} />} color="var(--blue-info)">
-          Season Advisory
+          {t("advisor.seasonAdvisory")}
         </SectionLabel>
-        <p className="text-[15px] font-bold">{SEASON_ADVISORY.headline}</p>
+        <p className="text-[15px] font-bold">{t("advisor.seasonHeadline")}</p>
         <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto">
           {SEASON_ADVISORY.crops.map((c) => (
             <Chip
@@ -235,15 +256,19 @@ function AdvisorContent() {
               onClick={() => setTipCrop(c)}
               color="var(--blue-info)"
             >
-              {c}
+              {c === "All" ? t("expenses.all") : tCrop(c)}
             </Chip>
           ))}
         </div>
         <ul className="mt-3 space-y-2">
-          {SEASON_ADVISORY.tips[tipCrop].map((t) => (
-            <li key={t} className="flex gap-2.5">
+          {(lang === "hi" ? SEASON_ADVISORY.tipsHi : SEASON_ADVISORY.tips)[
+            tipCrop
+          ].map((tip) => (
+            <li key={tip} className="flex gap-2.5">
               <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-info" />
-              <span className="text-[13px] leading-snug text-text-secondary">{t}</span>
+              <span className="text-[13px] leading-snug text-text-secondary">
+                {tip}
+              </span>
             </li>
           ))}
         </ul>
@@ -251,11 +276,9 @@ function AdvisorContent() {
 
       <Card>
         <SectionLabel icon={<CalendarRange size={14} />} color="var(--blue-info)">
-          India Climate Calendar
+          {t("advisor.climate")}
         </SectionLabel>
-        <p className="mb-3 text-[12px] text-text-muted">
-          Average monthly rainfall and mean temperature
-        </p>
+        <p className="mb-3 text-[12px] text-text-muted">{t("advisor.climateSub")}</p>
         <div className="h-[220px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
@@ -300,7 +323,7 @@ function AdvisorContent() {
               <Bar
                 yAxisId="rain"
                 dataKey="rain"
-                name="Rainfall (mm)"
+                name={t("advisor.rainfall")}
                 fill="var(--blue-info)"
                 radius={[4, 4, 0, 0]}
                 barSize={12}
@@ -309,7 +332,7 @@ function AdvisorContent() {
                 yAxisId="temp"
                 type="monotone"
                 dataKey="temp"
-                name="Avg temp (°C)"
+                name={t("advisor.avgTemp")}
                 stroke="var(--orange)"
                 strokeWidth={2.5}
                 dot={false}
@@ -321,7 +344,7 @@ function AdvisorContent() {
           {CLIMATE_CALENDAR.map((m) => (
             <div key={m.month} className="flex items-center gap-3">
               <span className="w-8 text-[12px] text-text-muted">{m.month}</span>
-              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.07]">
+              <div className="h-1.5 flex-1 overflow-hidden rounded-full surface-2">
                 <div
                   className="h-full rounded-full bg-info"
                   style={{ width: `${(m.rain / 285) * 100}%` }}
@@ -353,7 +376,7 @@ function WeatherStat({
   color: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.04] px-3 py-2.5">
+    <div className="rounded-2xl hairline surface px-3 py-2.5">
       <div className="flex items-center gap-1.5 text-[11px] text-text-muted">
         <span style={{ color }}>{icon}</span>
         {label}

@@ -18,10 +18,16 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className="min-h-dvh bg-bg-black text-text-primary antialiased">
-        {children}
-      </body>
+    <html lang="en" data-theme="dark">
+      <head>
+        {/* Applies the saved theme before first paint so there is no flash. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var s=JSON.parse(localStorage.getItem('gramconnect-state')||'{}');var t=s&&s.state&&s.state.theme;if(t)document.documentElement.dataset.theme=t;}catch(e){}`,
+          }}
+        />
+      </head>
+      <body className="min-h-dvh text-text-primary antialiased">{children}</body>
     </html>
   );
 }

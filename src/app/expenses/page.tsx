@@ -36,6 +36,7 @@ import {
   categoryMeta,
 } from "@/lib/seed/categories";
 import { isThisMonth, rupees, shortDate } from "@/lib/format";
+import { useT } from "@/lib/i18n";
 
 export default function ExpensesPage() {
   return (
@@ -48,6 +49,7 @@ export default function ExpensesPage() {
 function ExpensesContent() {
   const expenses = useApp((s) => s.expenses);
   const profile = useApp((s) => s.profile);
+  const { t, lang, tCrop, tCategory, tPayment, tSeason } = useT();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [crop, setCrop] = useState("All crops");
@@ -78,17 +80,14 @@ function ExpensesContent() {
   }, [expenses]);
 
   const insight = useMemo(() => {
-    if (byCategory.length === 0)
-      return "Add a few entries and this box will show where your money is going.";
+    if (byCategory.length === 0) return t("expenses.insight.empty");
     const top = byCategory[0];
-    if (top.key === "Fertilizer")
-      return `Fertilizer is ${Math.round(top.pct)}% of spend — consider soil testing to optimize urea usage.`;
-    if (top.key === "Labor")
-      return `Labor is ${Math.round(top.pct)}% of spend — machine hire for one operation could bring this down.`;
-    if (top.key === "Diesel & Fuel")
-      return `Diesel & Fuel is ${Math.round(top.pct)}% of spend — check pump efficiency and irrigation timing.`;
-    return `${top.key} is ${Math.round(top.pct)}% of spend — review whether that share fits your plan for this season.`;
-  }, [byCategory]);
+    const pct = Math.round(top.pct);
+    if (top.key === "Fertilizer") return t("expenses.insight.fertilizer", { pct });
+    if (top.key === "Labor") return t("expenses.insight.labor", { pct });
+    if (top.key === "Diesel & Fuel") return t("expenses.insight.fuel", { pct });
+    return t("expenses.insight.generic", { pct, category: tCategory(top.key) });
+  }, [byCategory, t, tCategory]);
 
   const cropOptions = useMemo(
     () => ["All crops", ...Array.from(new Set(expenses.map((e) => e.crop)))],
@@ -119,11 +118,11 @@ function ExpensesContent() {
   return (
     <div className="space-y-4">
       <ScreenHeader
-        title="Farm Expenses"
+        title={t("expenses.title")}
         action={
           <button
             type="button"
-            aria-label="Add expense"
+            aria-label={t("expenses.add")}
             onClick={() => setShowAdd(true)}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-green-primary text-white shadow-glow transition hover:bg-green-dark"
           >
@@ -140,8 +139,8 @@ function ExpensesContent() {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search crop, category, or notes"
-          className="h-[46px] w-full rounded-full border border-white/8 bg-white/[0.05] pl-10 pr-4 text-[14px] outline-none focus:border-green-primary/50"
+          placeholder={t("expenses.search")}
+          className="h-[46px] w-full rounded-full hairline surface pl-10 pr-4 text-[14px] outline-none focus:border-green-primary/50"
         />
       </div>
 
@@ -149,21 +148,23 @@ function ExpensesContent() {
         <div className="flex items-start justify-between">
           <div>
             <SectionLabel icon={<CircleDollarSign size={14} />}>
-              Farm Ledger
+              {t("expenses.ledger")}
             </SectionLabel>
             <p className="text-[32px] font-bold leading-none">
               {rupees(monthTotal)}
             </p>
-            <p className="mt-1 text-[13px] text-text-secondary">Spent this month</p>
+            <p className="mt-1 text-[13px] text-text-secondary">
+              {t("expenses.spentThisMonth")}
+            </p>
             <div className="mt-3 flex items-center gap-2 text-[12.5px] font-semibold">
               <span className="flex items-center gap-1.5 text-green-bright">
                 <Sprout size={13} />
-                {profile.farmSizeAcres.toFixed(1)} acres
+                {t("common.acres", { n: profile.farmSizeAcres.toFixed(1) })}
               </span>
               <span className="text-text-muted">·</span>
-              <span className="flex items-center gap-1.5 text-[#93c5fd]">
+              <span className="flex items-center gap-1.5 text-info">
                 <CloudRain size={13} />
-                {profile.season}
+                {tSeason(profile.season)}
               </span>
             </div>
           </div>
@@ -172,14 +173,16 @@ function ExpensesContent() {
       </Card>
 
       <div className="grid grid-cols-3 gap-2.5">
-        <MiniStat value={rupees(perAcre)} label="Per acre" />
-        <MiniStat value={rupees(budget)} label="Budget" />
-        <MiniStat value={String(expenses.length)} label="Entries" />
+        <MiniStat value={rupees(perAcre)} label={t("expenses.perAcre")} />
+        <MiniStat value={rupees(budget)} label={t("expenses.budget")} />
+        <MiniStat value={String(expenses.length)} label={t("expenses.entries")} />
       </div>
 
       <Card>
         <div className="flex items-center justify-between">
-          <SectionLabel icon={<BarChart3 size={14} />}>Season Budget</SectionLabel>
+          <SectionLabel icon={<BarChart3 size={14} />}>
+            {t("expenses.seasonBudget")}
+          </SectionLabel>
           <span
             className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${
               overBudget
@@ -189,10 +192,14 @@ function ExpensesContent() {
                   : "bg-green-primary/15 text-green-bright"
             }`}
           >
-            {overBudget ? "Over budget" : budgetPct > 80 ? "Watch spend" : "On track"}
+            {overBudget
+              ? t("expenses.overBudget")
+              : budgetPct > 80
+                ? t("expenses.watchSpend")
+                : t("expenses.onTrack")}
           </span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-white/[0.08]">
+        <div className="h-2 w-full overflow-hidden rounded-full surface-2">
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{
@@ -207,12 +214,12 @@ function ExpensesContent() {
         </div>
         <p className="mt-2.5 text-[13px] text-text-secondary">
           {overBudget
-            ? `You are ${rupees(monthTotal - budget)} over the seasonal budget.`
-            : `Spending is well within your seasonal budget. ${rupees(budget - monthTotal)} left.`}
+            ? t("expenses.over", { amount: rupees(monthTotal - budget) })
+            : t("expenses.within", { left: rupees(budget - monthTotal) })}
         </p>
-        <div className="mt-3 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-white/[0.04] px-3 py-2">
+        <div className="mt-3 flex items-center justify-between rounded-2xl hairline surface px-3 py-2">
           <span className="text-[13px] text-text-secondary">
-            Farm size: {profile.farmSizeAcres.toFixed(1)} acres
+            {t("expenses.farmSize", { n: profile.farmSizeAcres.toFixed(1) })}
           </span>
           <div className="flex items-center gap-2">
             <StepperButton label="Decrease farm size" onClick={() => adjustFarmSize(-0.5)}>
@@ -225,7 +232,7 @@ function ExpensesContent() {
         </div>
       </Card>
 
-      <div className="rounded-2xl border border-white/[0.06] border-l-4 border-l-amber bg-amber/[0.08] px-4 py-3">
+      <div className="rounded-2xl hairline border-l-4 border-l-amber bg-amber/[0.08] px-4 py-3">
         <div className="flex gap-2.5">
           <Lightbulb size={17} className="mt-0.5 shrink-0 text-amber" />
           <p className="text-[13px] leading-snug text-text-secondary">{insight}</p>
@@ -233,10 +240,12 @@ function ExpensesContent() {
       </div>
 
       <Card>
-        <SectionLabel icon={<BarChart3 size={14} />}>Spend by Category</SectionLabel>
+        <SectionLabel icon={<BarChart3 size={14} />}>
+          {t("expenses.byCategory")}
+        </SectionLabel>
         {byCategory.length === 0 ? (
           <p className="py-4 text-center text-[13px] text-text-secondary">
-            No spending recorded yet.
+            {t("expenses.noSpend")}
           </p>
         ) : (
           <div className="space-y-3">
@@ -250,14 +259,14 @@ function ExpensesContent() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="truncate text-[13px] font-semibold">
-                        {row.key}
+                        {tCategory(row.key)}
                       </span>
                       <span className="shrink-0 text-[13px] font-bold">
                         {rupees(row.amount)}
                       </span>
                     </div>
                     <div className="mt-1.5 flex items-center gap-2">
-                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.07]">
+                      <div className="h-1.5 flex-1 overflow-hidden rounded-full surface-2">
                         <div
                           className="h-full rounded-full"
                           style={{
@@ -280,11 +289,11 @@ function ExpensesContent() {
 
       <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4">
         <Chip active={category === "All"} onClick={() => setCategory("All")}>
-          All
+          {t("expenses.all")}
         </Chip>
         {CATEGORY_KEYS.map((c) => (
           <Chip key={c} active={category === c} onClick={() => setCategory(c)}>
-            {c}
+            {tCategory(c)}
           </Chip>
         ))}
       </div>
@@ -297,13 +306,15 @@ function ExpensesContent() {
             onClick={() => setCrop(c)}
             color="var(--blue-info)"
           >
-            {c}
+            {c === "All crops" ? t("expenses.allCrops") : tCrop(c)}
           </Chip>
         ))}
       </div>
 
       <p className="text-[13px] text-text-secondary">
-        {filtered.length} entr{filtered.length === 1 ? "y" : "ies"}
+        {filtered.length === 1
+          ? t("expenses.count_one")
+          : t("expenses.count", { n: filtered.length })}
       </p>
 
       <div className="space-y-2.5">
@@ -311,11 +322,15 @@ function ExpensesContent() {
           <Card>
             <EmptyState
               icon={<CircleDollarSign size={28} />}
-              title={expenses.length === 0 ? "No expenses yet" : "Nothing matches"}
+              title={
+                expenses.length === 0
+                  ? t("expenses.emptyTitle")
+                  : t("expenses.noMatchTitle")
+              }
               body={
                 expenses.length === 0
-                  ? "Tap the green + button to record your first farm expense."
-                  : "Clear the search or pick a different filter to see your entries."
+                  ? t("expenses.emptyBody")
+                  : t("expenses.noMatchBody")
               }
               action={
                 expenses.length === 0 ? (
@@ -324,7 +339,7 @@ function ExpensesContent() {
                     onClick={() => setShowAdd(true)}
                     className="mt-2 rounded-full bg-green-primary px-4 py-2 text-[13px] font-bold text-white"
                   >
-                    Add expense
+                    {t("expenses.add")}
                   </button>
                 ) : undefined
               }
@@ -346,24 +361,24 @@ function ExpensesContent() {
                   <CategoryIcon name={meta.icon} size={18} />
                 </IconTile>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[14px] font-bold">{e.category}</p>
+                  <p className="text-[14px] font-bold">{tCategory(e.category)}</p>
                   <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                    <Tag color="#4ade80" tint="rgba(34,197,94,0.14)">
-                      {e.crop}
+                    <Tag color="var(--green-bright)" tint="rgba(34,197,94,0.14)">
+                      {tCrop(e.crop)}
                     </Tag>
-                    <Tag color="#9ca3af" tint="rgba(156,163,175,0.14)">
-                      {e.paymentMethod}
+                    <Tag color="var(--text-secondary)" tint="rgba(156,163,175,0.16)">
+                      {tPayment(e.paymentMethod)}
                     </Tag>
                   </div>
                   <p className="mt-1 truncate text-[12px] text-text-muted">
-                    {shortDate(e.date)}
+                    {shortDate(e.date, lang)}
                     {e.notes ? ` · ${e.notes}` : ""}
                   </p>
                 </div>
                 <span className="text-[15px] font-bold">{rupees(e.amount)}</span>
                 <button
                   type="button"
-                  aria-label={`Delete ${e.category} expense`}
+                  aria-label={`${t("expenses.title")} — ${tCategory(e.category)}`}
                   onClick={() => void deleteExpense(e.id)}
                   className="rounded-full p-2 text-text-muted transition hover:bg-red-500/15 hover:text-red-300"
                 >
@@ -396,7 +411,7 @@ function StepperButton({
       type="button"
       aria-label={label}
       onClick={onClick}
-      className="flex h-8 w-8 items-center justify-center rounded-full border border-white/12 bg-white/[0.06] text-text-primary transition hover:bg-white/12"
+      className="flex h-8 w-8 items-center justify-center rounded-full hairline surface text-text-primary transition hover:surface-2"
     >
       {children}
     </button>
@@ -451,6 +466,7 @@ function BudgetRing({ percent, over }: { percent: number; over: boolean }) {
 }
 
 function AddExpenseSheet({ onClose }: { onClose: () => void }) {
+  const { t, tCrop, tCategory, tPayment } = useT();
   const [crop, setCrop] = useState(EXPENSE_CROPS[0]);
   const [category, setCategory] = useState<string>(CATEGORIES[0].key);
   const [amount, setAmount] = useState("");
@@ -464,7 +480,7 @@ function AddExpenseSheet({ onClose }: { onClose: () => void }) {
     e.preventDefault();
     const value = Number(amount);
     if (!value || value <= 0) {
-      setError("Enter an amount greater than zero.");
+      setError(t("expenses.amountError"));
       return;
     }
     setSaving(true);
@@ -487,39 +503,39 @@ function AddExpenseSheet({ onClose }: { onClose: () => void }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="fixed inset-0 z-50 bg-black/65 backdrop-blur-sm"
+        className="fixed inset-0 z-50 overlay-bg backdrop-blur-sm"
       />
       <motion.div
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 30, stiffness: 280 }}
-        className="fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[88dvh] w-full max-w-phone overflow-y-auto rounded-t-[26px] border border-white/10 bg-[rgba(16,19,16,0.98)] px-4 pb-[max(20px,env(safe-area-inset-bottom))] pt-4"
+        className="fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[88dvh] w-full max-w-phone overflow-y-auto rounded-t-[26px] hairline sheet-surface px-4 pb-[max(20px,env(safe-area-inset-bottom))] pt-4"
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-[19px] font-bold">Add expense</h2>
+          <h2 className="text-[19px] font-bold">{t("expenses.add")}</h2>
           <button
             type="button"
             aria-label="Close"
             onClick={onClose}
-            className="rounded-full p-1.5 text-text-secondary hover:bg-white/10"
+            className="rounded-full p-1.5 text-text-secondary hover-surface"
           >
             <X size={18} />
           </button>
         </div>
 
         <form onSubmit={submit} className="space-y-3.5">
-          <FieldWrap label="Amount (₹)">
+          <FieldWrap label={t("expenses.amount")}>
             <input
               value={amount}
               onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ""))}
               inputMode="decimal"
               placeholder="0"
-              className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-[16px] font-semibold outline-none focus:border-green-primary/50"
+              className="h-12 w-full rounded-2xl hairline surface px-4 text-[16px] font-semibold outline-none focus:border-green-primary/50"
             />
           </FieldWrap>
 
-          <FieldWrap label="Category">
+          <FieldWrap label={t("expenses.category")}>
             <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
               {CATEGORIES.map((c) => (
                 <Chip
@@ -528,47 +544,47 @@ function AddExpenseSheet({ onClose }: { onClose: () => void }) {
                   onClick={() => setCategory(c.key)}
                   color={c.color}
                 >
-                  {c.key}
+                  {tCategory(c.key)}
                 </Chip>
               ))}
             </div>
           </FieldWrap>
 
-          <FieldWrap label="Crop">
+          <FieldWrap label={t("expenses.crop")}>
             <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1">
               {EXPENSE_CROPS.map((c) => (
                 <Chip key={c} active={crop === c} onClick={() => setCrop(c)}>
-                  {c}
+                  {tCrop(c)}
                 </Chip>
               ))}
             </div>
           </FieldWrap>
 
-          <FieldWrap label="Payment method">
+          <FieldWrap label={t("expenses.payment")}>
             <div className="flex gap-2">
               {PAYMENT_METHODS.map((m) => (
                 <Chip key={m} active={method === m} onClick={() => setMethod(m)}>
-                  {m}
+                  {tPayment(m)}
                 </Chip>
               ))}
             </div>
           </FieldWrap>
 
-          <FieldWrap label="Date">
+          <FieldWrap label={t("expenses.date")}>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-[14px] outline-none focus:border-green-primary/50"
+              className="h-12 w-full rounded-2xl hairline surface px-4 text-[14px] outline-none focus:border-green-primary/50"
             />
           </FieldWrap>
 
-          <FieldWrap label="Notes">
+          <FieldWrap label={t("expenses.notes")}>
             <input
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="e.g. Urea top-dress, 2 bags"
-              className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-[14px] outline-none focus:border-green-primary/50"
+              placeholder={t("expenses.notesHint")}
+              className="h-12 w-full rounded-2xl hairline surface px-4 text-[14px] outline-none focus:border-green-primary/50"
             />
           </FieldWrap>
 
@@ -579,7 +595,7 @@ function AddExpenseSheet({ onClose }: { onClose: () => void }) {
           )}
 
           <PrimaryButton type="submit" disabled={saving}>
-            {saving ? "Saving…" : "Save expense"}
+            {saving ? t("common.saving") : t("expenses.saveExpense")}
           </PrimaryButton>
         </form>
       </motion.div>

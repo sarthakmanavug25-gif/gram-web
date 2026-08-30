@@ -9,6 +9,7 @@ import { useApp } from "@/lib/store";
 import { saveProfile } from "@/lib/repo";
 import { SEASONS } from "@/lib/seed/reference";
 import { EXPENSE_CROPS } from "@/lib/seed/categories";
+import { useT } from "@/lib/i18n";
 
 const LOCATIONS = [
   { name: "Nashik, Maharashtra", latitude: 19.9975, longitude: 73.7898 },
@@ -30,6 +31,7 @@ export default function SettingsPage() {
 function SettingsContent() {
   const router = useRouter();
   const profile = useApp((s) => s.profile);
+  const { t, tCrop, tSeason } = useT();
   const [name, setName] = useState(profile.name);
   const [acres, setAcres] = useState(String(profile.farmSizeAcres));
   const [budget, setBudget] = useState(String(profile.monthlyBudget));
@@ -69,68 +71,68 @@ function SettingsContent() {
         <button
           type="button"
           onClick={() => router.back()}
-          aria-label="Go back"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06]"
+          aria-label={t("common.back")}
+          className="flex h-10 w-10 items-center justify-center rounded-full hairline surface"
         >
           <ArrowLeft size={18} />
         </button>
-        <h1 className="text-[26px] font-bold">Settings</h1>
+        <h1 className="text-[26px] font-bold">{t("settings.title")}</h1>
       </div>
 
       <Card className="space-y-4">
-        <Field label="Name">
+        <Field label={t("settings.name")}>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-[15px] outline-none focus:border-green-primary/50"
+            className="h-12 w-full rounded-2xl hairline surface px-4 text-[15px] outline-none focus:border-green-primary/50"
           />
         </Field>
 
-        <Field label="Phone (read-only)">
+        <Field label={t("settings.phone")}>
           <input
-            value={profile.phone || "Guest session"}
+            value={profile.phone || t("common.guest")}
             readOnly
-            className="h-12 w-full cursor-not-allowed rounded-2xl border border-white/8 bg-white/[0.03] px-4 text-[15px] text-text-muted outline-none"
+            className="h-12 w-full cursor-not-allowed rounded-2xl hairline surface px-4 text-[15px] text-text-muted outline-none"
           />
         </Field>
 
         <div className="grid grid-cols-2 gap-3">
-          <Field label="Farm size (acres)">
+          <Field label={t("settings.farmSize")}>
             <input
               value={acres}
               onChange={(e) => setAcres(e.target.value.replace(/[^\d.]/g, ""))}
               inputMode="decimal"
-              className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-[15px] outline-none focus:border-green-primary/50"
+              className="h-12 w-full rounded-2xl hairline surface px-4 text-[15px] outline-none focus:border-green-primary/50"
             />
           </Field>
-          <Field label="Monthly budget (₹)">
+          <Field label={t("settings.budget")}>
             <input
               value={budget}
               onChange={(e) => setBudget(e.target.value.replace(/[^\d]/g, ""))}
               inputMode="numeric"
-              className="h-12 w-full rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-[15px] outline-none focus:border-green-primary/50"
+              className="h-12 w-full rounded-2xl hairline surface px-4 text-[15px] outline-none focus:border-green-primary/50"
             />
           </Field>
         </div>
       </Card>
 
       <Card>
-        <SectionLabel>Primary crops</SectionLabel>
+        <SectionLabel>{t("settings.primaryCrops")}</SectionLabel>
         <div className="flex flex-wrap gap-2">
           {EXPENSE_CROPS.map((c) => (
             <Chip key={c} active={crops.includes(c)} onClick={() => toggleCrop(c)}>
-              {c}
+              {tCrop(c)}
             </Chip>
           ))}
         </div>
       </Card>
 
       <Card>
-        <SectionLabel>Season</SectionLabel>
+        <SectionLabel>{t("settings.season")}</SectionLabel>
         <div className="flex gap-2">
           {SEASONS.map((s) => (
             <Chip key={s} active={season === s} onClick={() => setSeason(s)}>
-              {s}
+              {tSeason(s)}
             </Chip>
           ))}
         </div>
@@ -138,7 +140,7 @@ function SettingsContent() {
 
       <Card>
         <SectionLabel icon={<MapPin size={14} />} color="var(--blue-info)">
-          Location for weather
+          {t("settings.location")}
         </SectionLabel>
         <div className="flex flex-wrap gap-2">
           {LOCATIONS.map((l) => (
@@ -153,7 +155,7 @@ function SettingsContent() {
           ))}
         </div>
         <p className="mt-2 text-[12px] text-text-muted">
-          The advisor also uses browser geolocation when you allow it.
+          {t("settings.geoNote")}
         </p>
       </Card>
 
@@ -163,7 +165,7 @@ function SettingsContent() {
         ) : saved ? (
           <Check size={17} />
         ) : null}
-        {saved ? "Saved" : "Save changes"}
+        {saved ? t("common.saved") : t("common.save")}
       </PrimaryButton>
     </div>
   );

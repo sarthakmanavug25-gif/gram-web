@@ -6,12 +6,14 @@ import { motion } from "framer-motion";
 import { Loader2, Sprout } from "lucide-react";
 import { signIn, signUp } from "@/lib/repo";
 import { useApp } from "@/lib/store";
+import { useT } from "@/lib/i18n";
 
 type Mode = "login" | "signup";
 
 export default function LoginPage() {
   const router = useRouter();
   const markWelcomeSeen = useApp((s) => s.markWelcomeSeen);
+  const { t } = useT();
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -25,20 +27,20 @@ export default function LoginPage() {
     setError("");
 
     if (!/^\d{10}$/.test(phone.replace(/\D/g, ""))) {
-      setError("Enter a valid 10-digit phone number.");
+      setError(t("login.err.phone"));
       return;
     }
     if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+      setError(t("login.err.password"));
       return;
     }
     if (mode === "signup") {
       if (name.trim().length < 2) {
-        setError("Please enter your name.");
+        setError(t("login.err.name"));
         return;
       }
       if (password !== confirm) {
-        setError("Passwords do not match.");
+        setError(t("login.err.mismatch"));
         return;
       }
     }
@@ -76,35 +78,35 @@ export default function LoginPage() {
         <form onSubmit={submit} className="space-y-3">
           {mode === "signup" && (
             <Field
-              label="Full name"
+              label={t("login.name")}
               value={name}
               onChange={setName}
-              placeholder="Full Name"
+              placeholder={t("login.name")}
               autoComplete="name"
             />
           )}
           <Field
-            label="Phone number"
+            label={t("login.phone")}
             value={phone}
             onChange={(v) => setPhone(v.replace(/[^\d]/g, "").slice(0, 10))}
-            placeholder="Phone Number"
+            placeholder={t("login.phone")}
             inputMode="numeric"
             autoComplete="tel"
           />
           <Field
-            label="Password"
+            label={t("login.password")}
             value={password}
             onChange={setPassword}
-            placeholder="Password"
+            placeholder={t("login.password")}
             type="password"
             autoComplete={mode === "login" ? "current-password" : "new-password"}
           />
           {mode === "signup" && (
             <Field
-              label="Confirm password"
+              label={t("login.confirm")}
               value={confirm}
               onChange={setConfirm}
-              placeholder="Confirm Password"
+              placeholder={t("login.confirm")}
               type="password"
               autoComplete="new-password"
             />
@@ -122,7 +124,7 @@ export default function LoginPage() {
             className="mt-1 flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-green-primary text-[16px] font-bold text-white shadow-glow transition hover:bg-green-dark disabled:opacity-60"
           >
             {busy && <Loader2 size={18} className="animate-spin" />}
-            {mode === "login" ? "Login" : "Create account"}
+            {mode === "login" ? t("login.login") : t("login.create")}
           </button>
         </form>
 
@@ -134,14 +136,11 @@ export default function LoginPage() {
           }}
           className="mt-4 w-full text-center text-[13px] font-medium text-[#4a9bff] underline-offset-2 hover:underline"
         >
-          {mode === "login"
-            ? "Don't have an account? Create one"
-            : "Already have an account? Login"}
+          {mode === "login" ? t("login.toSignup") : t("login.toLogin")}
         </button>
 
         <p className="mt-6 text-center text-[12px] text-white/45">
-          New here? Create an account — your data stays on this device unless a
-          Supabase project is connected.
+          {t("login.note")}
         </p>
       </motion.div>
     </main>
@@ -175,7 +174,7 @@ function Field({
         type={type}
         inputMode={inputMode}
         autoComplete={autoComplete}
-        className="h-[52px] w-full rounded-xl border border-white/10 bg-[#0d100d] px-4 text-[15px] text-white outline-none transition focus:border-green-primary/60"
+        className="h-[52px] w-full rounded-xl hairline bg-[#0d100d] px-4 text-[15px] text-white outline-none transition focus:border-green-primary/60"
       />
     </label>
   );

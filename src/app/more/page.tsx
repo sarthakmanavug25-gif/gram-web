@@ -11,7 +11,9 @@ import {
   Info,
   Languages,
   LogOut,
+  Moon,
   Store,
+  Sun,
   User,
 } from "lucide-react";
 import AppShell from "@/components/AppShell";
@@ -20,6 +22,7 @@ import { Card, IconTile } from "@/components/ui/primitives";
 import { useApp } from "@/lib/store";
 import { signOut } from "@/lib/repo";
 import { supabaseConfigured } from "@/lib/supabase/client";
+import { useT } from "@/lib/i18n";
 
 export default function MorePage() {
   return (
@@ -34,7 +37,10 @@ function MoreContent() {
   const profile = useApp((s) => s.profile);
   const language = useApp((s) => s.language);
   const setLanguage = useApp((s) => s.setLanguage);
+  const theme = useApp((s) => s.theme);
+  const setTheme = useApp((s) => s.setTheme);
   const seedDemoData = useApp((s) => s.seedDemoData);
+  const { t } = useT();
   const [alerts, setAlerts] = useState(true);
   const [notifications, setNotifications] = useState(true);
 
@@ -45,7 +51,7 @@ function MoreContent() {
 
   return (
     <div className="space-y-4">
-      <ScreenHeader title="More" />
+      <ScreenHeader title={t("more.title")} />
 
       <Card className="flex items-center gap-3">
         <IconTile color="var(--green-primary)" tint="rgba(34,197,94,0.14)" size={48}>
@@ -54,39 +60,43 @@ function MoreContent() {
         <div className="min-w-0 flex-1">
           <p className="text-[16px] font-bold">{profile.name}</p>
           <p className="text-[13px] text-text-secondary">
-            {profile.phone || "Guest session"} · {profile.farmSizeAcres.toFixed(1)} acres
+            {profile.phone || t("common.guest")} ·{" "}
+            {t("common.acres", { n: profile.farmSizeAcres.toFixed(1) })}
           </p>
         </div>
         <Link
           href="/settings"
-          className="rounded-full border border-white/12 bg-white/[0.06] px-3 py-1.5 text-[12px] font-semibold"
+          className="rounded-full hairline surface px-3 py-1.5 text-[12px] font-semibold"
         >
-          Edit
+          {t("common.edit")}
         </Link>
       </Card>
 
       <Card className="p-0">
-        <Row href="/settings" icon={<User size={18} />} label="Profile" />
-        <Row href="/market" icon={<Store size={18} />} label="Market Prices" />
+        <Row href="/settings" icon={<User size={18} />} label={t("more.profile")} />
+        <Row href="/market" icon={<Store size={18} />} label={t("more.marketPrices")} />
         <ToggleRow
           icon={<BellRing size={18} />}
-          label="Weather Alerts"
+          label={t("more.weatherAlerts")}
           value={alerts}
           onChange={setAlerts}
         />
-        <div className="flex items-center gap-3 border-t border-white/[0.06] px-4 py-3.5">
+
+        <div className="flex items-center gap-3 divider-t px-4 py-3.5">
           <IconTile color="var(--blue-info)" tint="rgba(59,130,246,0.14)" size={36}>
             <Languages size={18} />
           </IconTile>
-          <span className="flex-1 text-[14px] font-medium">Language</span>
-          <div className="flex rounded-full border border-white/10 bg-white/[0.05] p-0.5">
+          <span className="flex-1 text-[14px] font-medium">{t("more.language")}</span>
+          <div className="flex rounded-full hairline surface p-0.5">
             {(["en", "hi"] as const).map((l) => (
               <button
                 key={l}
                 type="button"
                 onClick={() => setLanguage(l)}
                 className={`rounded-full px-3 py-1 text-[12px] font-semibold transition ${
-                  language === l ? "bg-green-primary text-white" : "text-text-secondary"
+                  language === l
+                    ? "bg-green-primary text-white"
+                    : "text-text-secondary"
                 }`}
               >
                 {l === "en" ? "English" : "हिंदी"}
@@ -94,14 +104,39 @@ function MoreContent() {
             ))}
           </div>
         </div>
+
+        <div className="flex items-center gap-3 divider-t px-4 py-3.5">
+          <IconTile color="var(--amber)" tint="rgba(245,158,11,0.14)" size={36}>
+            {theme === "dark" ? <Moon size={18} /> : <Sun size={18} />}
+          </IconTile>
+          <span className="flex-1 text-[14px] font-medium">{t("more.theme")}</span>
+          <div className="flex rounded-full hairline surface p-0.5">
+            {(["light", "dark"] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setTheme(mode)}
+                className={`flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-semibold transition ${
+                  theme === mode
+                    ? "bg-green-primary text-white"
+                    : "text-text-secondary"
+                }`}
+              >
+                {mode === "light" ? <Sun size={13} /> : <Moon size={13} />}
+                {mode === "light" ? t("more.themeLight") : t("more.themeDark")}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <ToggleRow
           icon={<BellRing size={18} />}
-          label="Notifications"
+          label={t("more.notifications")}
           value={notifications}
           onChange={setNotifications}
         />
-        <Row href="/help" icon={<CircleHelp size={18} />} label="Help & Support" />
-        <Row href="/about" icon={<Info size={18} />} label="About GramConnect" />
+        <Row href="/help" icon={<CircleHelp size={18} />} label={t("more.help")} />
+        <Row href="/about" icon={<Info size={18} />} label={t("more.about")} />
       </Card>
 
       <Card className="flex items-center gap-3">
@@ -109,28 +144,26 @@ function MoreContent() {
           <Database size={18} />
         </IconTile>
         <div className="min-w-0 flex-1">
-          <p className="text-[14px] font-semibold">Demo data</p>
+          <p className="text-[14px] font-semibold">{t("more.demoData")}</p>
           <p className="text-[12px] text-text-secondary">
-            {supabaseConfigured
-              ? "Connected to Supabase."
-              : "Running on local device storage — no Supabase keys set."}
+            {supabaseConfigured ? t("more.demoCloud") : t("more.demoLocal")}
           </p>
         </div>
         <button
           type="button"
           onClick={seedDemoData}
-          className="rounded-full border border-white/12 bg-white/[0.06] px-3 py-1.5 text-[12px] font-semibold"
+          className="rounded-full hairline surface px-3 py-1.5 text-[12px] font-semibold"
         >
-          Reseed
+          {t("more.reseed")}
         </button>
       </Card>
 
       <button
         type="button"
         onClick={handleLogout}
-        className="flex w-full items-center justify-center gap-2 rounded-full border border-red-400/25 bg-red-500/10 py-3.5 text-[15px] font-bold text-red-300 transition hover:bg-red-500/20"
+        className="flex w-full items-center justify-center gap-2 rounded-full border border-red-400/25 bg-red-500/10 py-3.5 text-[15px] font-bold text-red-500 transition hover:bg-red-500/20"
       >
-        <LogOut size={18} /> Logout
+        <LogOut size={18} /> {t("more.logout")}
       </button>
     </div>
   );
@@ -148,7 +181,7 @@ function Row({
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 border-white/[0.06] px-4 py-3.5 [&:not(:first-child)]:border-t"
+      className="flex items-center gap-3 px-4 py-3.5 [&:not(:first-child)]:divider-t"
     >
       <IconTile color="var(--green-primary)" tint="rgba(34,197,94,0.14)" size={36}>
         {icon}
@@ -171,7 +204,7 @@ function ToggleRow({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <div className="flex items-center gap-3 border-t border-white/[0.06] px-4 py-3.5">
+    <div className="flex items-center gap-3 divider-t px-4 py-3.5">
       <IconTile color="var(--amber)" tint="rgba(245,158,11,0.14)" size={36}>
         {icon}
       </IconTile>
@@ -183,11 +216,11 @@ function ToggleRow({
         aria-label={label}
         onClick={() => onChange(!value)}
         className={`h-6 w-11 rounded-full p-0.5 transition ${
-          value ? "bg-green-primary" : "bg-white/12"
+          value ? "bg-green-primary" : "surface-2"
         }`}
       >
         <span
-          className={`block h-5 w-5 rounded-full bg-white transition ${
+          className={`block h-5 w-5 rounded-full bg-white shadow transition ${
             value ? "translate-x-5" : ""
           }`}
         />

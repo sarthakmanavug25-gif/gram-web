@@ -150,6 +150,7 @@ type State = {
   sprinklerPercent: number;
   sprinklerAuto: boolean;
   language: "en" | "hi";
+  theme: "dark" | "light";
   hasSeenWelcome: boolean;
 };
 
@@ -177,6 +178,7 @@ type Actions = {
   updateChat: (id: string, content: string) => void;
   clearChat: () => void;
   setLanguage: (l: "en" | "hi") => void;
+  setTheme: (t: "dark" | "light") => void;
   seedDemoData: () => void;
   markWelcomeSeen: () => void;
 };
@@ -194,6 +196,7 @@ export const useApp = create<State & Actions>()(
       sprinklerPercent: 74,
       sprinklerAuto: true,
       language: "en",
+      theme: "dark",
       hasSeenWelcome: false,
 
       setHydrated: () => set({ hydrated: true }),
@@ -268,13 +271,15 @@ export const useApp = create<State & Actions>()(
 
       setLanguage: (language) => set({ language }),
 
+      setTheme: (theme) => set({ theme }),
+
       seedDemoData: () => set({ expenses: demoExpenses() }),
 
       markWelcomeSeen: () => set({ hasSeenWelcome: true }),
     }),
     {
       name: "gramconnect-state",
-      version: 1,
+      version: 2,
       onRehydrateStorage: () => (state) => state?.setHydrated(),
     }
   )

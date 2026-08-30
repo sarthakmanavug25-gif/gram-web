@@ -21,7 +21,9 @@ export type SeasonCrop = {
   avgTemp: string;
   rainfall: string;
   window: string;
+  windowHi: string;
   note: string;
+  noteHi: string;
   emoji: string;
 };
 
@@ -32,7 +34,9 @@ export const SEASON_CROPS: SeasonCrop[] = [
     avgTemp: "31°C",
     rainfall: "165 mm",
     window: "Jun - Jul sowing",
+    windowHi: "जून - जुलाई बुवाई",
     note: "Transplant 25-day seedlings once the field holds water.",
+    noteHi: "खेत में पानी टिकने पर 25 दिन की पौध रोपें।",
     emoji: "🌾",
   },
   {
@@ -41,7 +45,9 @@ export const SEASON_CROPS: SeasonCrop[] = [
     avgTemp: "29°C",
     rainfall: "140 mm",
     window: "Jun - Jul sowing",
+    windowHi: "जून - जुलाई बुवाई",
     note: "Sow on ridges so heavy rain drains off quickly.",
+    noteHi: "मेड़ों पर बोएँ ताकि तेज़ बारिश का पानी निकल जाए।",
     emoji: "🌽",
   },
   {
@@ -50,7 +56,9 @@ export const SEASON_CROPS: SeasonCrop[] = [
     avgTemp: "32°C",
     rainfall: "120 mm",
     window: "May - Jun sowing",
+    windowHi: "मई - जून बुवाई",
     note: "Keep the refuge belt and scout weekly for bollworm.",
+    noteHi: "रेफ्यूज पट्टी रखें और हर हफ़्ते सुंडी की जाँच करें।",
     emoji: "🌱",
   },
   {
@@ -59,7 +67,9 @@ export const SEASON_CROPS: SeasonCrop[] = [
     avgTemp: "28°C",
     rainfall: "155 mm",
     window: "Jun sowing",
+    windowHi: "जून बुवाई",
     note: "Treat seed with Rhizobium before sowing.",
+    noteHi: "बुवाई से पहले बीज को राइज़ोबियम से उपचारित करें।",
     emoji: "🫘",
   },
   {
@@ -68,7 +78,9 @@ export const SEASON_CROPS: SeasonCrop[] = [
     avgTemp: "33°C",
     rainfall: "95 mm",
     window: "Jul sowing",
+    windowHi: "जुलाई बुवाई",
     note: "Best fit for light soils with an uncertain rain spell.",
+    noteHi: "हल्की मिट्टी और अनिश्चित बारिश के लिए सबसे सही।",
     emoji: "🌾",
   },
 ];
@@ -76,7 +88,9 @@ export const SEASON_CROPS: SeasonCrop[] = [
 export type Priority = {
   id: string;
   title: string;
+  titleHi: string;
   body: string;
+  bodyHi: string;
   tone: "warning" | "info" | "success";
   icon: "bug" | "droplet" | "sun";
 };
@@ -85,24 +99,38 @@ export const PRIORITIES: Priority[] = [
   {
     id: "p1",
     title: "Monsoon disease watch",
+    titleHi: "मानसून रोग निगरानी",
     body: "Scout rice for blast & cotton for bollworm this week.",
+    bodyHi: "इस हफ़्ते धान में ब्लास्ट और कपास में सुंडी की जाँच करें।",
     tone: "warning",
     icon: "bug",
   },
   {
     id: "p2",
     title: "Drainage check",
+    titleHi: "जल निकासी जाँचें",
     body: "Clear field channels before the next heavy spell.",
+    bodyHi: "अगली तेज़ बारिश से पहले खेत की नालियाँ साफ़ कर लें।",
     tone: "info",
     icon: "droplet",
   },
   {
     id: "p3",
     title: "Nitrogen top-dress",
+    titleHi: "यूरिया टॉप-ड्रेस",
     body: "Hold the urea split until rain eases for 2 days.",
+    bodyHi: "बारिश थमने के 2 दिन बाद ही यूरिया डालें।",
     tone: "success",
     icon: "sun",
   },
+];
+
+export const FIELD_TIPS_HI = [
+  "छिड़काव सुबह जल्दी या शाम को करें — दोपहर की गर्मी में दवा असर करने से पहले ही उड़ जाती है।",
+  "कल्ले फूटते समय धान में 15 सेमी पानी रखें, फिर 3 दिन सुखाकर जड़ मज़बूत करें।",
+  "यूरिया डालने से पहले उसमें नीम की खली मिलाएँ, नाइट्रोजन कम उड़ेगी।",
+  "हर तीसरे मौसम में मिट्टी की जाँच कराएँ — बची हुई खाद से ही खर्च निकल आता है।",
+  "हर खर्च उसी दिन दर्ज करें, वरना महीने का हिसाब सिर्फ़ अंदाज़ा रह जाता है।",
 ];
 
 export const FIELD_TIPS = [
@@ -140,12 +168,41 @@ export type SeasonAdvisory = {
   headline: string;
   crops: string[];
   tips: Record<string, string[]>;
+  tipsHi: Record<string, string[]>;
 };
 
 export const SEASON_ADVISORY: SeasonAdvisory = {
   season: "Monsoon",
   headline: "Monsoon season — crop & irrigation tips",
   crops: ["All", "Rice", "Cotton", "Maize", "Soybean"],
+  tipsHi: {
+    All: [
+      "जलभराव से बचने के लिए खेत की निकासी ठीक रखें।",
+      "भारी बारिश का अनुमान हो तो यूरिया टॉप-ड्रेस टाल दें।",
+      "नमी वाले दिनों में धान में ब्लास्ट की जाँच करते रहें।",
+      "मेड़ें दुरुस्त रखें ताकि खेत में पानी बराबर रहे।",
+    ],
+    Rice: [
+      "कल्ले फूटते समय 5 सेमी पानी रखें, यूरिया डालने से पहले निकाल दें।",
+      "बादल वाले हफ़्ते के बाद बाली की गर्दन पर ब्लास्ट देखें।",
+      "पौध की नोक न काटें — इससे जीवाणु झुलसा आता है।",
+    ],
+    Cotton: [
+      "सुंडी के लिए प्रति एकड़ 5 फेरोमोन ट्रैप लगाएँ।",
+      "तेज़ बारिश के 24 घंटे के भीतर नालियों से पानी निकालें।",
+      "हर तीसरे दिन पत्तों के नीचे सफ़ेद मक्खी देखें।",
+    ],
+    Maize: [
+      "पहली तेज़ बारिश के बाद मेड़ों पर मिट्टी चढ़ाएँ।",
+      "तने का निचला हिस्सा मुलायम लगे तो पोटाश दें।",
+      "लंबे खरपतवार जल्दी हटाएँ, वे फसल में नमी रोकते हैं।",
+    ],
+    Soybean: [
+      "12 घंटे से ज़्यादा पानी न ठहरने दें।",
+      "30 दिन की अवस्था पर गर्डल बीटल की जाँच करें।",
+      "फसल की छत्र बन चुकी हो तो दूसरी निराई छोड़ दें।",
+    ],
+  },
   tips: {
     All: [
       "Ensure field drainage to avoid waterlogging.",

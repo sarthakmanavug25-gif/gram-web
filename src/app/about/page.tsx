@@ -5,6 +5,7 @@ import { ArrowLeft, Camera, CloudSun, IndianRupee, Sprout } from "lucide-react";
 import AppShell from "@/components/AppShell";
 import { Card, IconTile } from "@/components/ui/primitives";
 import { DISEASES, CROPS } from "@/lib/seed/diseases";
+import { useT } from "@/lib/i18n";
 
 export default function AboutPage() {
   return (
@@ -16,55 +17,54 @@ export default function AboutPage() {
 
 function AboutContent() {
   const router = useRouter();
+  const { t } = useT();
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 pt-2">
         <button
           type="button"
           onClick={() => router.back()}
-          aria-label="Go back"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06]"
+          aria-label={t("common.back")}
+          className="flex h-10 w-10 items-center justify-center rounded-full hairline surface"
         >
           <ArrowLeft size={18} />
         </button>
-        <h1 className="text-[26px] font-bold">About</h1>
+        <h1 className="text-[26px] font-bold">{t("about.title")}</h1>
       </div>
 
       <Card className="text-center">
         <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-green-primary/15 text-green-bright">
           <Sprout size={28} />
         </div>
-        <p className="text-[20px] font-bold">GramConnect</p>
-        <p className="mt-1 text-[13px] text-text-secondary">
-          A smart farming assistant for Indian farmers — disease guides, live
-          weather advisory and a simple farm ledger in one place.
-        </p>
-        <p className="mt-3 text-[12px] text-text-muted">Version 1.0.0</p>
+        <p className="text-[20px] font-bold">{t("app.name")}</p>
+        <p className="mt-1 text-[13px] text-text-secondary">{t("about.tagline")}</p>
+        <p className="mt-3 text-[12px] text-text-muted">{t("about.version")}</p>
       </Card>
 
       <Card className="space-y-3">
         <Feature
           icon={<Camera size={18} />}
-          title="Crop Doctor"
-          body={`${DISEASES.length} disease guides across ${CROPS.length} crops, plus photo-based scanning.`}
+          title={t("nav.cropDoctor")}
+          body={t("about.cropDoctorBody", {
+            n: DISEASES.length,
+            crops: CROPS.length,
+          })}
         />
         <Feature
           icon={<CloudSun size={18} />}
-          title="Smart Advisory"
-          body="Live weather, an auto sprinkler recommendation and season-wise field tips."
+          title={t("advisor.title")}
+          body={t("about.advisorBody")}
         />
         <Feature
           icon={<IndianRupee size={18} />}
-          title="Farm Expenses"
-          body="Track spend by category and crop against a seasonal budget."
+          title={t("expenses.title")}
+          body={t("about.expensesBody")}
         />
       </Card>
 
       <Card>
         <p className="text-[13px] leading-relaxed text-text-secondary">
-          Weather data from Open-Meteo. MSP figures from the Government of India
-          2024-25 announcement. Disease information is for guidance only —
-          confirm dosage with your local agriculture officer before spraying.
+          {t("about.dataNote")}
         </p>
       </Card>
     </div>

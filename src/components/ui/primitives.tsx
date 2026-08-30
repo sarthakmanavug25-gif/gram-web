@@ -61,7 +61,7 @@ export function Chip({
         "shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition",
         active
           ? "text-black shadow-glow"
-          : "border border-white/10 bg-white/[0.06] text-text-secondary hover:bg-white/10"
+          : "hairline surface text-text-secondary hover-surface"
       )}
       style={active ? { backgroundColor: color } : undefined}
     >
@@ -153,7 +153,7 @@ export function GhostButton({
       type="button"
       onClick={onClick}
       className={clsx(
-        "flex w-full items-center justify-center gap-2 rounded-full border border-white/12 bg-white/[0.06] px-5 py-3.5 text-[15px] font-semibold text-text-primary transition hover:bg-white/10",
+        "flex w-full items-center justify-center gap-2 rounded-full hairline surface px-5 py-3.5 text-[15px] font-semibold text-text-primary transition hover-surface",
         className
       )}
     >
@@ -198,7 +198,7 @@ export function ProgressBar({
 }) {
   return (
     <div
-      className="w-full overflow-hidden rounded-full bg-white/[0.08]"
+      className="w-full overflow-hidden rounded-full surface-2"
       style={{ height }}
     >
       <div
