@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, MapPin, Phone, Store, TrendingUp } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, RefreshCw, Store, TrendingUp } from "lucide-react";
 import AppShell from "@/components/AppShell";
 import { Card, Chip, IconTile, SectionLabel, Tag } from "@/components/ui/primitives";
 import { MSP_PRICES } from "@/lib/seed/reference";
@@ -15,6 +15,16 @@ type Buyer = {
   price: number;
   distanceKm: number;
   phone: string;
+};
+type LivePrice = {
+  commodity: string;
+  market: string;
+  district: string;
+  variety?: string;
+  arrivalDate?: string;
+  modalPrice: number;
+  minPrice: number;
+  maxPrice: number;
 };
 
 const BUYERS: Buyer[] = [
@@ -38,10 +48,35 @@ function MarketContent() {
   const router = useRouter();
   const { t, tCrop } = useT();
   const [crop, setCrop] = useState("All");
+  const [livePrices, setLivePrices] = useState<LivePrice[]>([]);
+  const [liveSource, setLiveSource] = useState("");
+  const [liveMessage, setLiveMessage] = useState("");
+  const [loadingLive, setLoadingLive] = useState(true);
   const crops = ["All", ...Array.from(new Set(BUYERS.map((b) => b.crop)))];
   const rows = BUYERS.filter((b) => crop === "All" || b.crop === crop).sort(
     (a, b) => b.price - a.price
   );
+
+  async function loadLivePrices() {
+    setLoadingLive(true);
+    try {
+      const response = await fetch("/api/mandi");
+      const data = await response.json();
+      setLivePrices(data.prices ?? []);
+      setLiveSource(data.source ?? "fallback");
+      setLiveMessage(data.message ?? "");
+    } catch {
+      setLivePrices([]);
+      setLiveSource("unavailable");
+      setLiveMessage("Could not load rates right now.");
+    } finally {
+      setLoadingLive(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadLivePrices();
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -76,6 +111,60 @@ function MarketContent() {
         </div>
         <p className="mt-3 text-[12px] text-text-muted">
           {t("market.mspNote")}
+        </p>
+      </Card>
+
+      <Card>
+        <div className="mb-3 flex items-center justify-between">
+          <SectionLabel icon={<TrendingUp size={14} />} color="var(--green-bright)">
+            Live mandi rates
+          </SectionLabel>
+          <button
+            type="button"
+            onClick={() => void loadLivePrices()}
+            aria-label="Refresh live mandi rates"
+            className="rounded-full p-1.5 text-green-bright hover-surface"
+          >
+            <RefreshCw size={15} className={loadingLive ? "animate-spin" : ""} />
+          </button>
+        </div>
+        {loadingLive ? (
+          <p className="py-3 text-center text-[13px] text-text-secondary">Loading latest rates…</p>
+        ) : livePrices.length === 0 ? (
+          <p className="py-3 text-center text-[13px] text-text-secondary">
+            {liveMessage || "No mandi rates available right now."}
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {livePrices.map((price, index) => (
+              <div
+                key={`${price.commodity}-${price.market}-${index}`}
+                className={index ? "divider-t pt-3" : ""}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-[14px] font-semibold">{tCrop(price.commodity)}</p>
+                    <p className="text-[12px] text-text-secondary">
+                      {price.market} · {price.district}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[15px] font-bold text-green-bright">
+                      ₹{price.modalPrice.toLocaleString("en-IN")}/q
+                    </p>
+                    <p className="text-[10px] text-text-muted">
+                      ₹{price.minPrice.toLocaleString("en-IN")}–₹{price.maxPrice.toLocaleString("en-IN")}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="mt-3 text-[11px] text-text-muted">
+          {liveSource === "AGMARKNET"
+            ? "Source: AGMARKNET / data.gov.in · modal price per quintal"
+            : `${liveMessage} Showing recent reference rates.`}
         </p>
       </Card>
 

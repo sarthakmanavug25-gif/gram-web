@@ -90,6 +90,22 @@ Add `ANTHROPIC_API_KEY` to `.env.local` (get one at
 Without the key both routes fall back to deterministic answers so the demo never
 breaks.
 
+## Optional: live mandi prices
+
+The Market page reads daily rates from the official AGMARKNET dataset through
+India's Open Government Data platform. Create a free account at
+[data.gov.in](https://data.gov.in), generate an API key from **My Account**, then
+add this server-only value to `.env.local`:
+
+```bash
+DATA_GOV_API_KEY=your-data-gov-in-key
+```
+
+Add the same value to Vercel's Environment Variables before deploying. Requests
+are made through `/api/mandi`, so this key is never exposed in browser code.
+Without it—or if the government feed is slow—the Market page clearly labels and
+uses its built-in reference-rate fallback.
+
 ## Deploy to Vercel
 
 1. Push this repository to GitHub.
