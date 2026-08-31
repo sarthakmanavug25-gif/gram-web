@@ -44,6 +44,18 @@ export type ChatMessage = {
   content: string;
 };
 
+export type DroneBooking = {
+  id: string;
+  operatorName: string;
+  crop: string;
+  acres: number;
+  date: string;
+  slot: string;
+  estimate: number;
+  status: "Requested" | "Confirmed";
+  createdAt: string;
+};
+
 export type Account = {
   id: string;
   name: string;
@@ -149,6 +161,7 @@ type State = {
   expenses: Expense[];
   scans: ScanRecord[];
   chat: ChatMessage[];
+  droneBookings: DroneBooking[];
   sprinklerPercent: number;
   sprinklerAuto: boolean;
   language: "en" | "hi";
@@ -182,6 +195,7 @@ type Actions = {
   pushChat: (m: ChatMessage) => void;
   updateChat: (id: string, content: string) => void;
   clearChat: () => void;
+  addDroneBooking: (booking: Omit<DroneBooking, "id" | "createdAt" | "status">) => void;
   setLanguage: (l: "en" | "hi") => void;
   setTheme: (t: "dark" | "light") => void;
   seedDemoData: () => void;
@@ -200,6 +214,7 @@ export const useApp = create<State & Actions>()(
       expenses: demoExpenses(),
       scans: [],
       chat: [],
+      droneBookings: [],
       sprinklerPercent: 74,
       sprinklerAuto: true,
       language: "en",
@@ -302,6 +317,19 @@ export const useApp = create<State & Actions>()(
         })),
 
       clearChat: () => set({ chat: [] }),
+
+      addDroneBooking: (booking) =>
+        set((s) => ({
+          droneBookings: [
+            {
+              ...booking,
+              id: `drone-${Date.now()}`,
+              createdAt: new Date().toISOString(),
+              status: "Requested",
+            },
+            ...s.droneBookings,
+          ],
+        })),
 
       setLanguage: (language) => set({ language }),
 

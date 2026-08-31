@@ -8,6 +8,7 @@ import {
   ChevronRight,
   CircleHelp,
   CalendarDays,
+  Plane,
   Database,
   Info,
   Map,
@@ -82,6 +83,7 @@ function MoreContent() {
           icon={<CalendarDays size={18} />}
           label={t("more.calendar")}
         />
+        <Row href="/drone-spray" icon={<Plane size={18} />} label="Drone Spray Booking" />
         <Row href="/market" icon={<Store size={18} />} label={t("more.marketPrices")} />
         <ToggleRow
           icon={<BellRing size={18} />}
