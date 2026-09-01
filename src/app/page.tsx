@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  HandCoins,
   Landmark,
   Smartphone,
   Stethoscope,
@@ -205,16 +204,22 @@ export default function HomePage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <span className="rounded-full border border-[var(--hairline)] px-5 py-3 text-[14px] font-semibold">
+              <a
+                href="https://www.apple.com/app-store/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-apple inline-flex items-center justify-center rounded-full bg-green-primary px-6 py-3 text-[14px] font-semibold text-white shadow-[0_8px_20px_rgba(20,90,45,0.22)] transition hover:brightness-110"
+              >
                 {t("site.apps.ios")}
-              </span>
-              <span className="rounded-full border border-[var(--hairline)] px-5 py-3 text-[14px] font-semibold">
+              </a>
+              <a
+                href="https://play.google.com/store/apps"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-apple inline-flex items-center justify-center rounded-full bg-green-primary px-6 py-3 text-[14px] font-semibold text-white shadow-[0_8px_20px_rgba(20,90,45,0.22)] transition hover:brightness-110"
+              >
                 {t("site.apps.android")}
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full bg-green-primary px-5 py-3 text-[14px] font-semibold text-white">
-                <HandCoins size={16} />
-                {t("showcase.apps.webNote")}
-              </span>
+              </a>
             </div>
           </div>
         </div>
