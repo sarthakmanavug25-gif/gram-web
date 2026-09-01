@@ -9,6 +9,7 @@ import {
   normalizeDay,
   type GramPointEvent,
   type GramPointsDay,
+  type PendingLoginReward,
 } from "./gramPoints";
 
 export type Expense = {
@@ -182,6 +183,8 @@ type State = {
   enquiredProductIds: string[];
   gramPointsDay: GramPointsDay;
   claimedMarketplaceWelcome: boolean;
+  claimedFirstLoginBonus: boolean;
+  pendingLoginReward: PendingLoginReward;
 };
 
 type Actions = {
@@ -227,6 +230,9 @@ type Actions = {
     productId: string,
     listPrice: number
   ) => { ok: boolean; spent: number; discount: number };
+  /** Award +100 GP on login (once per day). Returns reward for bubble UI. */
+  claimLoginBonus: () => PendingLoginReward;
+  clearLoginReward: () => void;
 };
 
 export const useApp = create<State & Actions>()(
@@ -249,8 +255,10 @@ export const useApp = create<State & Actions>()(
       gramPoints: 0,
       gramPointsHistory: [],
       enquiredProductIds: [],
-      gramPointsDay: { date: "", enquireCount: 0, sellIntent: false },
+      gramPointsDay: { date: "", enquireCount: 0, sellIntent: false, loginBonus: false },
       claimedMarketplaceWelcome: false,
+      claimedFirstLoginBonus: false,
+      pendingLoginReward: null,
 
       setHydrated: () => set({ hydrated: true }),
 
@@ -271,6 +279,7 @@ export const useApp = create<State & Actions>()(
           profile: { ...s.profile, name, phone: clean },
           hasSeenWelcome: false,
         }));
+        get().claimLoginBonus();
         return { ok: true };
       },
 
@@ -293,6 +302,7 @@ export const useApp = create<State & Actions>()(
           session: { id: account.id, name: account.name, phone: clean },
           profile: { ...s.profile, name: account.name, phone: clean },
         }));
+        get().claimLoginBonus();
         return { ok: true };
       },
 
@@ -314,6 +324,7 @@ export const useApp = create<State & Actions>()(
           profile: { ...s.profile, name, phone: clean },
           hasSeenGuide: false,
         }));
+        get().claimLoginBonus();
       },
 
       signOut: () => set({ session: null, chat: [] }),
@@ -463,10 +474,38 @@ export const useApp = create<State & Actions>()(
         });
         return { ok: true, spent: spend, discount };
       },
+
+      claimLoginBonus: () => {
+        const s = get();
+        const day = normalizeDay(s.gramPointsDay);
+        if (day.loginBonus) return null;
+
+        const firstTime = !s.claimedFirstLoginBonus;
+        const earned = GRAM_POINTS.LOGIN;
+        const event: GramPointEvent = {
+          id: `gp-${Date.now()}`,
+          reason: "login",
+          amount: earned,
+          label: firstTime ? "First login bonus" : "Daily login bonus",
+          labelHi: firstTime ? "पहली लॉगिन बोनस" : "रोज़ाना लॉगिन बोनस",
+          at: new Date().toISOString(),
+        };
+        const reward = { amount: earned, firstTime };
+        set({
+          claimedFirstLoginBonus: true,
+          gramPoints: s.gramPoints + earned,
+          gramPointsDay: { ...day, loginBonus: true },
+          gramPointsHistory: [event, ...s.gramPointsHistory].slice(0, 40),
+          pendingLoginReward: reward,
+        });
+        return reward;
+      },
+
+      clearLoginReward: () => set({ pendingLoginReward: null }),
     }),
     {
       name: "gramconnect-state",
-      version: 4,
+      version: 5,
       migrate: (persisted, fromVersion) => {
         const p = {
           ...((persisted ?? {}) as Record<string, unknown>),
@@ -480,11 +519,23 @@ export const useApp = create<State & Actions>()(
               date: "",
               enquireCount: 0,
               sellIntent: false,
+              loginBonus: false,
             };
           }
           if (p.claimedMarketplaceWelcome == null) {
             p.claimedMarketplaceWelcome = false;
           }
+        }
+        if (fromVersion < 5) {
+          const day = (p.gramPointsDay ?? {}) as Record<string, unknown>;
+          p.gramPointsDay = {
+            date: day.date ?? "",
+            enquireCount: day.enquireCount ?? 0,
+            sellIntent: !!day.sellIntent,
+            loginBonus: !!day.loginBonus,
+          };
+          if (p.claimedFirstLoginBonus == null) p.claimedFirstLoginBonus = false;
+          p.pendingLoginReward = null;
         }
         return p;
       },
@@ -492,7 +543,6 @@ export const useApp = create<State & Actions>()(
         if (error) {
           console.error("gramconnect persist rehydrate failed", error);
         }
-        // Prefer the rehydrated store instance; fall back after create() finishes.
         if (state) state.setHydrated();
         else queueMicrotask(() => useApp.getState().setHydrated());
       },

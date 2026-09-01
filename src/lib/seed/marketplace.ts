@@ -9,6 +9,8 @@ export type MarketProduct = {
   unit: string;
   blurb: string;
   blurbHi: string;
+  /** Product photo under /public */
+  image: string;
 };
 
 export const MARKET_CATEGORIES = [
@@ -32,6 +34,7 @@ export const MARKET_PRODUCTS: MarketProduct[] = [
     unit: "unit",
     blurb: "Ideal for 2–5 acre farms. Includes rotavator hitch kit.",
     blurbHi: "2–5 एकड़ खेत के लिए उपयुक्त। रोटावेटर हिट्च किट सहित।",
+    image: "/market/mini-tractor.jpg",
   },
   {
     id: "drip-kit",
@@ -44,6 +47,7 @@ export const MARKET_PRODUCTS: MarketProduct[] = [
     unit: "kit",
     blurb: "Complete drip set with filters, laterals and emitters.",
     blurbHi: "फ़िल्टर, लैटरल और एमिटर के साथ पूरा ड्रिप सेट।",
+    image: "/market/drip-kit.jpg",
   },
   {
     id: "battery-sprayer",
@@ -56,6 +60,7 @@ export const MARKET_PRODUCTS: MarketProduct[] = [
     unit: "unit",
     blurb: "Lightweight sprayer for pesticide and nutrient foliar spray.",
     blurbHi: "कीटनाशक और पोषक छिड़काव के लिए हल्का स्प्रेयर।",
+    image: "/market/battery-sprayer.jpg",
   },
   {
     id: "seed-drill",
@@ -68,6 +73,7 @@ export const MARKET_PRODUCTS: MarketProduct[] = [
     unit: "unit",
     blurb: "Even sowing for wheat, soybean and pulses.",
     blurbHi: "गेहूँ, सोयाबीन और दालों के लिए समान बुवाई।",
+    image: "/market/seed-drill.jpg",
   },
   {
     id: "solar-pump",
@@ -80,6 +86,7 @@ export const MARKET_PRODUCTS: MarketProduct[] = [
     unit: "set",
     blurb: "Daytime irrigation without diesel cost. Panel set included.",
     blurbHi: "डीज़ल खर्च के बिना दिन की सिंचाई। पैनल सेट शामिल।",
+    image: "/market/solar-pump.jpg",
   },
   {
     id: "neem-oil",
@@ -92,6 +99,7 @@ export const MARKET_PRODUCTS: MarketProduct[] = [
     unit: "can",
     blurb: "Natural pest management input for vegetable and fruit crops.",
     blurbHi: "सब्ज़ी और फल फसलों के लिए प्राकृतिक कीट नियंत्रण।",
+    image: "/market/neem-oil.jpg",
   },
   {
     id: "grain-bin",
@@ -104,6 +112,7 @@ export const MARKET_PRODUCTS: MarketProduct[] = [
     unit: "bin",
     blurb: "Moisture-safe storage to reduce post-harvest loss.",
     blurbHi: "कटाई बाद नुकसान घटाने के लिए नमी-सुरक्षित भंडारण।",
+    image: "/market/grain-bin.jpg",
   },
   {
     id: "power-weeder",
@@ -116,5 +125,6 @@ export const MARKET_PRODUCTS: MarketProduct[] = [
     unit: "unit",
     blurb: "Fast inter-row weeding for vegetables and plantation rows.",
     blurbHi: "सब्ज़ी और बाग कतारों में तेज़ निराई।",
+    image: "/market/power-weeder.jpg",
   },
 ];

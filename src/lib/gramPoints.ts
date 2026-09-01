@@ -2,6 +2,7 @@
 
 export const GRAM_POINTS = {
   WELCOME: 25,
+  LOGIN: 100,
   ENQUIRE: 40,
   SELL_INTENT: 60,
   MAX_ENQUIRE_PER_DAY: 5,
@@ -14,6 +15,7 @@ export const GRAM_POINTS = {
 
 export type GramPointReason =
   | "welcome"
+  | "login"
   | "enquire"
   | "sell_intent"
   | "redeem";
@@ -33,7 +35,13 @@ export type GramPointsDay = {
   date: string;
   enquireCount: number;
   sellIntent: boolean;
+  loginBonus: boolean;
 };
+
+export type PendingLoginReward = {
+  amount: number;
+  firstTime: boolean;
+} | null;
 
 export function todayKey(d = new Date()) {
   return d.toISOString().slice(0, 10);
@@ -45,9 +53,14 @@ export function normalizeDay(
 ): GramPointsDay {
   const date = todayKey(now);
   if (!day || day.date !== date) {
-    return { date, enquireCount: 0, sellIntent: false };
+    return { date, enquireCount: 0, sellIntent: false, loginBonus: false };
   }
-  return day;
+  return {
+    date: day.date,
+    enquireCount: day.enquireCount ?? 0,
+    sellIntent: !!day.sellIntent,
+    loginBonus: !!day.loginBonus,
+  };
 }
 
 /** How many points can be spent on this list price. */

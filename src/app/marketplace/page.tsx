@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import Image from "next/image";
 import {
   Coins,
   MapPin,
@@ -242,8 +243,15 @@ export default function MarketplacePage() {
                 key={product.id}
                 className="flex flex-col rounded-2xl glass glass-hover p-5"
               >
-                <div className="flex h-28 items-end rounded-xl bg-[linear-gradient(145deg,rgba(31,122,69,0.16),rgba(31,122,69,0.04))] p-4">
-                  <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-green-bright">
+                <div className="relative h-40 overflow-hidden rounded-xl bg-[linear-gradient(145deg,rgba(31,122,69,0.16),rgba(31,122,69,0.04))]">
+                  <Image
+                    src={product.image}
+                    alt={lang === "hi" ? product.nameHi : product.name}
+                    fill
+                    sizes="(max-width:640px) 100vw, (max-width:1280px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                  <p className="absolute bottom-3 left-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-green-bright backdrop-blur-sm dark:bg-[#102318]/85">
                     {lang === "hi"
                       ? MARKET_CATEGORIES.find((c) => c.id === product.category)
                           ?.labelHi

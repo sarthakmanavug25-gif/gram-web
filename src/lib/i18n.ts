@@ -143,6 +143,13 @@ const EN = {
   "marketPlace.sell.notePh": "Qty / mandi note (optional)",
   "marketPlace.sell.cta": "Share & earn",
   "marketPlace.sell.done": "Sell intent saved on this device. Merchants can be matched later.",
+  "points.login.firstTitle": "Free Gram Points!",
+  "points.login.firstBody":
+    "You got {n} free Gram Points for your first-time login. Use them for tool discounts in the marketplace.",
+  "points.login.dailyTitle": "Login reward unlocked",
+  "points.login.dailyBody":
+    "+{n} Gram Points added for today’s login. Keep using GramConnect to save on farm tools.",
+  "points.login.cta": "Nice — continue",
 
   "diseasesLib.title": "Crop Doctor disease library",
   "diseasesLib.sub":
@@ -620,6 +627,13 @@ const HI: Record<keyof typeof EN, string> = {
   "marketPlace.sell.notePh": "मात्रा / मंडी नोट (वैकल्पिक)",
   "marketPlace.sell.cta": "साझा करें और कमाएँ",
   "marketPlace.sell.done": "सेल इरादा इस डिवाइस पर सेव हो गया। बाद में व्यापारी मिलाए जा सकते हैं।",
+  "points.login.firstTitle": "मुफ़्त ग्राम पॉइंट्स!",
+  "points.login.firstBody":
+    "पहली बार लॉगिन पर आपको {n} मुफ़्त ग्राम पॉइंट्स मिले। औज़ार बाज़ार में छूट के लिए इस्तेमाल करें।",
+  "points.login.dailyTitle": "लॉगिन रिवॉर्ड खुला",
+  "points.login.dailyBody":
+    "आज की लॉगिन पर +{n} ग्राम पॉइंट्स जुड़े। औज़ार पर बचत के लिए ग्रामकनेक्ट इस्तेमाल करते रहें।",
+  "points.login.cta": "बढ़िया — आगे बढ़ें",
 
   "diseasesLib.title": "फसल डॉक्टर रोग लाइब्रेरी",
   "diseasesLib.sub":

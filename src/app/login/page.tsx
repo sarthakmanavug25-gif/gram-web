@@ -168,6 +168,7 @@ function OtpFlow() {
       setStep("name");
       return;
     }
+    useApp.getState().claimLoginBonus();
     markWelcomeSeen();
     router.replace("/");
   }
@@ -180,6 +181,7 @@ function OtpFlow() {
     setBusy(true);
     if (supabaseConfigured) {
       await saveProfile({ name: name.trim(), phone });
+      useApp.getState().claimLoginBonus();
     } else {
       useApp.getState().demoOtpSignIn(phone, name.trim());
     }

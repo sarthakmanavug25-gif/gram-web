@@ -10,6 +10,7 @@ import { useApp } from "@/lib/store";
 import { restoreSession } from "@/lib/repo";
 import { Skeleton } from "./ui/primitives";
 import OnboardingGuide from "./OnboardingGuide";
+import GramPointsRewardBubble from "./GramPointsRewardBubble";
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -67,6 +68,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <SiteFooter />
       <ChatAssistant />
       <OnboardingGuide />
+      <GramPointsRewardBubble />
     </div>
   );
 }
