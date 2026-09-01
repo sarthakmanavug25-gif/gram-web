@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import MarketingShell from "@/components/MarketingShell";
 import { MotionLink } from "@/components/MotionButton";
-import VectorFarmScene from "@/components/VectorFarmScene";
 import { useT } from "@/lib/i18n";
 
 const GUIDE_STEPS = ["scan", "weather", "spend", "ask"] as const;
@@ -26,7 +25,14 @@ export default function HomePage() {
     <MarketingShell>
       <section className="hero-panel relative min-h-[86vh] w-full overflow-hidden pb-8">
         <div className="hero-media" aria-hidden>
-          <VectorFarmScene />
+          <Image
+            src="/farm-hero.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[center_40%]"
+          />
         </div>
 
         <div className="relative z-10 mx-auto grid min-h-[86vh] w-full max-w-site items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
@@ -70,27 +76,16 @@ export default function HomePage() {
             </motion.div>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 28, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ delay: 0.18, duration: 0.75, ease }}
-            className="mx-auto w-full max-w-[280px] sm:max-w-[300px]"
-          >
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
-              className="relative"
-            >
-              <Image
-                src="/phone-cutout.png"
-                alt="GramConnect mobile app"
-                width={853}
-                height={1280}
-                priority
-                className="h-auto w-full drop-shadow-[0_28px_50px_rgba(0,0,0,0.38)]"
-              />
-            </motion.div>
-          </motion.div>
+          <div className="mx-auto w-full max-w-[280px] sm:max-w-[300px]">
+            <Image
+              src="/phone-cutout.png"
+              alt="GramConnect mobile app"
+              width={853}
+              height={1280}
+              priority
+              className="h-auto w-full drop-shadow-[0_28px_50px_rgba(0,0,0,0.38)]"
+            />
+          </div>
         </div>
       </section>
 
