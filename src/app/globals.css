@@ -189,32 +189,224 @@ body {
   position: absolute;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
 }
 
-.hero-media img {
-  object-fit: cover;
-  object-position: center 35%;
+.hero-media > img,
+.hero-media > span {
+  inset: 0 !important;
 }
 
-/* Soft farm-to-page fade, inspired by the app home hero */
+.farm-wind-photo {
+  animation: farmDrift 14s var(--ease-apple) infinite alternate;
+  transform-origin: 50% 70%;
+  will-change: transform;
+  filter: saturate(1.08) contrast(1.04);
+}
+
+@keyframes farmDrift {
+  0% {
+    transform: scale(1.08) translate3d(-1.6%, 0.5%, 0) skewX(-0.6deg);
+  }
+  50% {
+    transform: scale(1.12) translate3d(1.4%, -0.6%, 0) skewX(0.7deg);
+  }
+  100% {
+    transform: scale(1.1) translate3d(0.5%, 0.9%, 0) skewX(-0.35deg);
+  }
+}
+
+/* Lower crop band: masked + stronger sway for "wind in crops" feel */
+.farm-wind-crop {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 42%,
+    rgba(0, 0, 0, 0.55) 62%,
+    #000 78%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 42%,
+    rgba(0, 0, 0, 0.55) 62%,
+    #000 78%,
+    #000 100%
+  );
+  animation: cropBandSway 3.8s ease-in-out infinite;
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.farm-wind-crop img,
+.farm-wind-crop span {
+  transform: scale(1.14);
+  filter: saturate(1.15) brightness(1.02);
+}
+
+@keyframes cropBandSway {
+  0%,
+  100% {
+    transform: skewX(-3.2deg) translate3d(-1.8%, 0.4%, 0);
+  }
+  50% {
+    transform: skewX(3.4deg) translate3d(2%, -0.2%, 0);
+  }
+}
+
+.farm-grass {
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  bottom: 0;
+  z-index: 2;
+  width: 104%;
+  height: min(28vh, 220px);
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.farm-grass-row {
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+.farm-grass-back {
+  animation: grassSway 4.2s ease-in-out infinite;
+}
+
+.farm-grass-mid {
+  animation: grassSway 3.4s ease-in-out infinite reverse;
+}
+
+.farm-grass-front {
+  animation: grassSway 2.8s ease-in-out infinite;
+}
+
+@keyframes grassSway {
+  0%,
+  100% {
+    transform: skewX(-6deg) translateX(-1.2%);
+  }
+  50% {
+    transform: skewX(7deg) translateX(1.5%);
+  }
+}
+
+.farm-wind-layer {
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: -2%;
+  z-index: 2;
+  height: 46%;
+  pointer-events: none;
+  opacity: 0.55;
+  mix-blend-mode: soft-light;
+  transform-origin: 50% 100%;
+  will-change: transform;
+  background-repeat: repeat-x;
+  background-size: 220px 100%;
+}
+
+.farm-wind-a {
+  height: 52%;
+  opacity: 0.5;
+  background-image: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(34, 90, 40, 0.18) 35%,
+      rgba(20, 70, 30, 0.45) 100%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 10px,
+      rgba(70, 140, 60, 0.35) 10px 14px,
+      transparent 14px 24px,
+      rgba(40, 110, 50, 0.28) 24px 27px
+    );
+  animation: cropSwayA 4.2s ease-in-out infinite;
+}
+
+.farm-wind-b {
+  height: 40%;
+  opacity: 0.42;
+  background-image: repeating-linear-gradient(
+    95deg,
+    transparent 0 16px,
+    rgba(90, 160, 70, 0.4) 16px 19px,
+    transparent 19px 34px
+  );
+  animation: cropSwayB 3.2s ease-in-out infinite;
+}
+
+.farm-wind-c {
+  height: 28%;
+  opacity: 0.34;
+  background-image: repeating-linear-gradient(
+    85deg,
+    transparent 0 8px,
+    rgba(120, 180, 80, 0.45) 8px 11px,
+    transparent 11px 22px
+  );
+  animation: cropSwayC 4.8s ease-in-out infinite;
+}
+
+@keyframes cropSwayA {
+  0%,
+  100% {
+    transform: skewX(-3deg) translate3d(-2%, 0, 0);
+  }
+  50% {
+    transform: skewX(3.2deg) translate3d(2.2%, 0, 0);
+  }
+}
+
+@keyframes cropSwayB {
+  0%,
+  100% {
+    transform: skewX(2.4deg) translate3d(1.6%, 0, 0);
+  }
+  50% {
+    transform: skewX(-2.8deg) translate3d(-2%, 0, 0);
+  }
+}
+
+@keyframes cropSwayC {
+  0%,
+  100% {
+    transform: skewX(-2deg) translate3d(1%, 0, 0);
+  }
+  50% {
+    transform: skewX(2.2deg) translate3d(-1.4%, 0, 0);
+  }
+}
+
+/* Soft farm-to-page fade */
 .hero-media::after {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 3;
   background:
     linear-gradient(
       90deg,
-      rgba(8, 24, 16, 0.72) 0%,
-      rgba(8, 24, 16, 0.45) 38%,
-      rgba(8, 24, 16, 0.18) 68%,
-      rgba(8, 24, 16, 0.28) 100%
+      rgba(8, 24, 16, 0.7) 0%,
+      rgba(8, 24, 16, 0.4) 36%,
+      rgba(8, 24, 16, 0.16) 66%,
+      rgba(8, 24, 16, 0.25) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(8, 24, 16, 0.2) 0%,
-      rgba(8, 24, 16, 0.05) 42%,
+      rgba(8, 24, 16, 0.18) 0%,
+      rgba(8, 24, 16, 0.04) 40%,
       rgba(244, 250, 246, 0) 58%,
-      rgba(244, 250, 246, 0.55) 78%,
+      rgba(244, 250, 246, 0.5) 78%,
       var(--page-bg) 100%
     );
   pointer-events: none;
@@ -225,22 +417,27 @@ body {
     linear-gradient(
       90deg,
       rgba(4, 10, 7, 0.78) 0%,
-      rgba(4, 10, 7, 0.5) 40%,
-      rgba(4, 10, 7, 0.22) 70%,
-      rgba(4, 10, 7, 0.35) 100%
+      rgba(4, 10, 7, 0.48) 40%,
+      rgba(4, 10, 7, 0.2) 70%,
+      rgba(4, 10, 7, 0.32) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(4, 10, 7, 0.25) 0%,
-      rgba(4, 10, 7, 0.08) 40%,
+      rgba(4, 10, 7, 0.22) 0%,
+      rgba(4, 10, 7, 0.06) 40%,
       rgba(5, 10, 7, 0) 58%,
       rgba(5, 10, 7, 0.55) 78%,
       var(--page-bg) 100%
     );
 }
 
-.hero-field {
-  display: none;
+@media (prefers-reduced-motion: reduce) {
+  .farm-wind-photo,
+  .farm-wind-crop,
+  .farm-wind-layer,
+  .farm-grass-row {
+    animation: none !important;
+  }
 }
 
 .btn-apple {

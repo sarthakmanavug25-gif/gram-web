@@ -5,26 +5,15 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  BadgeIndianRupee,
-  Camera,
-  CloudSun,
   HandCoins,
   Landmark,
   Smartphone,
   Stethoscope,
-  Store,
   Wrench,
 } from "lucide-react";
 import MarketingShell from "@/components/MarketingShell";
 import { MotionLink } from "@/components/MotionButton";
 import { useT } from "@/lib/i18n";
-
-const APP_FEATURES = [
-  { key: "crop", icon: Camera },
-  { key: "weather", icon: CloudSun },
-  { key: "expense", icon: BadgeIndianRupee },
-  { key: "market", icon: Store },
-] as const;
 
 const GUIDE_STEPS = ["scan", "weather", "spend", "ask"] as const;
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -34,19 +23,81 @@ export default function HomePage() {
 
   return (
     <MarketingShell>
-      <section className="hero-panel relative min-h-[82vh] w-full pb-10">
+      <section className="hero-panel relative min-h-[86vh] w-full overflow-hidden pb-8">
         <div className="hero-media" aria-hidden>
           <Image
-            src="/hero-farm.jpg"
+            src="/farm-field.jpg"
             alt=""
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[center_35%]"
+            className="farm-wind-photo object-cover object-[center_40%]"
           />
+          <div className="farm-wind-crop">
+            <Image
+              src="/farm-field.jpg"
+              alt=""
+              fill
+              sizes="100vw"
+              className="object-cover object-[center_72%]"
+            />
+          </div>
+          <div className="farm-wind-layer farm-wind-a" />
+          <div className="farm-wind-layer farm-wind-b" />
+          <div className="farm-wind-layer farm-wind-c" />
+          <svg className="farm-grass" viewBox="0 0 1440 180" preserveAspectRatio="none" aria-hidden>
+            <g className="farm-grass-row farm-grass-back">
+              {Array.from({ length: 48 }).map((_, i) => {
+                const x = i * 30 + 8;
+                const h = 70 + ((i * 17) % 55);
+                return (
+                  <path
+                    key={`b-${i}`}
+                    d={`M${x} 180 Q${x - 6} ${180 - h / 2} ${x + ((i % 3) - 1) * 4} ${180 - h}`}
+                    fill="none"
+                    stroke="rgba(55,130,55,0.45)"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                  />
+                );
+              })}
+            </g>
+            <g className="farm-grass-row farm-grass-mid">
+              {Array.from({ length: 40 }).map((_, i) => {
+                const x = i * 36 + 18;
+                const h = 90 + ((i * 23) % 60);
+                return (
+                  <path
+                    key={`m-${i}`}
+                    d={`M${x} 180 Q${x + 8} ${180 - h / 2} ${x + ((i % 2) * 10 - 5)} ${180 - h}`}
+                    fill="none"
+                    stroke="rgba(70,150,60,0.55)"
+                    strokeWidth="2.6"
+                    strokeLinecap="round"
+                  />
+                );
+              })}
+            </g>
+            <g className="farm-grass-row farm-grass-front">
+              {Array.from({ length: 36 }).map((_, i) => {
+                const x = i * 40 + 4;
+                const h = 110 + ((i * 19) % 50);
+                return (
+                  <path
+                    key={`f-${i}`}
+                    d={`M${x} 180 Q${x - 10} ${180 - h / 2} ${x + ((i % 3) - 1) * 8} ${180 - h}`}
+                    fill="none"
+                    stroke="rgba(95,170,70,0.62)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                  />
+                );
+              })}
+            </g>
+          </svg>
         </div>
 
-        <div className="relative z-10 mx-auto grid min-h-[82vh] w-full max-w-site items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:px-8">
+        <div className="relative z-10 mx-auto grid min-h-[86vh] w-full max-w-site items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
           <div>
             <motion.p
               initial={{ opacity: 0, y: 18 }}
@@ -91,38 +142,35 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 28, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.18, duration: 0.75, ease }}
-            className="float-soft mx-auto w-full max-w-[280px]"
+            className="mx-auto w-full max-w-[340px]"
           >
-            <div className="rounded-[2rem] border border-white/25 bg-white/10 p-3 shadow-[0_30px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl">
-              <div className="overflow-hidden rounded-[1.55rem] bg-[#f4faf5]/95 text-[#102318]">
-                <div className="bg-[#1f7a45]/95 px-4 py-5 text-white backdrop-blur">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">
-                    {t("app.name")}
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold tracking-tight">
-                    {t("showcase.phone.title")}
-                  </p>
-                  <p className="mt-1 text-[12px] text-white/75">
-                    {t("showcase.phone.sub")}
-                  </p>
-                </div>
-                <div className="space-y-2.5 p-4">
-                  {APP_FEATURES.map(({ key, icon: Icon }) => (
-                    <div
-                      key={key}
-                      className="flex items-center gap-3 rounded-xl bg-[#e8f2eb]/90 px-3 py-2.5 backdrop-blur"
-                    >
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-[#1f7a45]">
-                        <Icon size={16} />
-                      </span>
-                      <span className="text-[13px] font-semibold">
-                        {t(`showcase.feature.${key}` as "showcase.feature.crop")}
-                      </span>
-                    </div>
-                  ))}
+            <motion.div
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+              className="overflow-hidden rounded-[28px] border border-white/35 bg-white/18 shadow-[0_30px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl"
+            >
+              <div className="bg-[linear-gradient(160deg,#163821_0%,#1f5a38_55%,#2a6b44_100%)] px-5 pb-4 pt-5 text-white">
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">
+                  GramConnect
+                </p>
+                <p className="mt-1 text-2xl font-semibold tracking-tight">
+                  {t("showcase.phone.title")}
+                </p>
+                <p className="mt-1 text-[13px] text-white/75">{t("showcase.phone.sub")}</p>
+              </div>
+              <div className="bg-white/55 p-3">
+                <div className="relative overflow-hidden rounded-[18px] border border-white/50 shadow-sm">
+                  <Image
+                    src="/app-phone.jpg"
+                    alt="GramConnect mobile app"
+                    width={853}
+                    height={1280}
+                    priority
+                    className="h-auto w-full object-cover object-top"
+                  />
                 </div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
