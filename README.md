@@ -2,10 +2,12 @@
 
 Official companion website for the GramConnect iOS and Android apps.
 
-This site is an **app showcase / guide**, plus two practical hubs:
+This site is an **app showcase / guide**, plus practical hubs for farmers:
 
-1. **Government schemes** — simple directory of farmer subsidies and support programmes with official links  
-2. **Farm tool marketplace** — companies list machinery and inputs; farmers can enquire
+1. **Government schemes** — simple directory of farmer subsidies with official links  
+2. **Farm tool marketplace** — browse tools, **add to cart**, demo pay (UPI / card / COD), enquire sellers, earn Gram Points  
+3. **Drone pesticide spraying** — pick operator, acres, date & slot, see cost estimate, then **continue in the app** for enquiry  
+4. **Disease library** and **help desk** for field guidance
 
 The full interactive farming tools live in the mobile apps. This website stays light and readable on phone, tablet and laptop.
 
@@ -16,10 +18,10 @@ npm install
 npm run build
 npm start
 # or for development:
-npm run dev
+npm run dev -- -H 0.0.0.0 -p 43117
 ```
 
-Open http://localhost:43117 (dev) or the production port you configure.
+Open http://localhost:43117 (or the port you choose).
 
 ## Main routes
 
@@ -27,9 +29,16 @@ Open http://localhost:43117 (dev) or the production port you configure.
 | --- | --- |
 | `/` | App showcase homepage + guide |
 | `/schemes` | Government schemes connector |
-| `/marketplace` | Farm tools marketplace |
+| `/marketplace` | Farm tools marketplace + cart checkout |
+| `/drone` | Drone spray planning (slots + cost → app) |
+| `/diseases` | Crop disease library |
+| `/help` | Farmer help desk |
 | `/about` | About GramConnect |
-| `/help` | Help & FAQ |
+
+## Notes
+
+- Marketplace checkout is a **demo payment** flow (orders saved on this device). No real money is charged until a payment gateway is connected.
+- Drone web page estimates cost; booking enquiry continues via `/#get-app` (mobile apps).
 
 ## Optional env
 
