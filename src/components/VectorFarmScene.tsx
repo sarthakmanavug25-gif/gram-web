@@ -194,14 +194,14 @@ export default function VectorFarmScene() {
 
   const rightPlants = useMemo<Leaf[]>(() => {
     const out: Leaf[] = [];
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 10; i++) {
       const r1 = seeded(70 + i * 2.7);
       const r2 = seeded(90 + i * 3.9);
       out.push({
         id: `R${i}`,
-        x: 980 + (i % 7) * 58 + r1 * 22,
-        y: 710 + Math.floor(i / 7) * 75 + r2 * 28,
-        scale: 1.1 + r1 * 0.6,
+        x: 1180 + (i % 5) * 48 + r1 * 18,
+        y: 780 + Math.floor(i / 5) * 55 + r2 * 20,
+        scale: 0.95 + r1 * 0.45,
         rot: 0,
         tone: ((i + 1) % 4) as 0 | 1 | 2 | 3,
         dur: 2.6 + r2 * 2.4,
@@ -215,14 +215,16 @@ export default function VectorFarmScene() {
 
   const midPlants = useMemo<Leaf[]>(() => {
     const out: Leaf[] = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 8; i++) {
       const r1 = seeded(120 + i * 5.1);
       const r2 = seeded(150 + i * 2.2);
+      // keep mid leaves away from phone column (~860–1180)
+      const x = 280 + i * 70 + r1 * 24;
       out.push({
         id: `M${i}`,
-        x: 320 + i * 85 + r1 * 30,
-        y: 640 + r2 * 40,
-        scale: 0.55 + r1 * 0.35,
+        x,
+        y: 680 + r2 * 35,
+        scale: 0.48 + r1 * 0.28,
         rot: 0,
         tone: ((i + 2) % 4) as 0 | 1 | 2 | 3,
         dur: 3.2 + r2 * 2,
@@ -236,14 +238,17 @@ export default function VectorFarmScene() {
 
   const grasses = useMemo(() => {
     const out = [];
-    for (let i = 0; i < 28; i++) {
+    for (let i = 0; i < 22; i++) {
       const r1 = seeded(200 + i);
       const r2 = seeded(300 + i * 1.7);
+      const x = 60 + i * 52 + r1 * 18;
+      // skip grass under phone
+      if (x > 860 && x < 1180) continue;
       out.push({
         id: `G${i}`,
-        x: 80 + i * 48 + r1 * 20,
-        y: 820 + r2 * 50,
-        scale: 0.7 + r1 * 0.5,
+        x,
+        y: 840 + r2 * 40,
+        scale: 0.65 + r1 * 0.45,
         dur: 2.2 + r2 * 1.8,
         delay: -r1 * 2.5,
         amp: 6 + r2 * 6,
