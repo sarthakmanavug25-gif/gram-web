@@ -39,7 +39,7 @@ function makeBlades(
       x: (i / count) * width + (r1 - 0.5) * (width / count) * 1.4,
       h: hMin + r2 * (hMax - hMin),
       lean: (r3 - 0.5) * 10,
-      w: 2.2 + r4 * 2.4,
+      w: 3.4 + r4 * 3.2,
       tone: (Math.floor(r5 * 3) % 3) as 0 | 1 | 2,
       dur: 2.6 + r2 * 2.8,
       delay: r1 * -4.5,
@@ -49,13 +49,13 @@ function makeBlades(
   return out;
 }
 
-const FILL = ["#1f6b38", "#2f8a48", "#46a85a"] as const;
-const STROKE = ["#16532b", "#24703a", "#348a49"] as const;
+const FILL = ["#1a7a3d", "#2e9a4f", "#4cbc66"] as const;
+const STROKE = ["#0f5c2c", "#1c7a3a", "#2a9448"] as const;
 
 function CropBlade({ b, y }: { b: Blade; y: number }) {
   const tipX = b.lean * 0.35;
   const midX = b.lean * 0.55;
-  const leaf = b.h * 0.22;
+  const leaf = Math.max(10, b.h * 0.32);
   const amp = b.amp;
   return (
     <g transform={`translate(${b.x} ${y})`}>
@@ -71,34 +71,34 @@ function CropBlade({ b, y }: { b: Blade; y: number }) {
           calcMode="spline"
           keySplines="0.45 0 0.55 1;0.45 0 0.55 1"
         />
+        {/* filled plant silhouette for clearer read */}
         <path
-          d={`M0 0 C ${midX * 0.4} ${-b.h * 0.35}, ${midX} ${-b.h * 0.7}, ${tipX} ${-b.h}`}
-          fill="none"
-          stroke={STROKE[b.tone]}
-          strokeWidth={b.w * 0.55}
-          strokeLinecap="round"
-        />
-        <path
-          d={`M${midX * 0.35} ${-b.h * 0.42}
-             C ${midX * 0.35 - leaf} ${-b.h * 0.5}, ${midX * 0.35 - leaf * 1.1} ${-b.h * 0.62}, ${midX * 0.2} ${-b.h * 0.58}
-             C ${midX * 0.35 - leaf * 0.3} ${-b.h * 0.52}, ${midX * 0.4} ${-b.h * 0.45}, ${midX * 0.35} ${-b.h * 0.42} Z`}
+          d={`M0 0
+             C ${-b.w * 1.2} ${-b.h * 0.35}, ${midX - b.w} ${-b.h * 0.7}, ${tipX - b.w * 0.6} ${-b.h}
+             L ${tipX + b.w * 0.6} ${-b.h}
+             C ${midX + b.w} ${-b.h * 0.7}, ${b.w * 1.2} ${-b.h * 0.35}, 0 0 Z`}
           fill={FILL[b.tone]}
-          opacity={0.92}
+          opacity={0.95}
         />
         <path
-          d={`M${midX * 0.55} ${-b.h * 0.58}
-             C ${midX * 0.55 + leaf} ${-b.h * 0.66}, ${midX * 0.55 + leaf * 1.15} ${-b.h * 0.78}, ${midX * 0.4} ${-b.h * 0.74}
-             C ${midX * 0.55 + leaf * 0.25} ${-b.h * 0.68}, ${midX * 0.6} ${-b.h * 0.6}, ${midX * 0.55} ${-b.h * 0.58} Z`}
+          d={`M${midX * 0.2} ${-b.h * 0.38}
+             C ${midX * 0.2 - leaf} ${-b.h * 0.48}, ${midX * 0.2 - leaf * 1.2} ${-b.h * 0.62}, ${midX * 0.05} ${-b.h * 0.55}
+             C ${midX * 0.25 - leaf * 0.35} ${-b.h * 0.5}, ${midX * 0.35} ${-b.h * 0.42}, ${midX * 0.2} ${-b.h * 0.38} Z`}
           fill={FILL[(b.tone + 1) % 3]}
-          opacity={0.9}
+        />
+        <path
+          d={`M${midX * 0.45} ${-b.h * 0.55}
+             C ${midX * 0.45 + leaf} ${-b.h * 0.64}, ${midX * 0.45 + leaf * 1.25} ${-b.h * 0.78}, ${midX * 0.25} ${-b.h * 0.72}
+             C ${midX * 0.5 + leaf * 0.3} ${-b.h * 0.66}, ${midX * 0.55} ${-b.h * 0.58}, ${midX * 0.45} ${-b.h * 0.55} Z`}
+          fill={FILL[(b.tone + 2) % 3]}
         />
         <ellipse
           cx={tipX}
-          cy={-b.h}
-          rx={b.w * 0.9}
-          ry={b.h * 0.06}
-          fill={FILL[(b.tone + 2) % 3]}
-          opacity={0.95}
+          cy={-b.h + 2}
+          rx={b.w * 1.35}
+          ry={b.h * 0.08}
+          fill={STROKE[b.tone]}
+          opacity={0.85}
         />
       </g>
     </g>
@@ -123,17 +123,25 @@ function GrassTuft({ b, y }: { b: Blade; y: number }) {
         />
         <path
           d={`M0 0
-             C ${-b.w} ${-b.h * 0.45}, ${-b.w * 0.4} ${-b.h * 0.85}, ${b.lean * 0.2} ${-b.h}
-             L ${b.lean * 0.2 + b.w * 0.35} ${-b.h * 0.92}
-             C ${b.w * 0.2} ${-b.h * 0.55}, ${b.w * 0.8} ${-b.h * 0.25}, 0 0 Z`}
+             C ${-b.w * 1.4} ${-b.h * 0.4}, ${-b.w * 0.6} ${-b.h * 0.82}, ${b.lean * 0.25} ${-b.h}
+             L ${b.lean * 0.25 + b.w * 0.55} ${-b.h * 0.9}
+             C ${b.w * 0.35} ${-b.h * 0.52}, ${b.w} ${-b.h * 0.22}, 0 0 Z`}
           fill={FILL[b.tone]}
         />
         <path
-          d={`M${b.w * 0.3} 0
-             C ${b.w} ${-b.h * 0.4}, ${b.w * 1.1} ${-b.h * 0.75}, ${b.lean * 0.4 + b.w} ${-b.h * 0.88}
-             L ${b.lean * 0.4 + b.w * 1.25} ${-b.h * 0.8}
-             C ${b.w * 1.4} ${-b.h * 0.45}, ${b.w * 0.9} ${-b.h * 0.2}, ${b.w * 0.3} 0 Z`}
+          d={`M${b.w * 0.35} 0
+             C ${b.w * 1.2} ${-b.h * 0.38}, ${b.w * 1.45} ${-b.h * 0.72}, ${b.lean * 0.45 + b.w * 1.1} ${-b.h * 0.92}
+             L ${b.lean * 0.45 + b.w * 1.55} ${-b.h * 0.82}
+             C ${b.w * 1.7} ${-b.h * 0.42}, ${b.w * 1.05} ${-b.h * 0.18}, ${b.w * 0.35} 0 Z`}
           fill={FILL[(b.tone + 1) % 3]}
+          opacity={0.92}
+        />
+        <path
+          d={`M${-b.w * 0.15} 0
+             C ${-b.w * 0.8} ${-b.h * 0.5}, ${-b.w * 0.2} ${-b.h * 0.88}, ${b.lean * 0.1 - b.w * 0.3} ${-b.h * 1.05}
+             L ${b.lean * 0.1} ${-b.h * 0.95}
+             C ${-b.w * 0.05} ${-b.h * 0.55}, ${b.w * 0.2} ${-b.h * 0.2}, ${-b.w * 0.15} 0 Z`}
+          fill={FILL[(b.tone + 2) % 3]}
           opacity={0.88}
         />
       </g>
@@ -146,10 +154,10 @@ function GrassTuft({ b, y }: { b: Blade; y: number }) {
  * Green palette only — no golden/yellow wheat look.
  */
 export default function VectorFarmScene() {
-  const farCrops = useMemo(() => makeBlades(42, 0, 1440, 11, 28, 52), []);
-  const midCrops = useMemo(() => makeBlades(58, 0, 1440, 27, 48, 86), []);
-  const nearGrass = useMemo(() => makeBlades(70, 0, 1440, 41, 70, 130), []);
-  const frontGrass = useMemo(() => makeBlades(48, 0, 1440, 63, 90, 160), []);
+  const farCrops = useMemo(() => makeBlades(56, 0, 1440, 11, 36, 64), []);
+  const midCrops = useMemo(() => makeBlades(72, 0, 1440, 27, 58, 100), []);
+  const nearGrass = useMemo(() => makeBlades(80, 0, 1440, 41, 85, 145), []);
+  const frontGrass = useMemo(() => makeBlades(56, 0, 1440, 63, 110, 175), []);
 
   return (
     <div className="vf-scene" aria-hidden>
@@ -261,22 +269,22 @@ export default function VectorFarmScene() {
         {/* —— animated crop / grass only —— */}
         <g className="vf-layer vf-layer-far">
           {farCrops.map((b) => (
-            <CropBlade key={b.id} b={b} y={545} />
+            <CropBlade key={b.id} b={b} y={555} />
           ))}
         </g>
         <g className="vf-layer vf-layer-mid">
           {midCrops.map((b) => (
-            <CropBlade key={b.id} b={b} y={620} />
+            <CropBlade key={b.id} b={b} y={635} />
           ))}
         </g>
         <g className="vf-layer vf-layer-near">
           {nearGrass.map((b) => (
-            <GrassTuft key={b.id} b={b} y={760} />
+            <GrassTuft key={b.id} b={b} y={745} />
           ))}
         </g>
         <g className="vf-layer vf-layer-front">
           {frontGrass.map((b) => (
-            <GrassTuft key={b.id} b={b} y={880} />
+            <GrassTuft key={b.id} b={b} y={855} />
           ))}
         </g>
       </svg>
