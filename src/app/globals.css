@@ -196,31 +196,7 @@ body {
 .vf-scene {
   position: absolute;
   inset: 0;
-}
-
-.vf-backdrop {
-  z-index: 0;
-  transform: scale(1.04);
-  filter: saturate(1.18) hue-rotate(-6deg) brightness(1.02);
-}
-
-.vf-tint {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(120, 190, 160, 0.18) 0%,
-      rgba(40, 120, 70, 0.08) 40%,
-      rgba(20, 80, 45, 0.12) 100%
-    ),
-    radial-gradient(
-      ellipse 80% 55% at 50% 35%,
-      rgba(180, 230, 200, 0.12),
-      transparent 70%
-    );
+  background: #8fd4f0;
 }
 
 .vf-svg {
@@ -229,11 +205,8 @@ body {
   height: 100%;
 }
 
-.vf-svg-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
+.vf-tractor {
+  filter: drop-shadow(0 6px 10px rgba(10, 50, 25, 0.28));
 }
 
 .vf-cloud {
@@ -253,14 +226,14 @@ body {
     transform: translateX(0);
   }
   50% {
-    transform: translateX(36px);
+    transform: translateX(40px);
   }
   100% {
     transform: translateX(0);
   }
 }
 
-/* Soft farm-to-page fade — keep greens vivid */
+/* Soft farm-to-page fade — keep greens vivid & crisp */
 .hero-media::after {
   content: "";
   position: absolute;
@@ -269,17 +242,17 @@ body {
   background:
     linear-gradient(
       90deg,
-      rgba(10, 42, 24, 0.48) 0%,
-      rgba(10, 42, 24, 0.22) 34%,
-      rgba(10, 42, 24, 0.06) 62%,
-      rgba(10, 42, 24, 0.14) 100%
+      rgba(8, 48, 28, 0.42) 0%,
+      rgba(8, 48, 28, 0.18) 34%,
+      rgba(8, 48, 28, 0.04) 62%,
+      rgba(8, 48, 28, 0.12) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(10, 42, 24, 0.08) 0%,
-      rgba(10, 42, 24, 0.02) 42%,
+      rgba(8, 48, 28, 0.06) 0%,
+      rgba(8, 48, 28, 0.01) 42%,
       rgba(244, 250, 246, 0) 64%,
-      rgba(244, 250, 246, 0.32) 84%,
+      rgba(244, 250, 246, 0.28) 84%,
       var(--page-bg) 100%
     );
   pointer-events: none;
