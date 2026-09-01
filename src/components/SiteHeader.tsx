@@ -7,6 +7,7 @@ import { Languages, Menu, Moon, Sprout, Sun, X } from "lucide-react";
 import clsx from "clsx";
 import { useApp } from "@/lib/store";
 import { useT } from "@/lib/i18n";
+import { MotionLink } from "@/components/MotionButton";
 
 const NAV = [
   { href: "/", labelKey: "site.nav.home" as const },
@@ -78,12 +79,13 @@ export default function SiteHeader() {
           >
             {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
           </button>
-          <a
+          <MotionLink
             href="/#get-app"
-            className="rounded-full bg-green-primary px-4 py-2 text-[13.5px] font-semibold text-white shadow-glow transition hover:bg-green-dark"
+            variant="primary"
+            className="!px-4 !py-2 text-[13.5px]"
           >
             {t("site.nav.getApp")}
-          </a>
+          </MotionLink>
           <button
             type="button"
             className="inline-flex h-10 w-10 items-center justify-center rounded-xl hairline bg-white/80 text-text-primary md:hidden"

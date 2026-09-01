@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -15,6 +16,7 @@ import {
   Wrench,
 } from "lucide-react";
 import MarketingShell from "@/components/MarketingShell";
+import { MotionLink } from "@/components/MotionButton";
 import { useT } from "@/lib/i18n";
 
 const APP_FEATURES = [
@@ -25,73 +27,79 @@ const APP_FEATURES = [
 ] as const;
 
 const GUIDE_STEPS = ["scan", "weather", "spend", "ask"] as const;
+const ease = [0.22, 1, 0.36, 1] as const;
 
 export default function HomePage() {
   const { t } = useT();
 
   return (
     <MarketingShell>
-      <section className="hero-panel relative min-h-[78vh] w-full">
-        <div className="hero-field" aria-hidden />
-        <div className="relative z-10 mx-auto grid min-h-[78vh] w-full max-w-site items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:px-8">
+      <section className="hero-panel relative min-h-[82vh] w-full pb-10">
+        <div className="hero-media" aria-hidden>
+          <Image
+            src="/hero-farm.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[center_35%]"
+          />
+        </div>
+
+        <div className="relative z-10 mx-auto grid min-h-[82vh] w-full max-w-site items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:px-8">
           <div>
             <motion.p
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              className="font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl"
+              transition={{ duration: 0.7, ease }}
+              className="text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl"
             >
               {t("site.hero.brand")}
             </motion.p>
             <motion.h1
-              initial={{ opacity: 0, y: 14 }}
+              initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.08 }}
-              className="mt-5 max-w-xl text-xl font-medium leading-snug text-white/92 sm:text-2xl"
+              transition={{ duration: 0.7, delay: 0.08, ease }}
+              className="mt-5 max-w-xl text-xl font-medium leading-snug text-white/93 sm:text-2xl"
             >
               {t("showcase.hero.headline")}
             </motion.h1>
             <motion.p
-              initial={{ opacity: 0, y: 14 }}
+              initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.16 }}
-              className="mt-4 max-w-lg text-[15px] leading-relaxed text-white/75"
+              transition={{ duration: 0.7, delay: 0.16, ease }}
+              className="mt-4 max-w-lg text-[15px] leading-relaxed text-white/78"
             >
               {t("showcase.hero.sub")}
             </motion.p>
             <motion.div
-              initial={{ opacity: 0, y: 14 }}
+              initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.24 }}
+              transition={{ duration: 0.7, delay: 0.24, ease }}
               className="mt-8 flex flex-wrap gap-3"
             >
-              <a
-                href="#get-app"
-                className="rounded-full bg-white px-6 py-3 text-[15px] font-semibold text-[#102318] transition hover:bg-[#e8f2eb]"
-              >
+              <MotionLink href="#get-app" variant="solid-light">
                 {t("showcase.hero.ctaApp")}
-              </a>
-              <Link
-                href="/schemes"
-                className="rounded-full border border-white/35 bg-white/10 px-6 py-3 text-[15px] font-semibold text-white backdrop-blur transition hover:bg-white/18"
-              >
+              </MotionLink>
+              <MotionLink href="/schemes" variant="secondary">
                 {t("showcase.hero.ctaSchemes")}
-              </Link>
+              </MotionLink>
             </motion.div>
           </div>
 
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.18, duration: 0.55 }}
+            initial={{ opacity: 0, y: 28, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.18, duration: 0.75, ease }}
             className="float-soft mx-auto w-full max-w-[280px]"
           >
-            <div className="rounded-[2rem] border border-white/20 bg-[#0c1f15]/70 p-3 shadow-[0_30px_80px_rgba(0,0,0,0.35)] backdrop-blur">
-              <div className="overflow-hidden rounded-[1.55rem] bg-[#f4faf5] text-[#102318]">
-                <div className="bg-[#1f7a45] px-4 py-5 text-white">
+            <div className="rounded-[2rem] border border-white/25 bg-white/10 p-3 shadow-[0_30px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl">
+              <div className="overflow-hidden rounded-[1.55rem] bg-[#f4faf5]/95 text-[#102318]">
+                <div className="bg-[#1f7a45]/95 px-4 py-5 text-white backdrop-blur">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">
                     {t("app.name")}
                   </p>
-                  <p className="mt-2 font-display text-2xl font-semibold">
+                  <p className="mt-2 text-2xl font-semibold tracking-tight">
                     {t("showcase.phone.title")}
                   </p>
                   <p className="mt-1 text-[12px] text-white/75">
@@ -102,7 +110,7 @@ export default function HomePage() {
                   {APP_FEATURES.map(({ key, icon: Icon }) => (
                     <div
                       key={key}
-                      className="flex items-center gap-3 rounded-xl bg-[#e8f2eb] px-3 py-2.5"
+                      className="flex items-center gap-3 rounded-xl bg-[#e8f2eb]/90 px-3 py-2.5 backdrop-blur"
                     >
                       <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-[#1f7a45]">
                         <Icon size={16} />
@@ -121,7 +129,7 @@ export default function HomePage() {
 
       <section id="app-guide" className="mx-auto w-full max-w-site px-4 py-16 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
-          <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             {t("showcase.guide.title")}
           </h2>
           <p className="mt-3 text-[15px] text-text-secondary">{t("showcase.guide.sub")}</p>
@@ -156,61 +164,67 @@ export default function HomePage() {
 
       <section className="py-4">
         <div className="mx-auto w-full max-w-site px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/diseases"
-            className="glass glass-hover group flex flex-col gap-6 p-7 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <div className="max-w-2xl">
-              <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-green-primary/12 text-green-bright">
-                <Stethoscope size={20} />
+          <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.99 }} transition={{ type: "spring", stiffness: 380, damping: 28 }}>
+            <Link
+              href="/diseases"
+              className="glass group flex flex-col gap-6 p-7 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="max-w-2xl">
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-green-primary/12 text-green-bright">
+                  <Stethoscope size={20} />
+                </div>
+                <h2 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+                  {t("diseasesLib.homeTitle")}
+                </h2>
+                <p className="mt-2 text-[14px] leading-relaxed text-text-secondary">
+                  {t("diseasesLib.homeBody")}
+                </p>
               </div>
-              <h2 className="mt-4 font-display text-2xl font-semibold sm:text-3xl">
-                {t("diseasesLib.homeTitle")}
-              </h2>
-              <p className="mt-2 text-[14px] leading-relaxed text-text-secondary">
-                {t("diseasesLib.homeBody")}
-              </p>
-            </div>
-            <span className="inline-flex items-center gap-2 self-start rounded-full bg-green-primary px-5 py-3 text-[14px] font-semibold text-white sm:self-center">
-              {t("diseasesLib.homeCta")} <ArrowRight size={16} />
-            </span>
-          </Link>
+              <span className="btn-apple inline-flex items-center gap-2 self-start rounded-full bg-green-primary px-5 py-3 text-[14px] font-semibold text-white sm:self-center">
+                {t("diseasesLib.homeCta")} <ArrowRight size={16} />
+              </span>
+            </Link>
+          </motion.div>
         </div>
       </section>
 
       <section className="border-y border-[var(--hairline-edge)] py-16">
         <div className="mx-auto grid w-full max-w-site gap-6 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-          <Link
-            href="/schemes"
-            className="group overflow-hidden rounded-[28px] bg-[linear-gradient(145deg,#143526_0%,#1f5a38_60%,#2a6b44_100%)] p-7 text-white transition duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(16,55,30,0.28)]"
-          >
-            <Landmark className="h-8 w-8 text-white/85" />
-            <h2 className="mt-5 font-display text-2xl font-semibold sm:text-3xl">
-              {t("showcase.schemes.title")}
-            </h2>
-            <p className="mt-3 max-w-md text-[14px] leading-relaxed text-white/75">
-              {t("showcase.schemes.body")}
-            </p>
-            <span className="mt-6 inline-flex items-center gap-2 text-[14px] font-semibold">
-              {t("showcase.schemes.cta")} <ArrowRight size={16} />
-            </span>
-          </Link>
+          <motion.div whileHover={{ y: -4 }} whileTap={{ scale: 0.985 }} transition={{ type: "spring", stiffness: 380, damping: 28 }}>
+            <Link
+              href="/schemes"
+              className="group block overflow-hidden rounded-[28px] bg-[linear-gradient(145deg,#143526_0%,#1f5a38_60%,#2a6b44_100%)] p-7 text-white shadow-[0_16px_40px_rgba(16,55,30,0.22)]"
+            >
+              <Landmark className="h-8 w-8 text-white/85" />
+              <h2 className="mt-5 text-2xl font-semibold tracking-tight sm:text-3xl">
+                {t("showcase.schemes.title")}
+              </h2>
+              <p className="mt-3 max-w-md text-[14px] leading-relaxed text-white/75">
+                {t("showcase.schemes.body")}
+              </p>
+              <span className="mt-6 inline-flex items-center gap-2 text-[14px] font-semibold">
+                {t("showcase.schemes.cta")} <ArrowRight size={16} />
+              </span>
+            </Link>
+          </motion.div>
 
-          <Link
-            href="/marketplace"
-            className="glass glass-hover group overflow-hidden rounded-[28px] p-7"
-          >
-            <Wrench className="h-8 w-8 text-green-bright" />
-            <h2 className="mt-5 font-display text-2xl font-semibold sm:text-3xl">
-              {t("showcase.market.title")}
-            </h2>
-            <p className="mt-3 max-w-md text-[14px] leading-relaxed text-text-secondary">
-              {t("showcase.market.body")}
-            </p>
-            <span className="mt-6 inline-flex items-center gap-2 text-[14px] font-semibold text-green-bright">
-              {t("showcase.market.cta")} <ArrowRight size={16} />
-            </span>
-          </Link>
+          <motion.div whileHover={{ y: -4 }} whileTap={{ scale: 0.985 }} transition={{ type: "spring", stiffness: 380, damping: 28 }}>
+            <Link
+              href="/marketplace"
+              className="glass group block overflow-hidden rounded-[28px] p-7"
+            >
+              <Wrench className="h-8 w-8 text-green-bright" />
+              <h2 className="mt-5 text-2xl font-semibold tracking-tight sm:text-3xl">
+                {t("showcase.market.title")}
+              </h2>
+              <p className="mt-3 max-w-md text-[14px] leading-relaxed text-text-secondary">
+                {t("showcase.market.body")}
+              </p>
+              <span className="mt-6 inline-flex items-center gap-2 text-[14px] font-semibold text-green-bright">
+                {t("showcase.market.cta")} <ArrowRight size={16} />
+              </span>
+            </Link>
+          </motion.div>
         </div>
       </section>
 
@@ -221,7 +235,7 @@ export default function HomePage() {
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-green-primary/12 text-green-bright">
                 <Smartphone size={22} />
               </div>
-              <h2 className="mt-4 font-display text-3xl font-semibold tracking-tight">
+              <h2 className="mt-4 text-3xl font-semibold tracking-tight">
                 {t("showcase.apps.title")}
               </h2>
               <p className="mt-3 text-[15px] leading-relaxed text-text-secondary">
