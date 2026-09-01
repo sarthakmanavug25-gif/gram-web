@@ -157,6 +157,11 @@ const EN = {
   "cart.discount": "Gram Points discount",
   "cart.total": "Total",
   "cart.usePoints": "Use {n} GP (−{off}) on this purchase",
+  "cart.autoPoints":
+    "{n} Gram Points will be deducted (−{off}). Balance left after pay: {left} GP.",
+  "cart.barPoints": "−{n} GP (−{off}) applied",
+  "cart.pointsDeducted": "{n} GP deducted (−{off})",
+  "cart.noPoints": "No Gram Points on this device yet — earn some by login or enquiries.",
   "cart.payMethod": "Payment method",
   "cart.upi": "UPI",
   "cart.card": "Card",
@@ -683,6 +688,11 @@ const HI: Record<keyof typeof EN, string> = {
   "cart.discount": "ग्राम पॉइंट्स छूट",
   "cart.total": "कुल",
   "cart.usePoints": "इस खरीद पर {n} GP (−{off}) इस्तेमाल करें",
+  "cart.autoPoints":
+    "{n} ग्राम पॉइंट्स काटेंगे (−{off})। भुगतान के बाद बचे: {left} GP।",
+  "cart.barPoints": "−{n} GP (−{off}) लागू",
+  "cart.pointsDeducted": "{n} GP काटे (−{off})",
+  "cart.noPoints": "इस डिवाइस पर अभी ग्राम पॉइंट्स नहीं — लॉगिन या पूछताछ से कमाएँ।",
   "cart.payMethod": "भुगतान तरीका",
   "cart.upi": "UPI",
   "cart.card": "कार्ड",

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import {
   CreditCard,
+  Coins,
   Minus,
   Plus,
   ShoppingCart,
@@ -14,9 +15,8 @@ import {
 } from "lucide-react";
 import { MARKET_PRODUCTS } from "@/lib/seed/marketplace";
 import {
-  GRAM_POINTS,
   discountFromPoints,
-  maxRedeemablePoints,
+  maxCartRedeemablePoints,
 } from "@/lib/gramPoints";
 import { useApp } from "@/lib/store";
 import { useT } from "@/lib/i18n";
@@ -36,9 +36,9 @@ export default function MarketplaceCartCheckout() {
 
   const [open, setOpen] = useState(false);
   const [method, setMethod] = useState<PayMethod>("upi");
-  const [usePoints, setUsePoints] = useState(false);
   const [busy, setBusy] = useState(false);
   const [receipt, setReceipt] = useState<string | null>(null);
+  const [pointsSpent, setPointsSpent] = useState(0);
   const [error, setError] = useState("");
 
   const lines = useMemo(
@@ -58,8 +58,9 @@ export default function MarketplaceCartCheckout() {
   );
 
   const subtotal = lines.reduce((sum, l) => sum + l.product.price * l.qty, 0);
-  const redeemable = maxRedeemablePoints(subtotal, gramPoints);
-  const discount = usePoints ? discountFromPoints(redeemable) : 0;
+  // Auto-apply every available Gram Point against cart total.
+  const redeemable = maxCartRedeemablePoints(subtotal, gramPoints);
+  const discount = discountFromPoints(redeemable);
   const total = Math.max(0, subtotal - discount);
   const count = lines.reduce((n, l) => n + l.qty, 0);
 
@@ -73,7 +74,7 @@ export default function MarketplaceCartCheckout() {
     }));
     const result = checkoutCart({
       method,
-      usePoints: usePoints && redeemable >= GRAM_POINTS.MIN_REDEEM,
+      usePoints: true,
       catalog,
     });
     setBusy(false);
@@ -81,8 +82,8 @@ export default function MarketplaceCartCheckout() {
       setError(result.error);
       return;
     }
+    setPointsSpent(result.order.pointsUsed);
     setReceipt(result.order.id);
-    setUsePoints(false);
   }
 
   if (count === 0 && !open && !receipt) return null;
@@ -99,11 +100,28 @@ export default function MarketplaceCartCheckout() {
             }}
             className="mx-auto flex w-full max-w-site items-center justify-between gap-3 rounded-2xl bg-green-primary px-5 py-3.5 text-white shadow-[0_16px_40px_rgba(16,55,30,0.35)]"
           >
-            <span className="inline-flex items-center gap-2 text-[14px] font-semibold">
-              <ShoppingCart size={18} />
-              {t("cart.bar", { n: count })}
+            <span className="inline-flex flex-col items-start gap-0.5 text-left">
+              <span className="inline-flex items-center gap-2 text-[14px] font-semibold">
+                <ShoppingCart size={18} />
+                {t("cart.bar", { n: count })}
+              </span>
+              {redeemable > 0 && (
+                <span className="text-[11px] font-medium text-white/85">
+                  {t("cart.barPoints", {
+                    n: redeemable,
+                    off: rupees(discount),
+                  })}
+                </span>
+              )}
             </span>
-            <span className="text-[14px] font-bold">{rupees(subtotal)}</span>
+            <span className="text-right">
+              {discount > 0 && (
+                <span className="block text-[11px] text-white/70 line-through">
+                  {rupees(subtotal)}
+                </span>
+              )}
+              <span className="text-[14px] font-bold">{rupees(total)}</span>
+            </span>
           </button>
         </div>
       )}
@@ -133,11 +151,21 @@ export default function MarketplaceCartCheckout() {
                 <p className="text-[13px] text-text-secondary">
                   {t("cart.successBody", { id: receipt })}
                 </p>
+                {pointsSpent > 0 && (
+                  <p className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-green-bright">
+                    <Coins size={14} />
+                    {t("cart.pointsDeducted", {
+                      n: pointsSpent,
+                      off: rupees(discountFromPoints(pointsSpent)),
+                    })}
+                  </p>
+                )}
                 <p className="text-[12px] text-text-muted">{t("cart.demoNote")}</p>
                 <button
                   type="button"
                   onClick={() => {
                     setReceipt(null);
+                    setPointsSpent(0);
                     setOpen(false);
                   }}
                   className="mt-2 w-full rounded-full bg-green-primary px-4 py-3 text-[14px] font-semibold text-white"
@@ -202,21 +230,21 @@ export default function MarketplaceCartCheckout() {
                   ))}
                 </ul>
 
-                {redeemable >= GRAM_POINTS.MIN_REDEEM && (
-                  <label className="mt-4 flex cursor-pointer items-start gap-2 rounded-xl border border-[var(--hairline-edge)] px-3 py-2.5 text-[13px] text-text-secondary">
-                    <input
-                      type="checkbox"
-                      className="mt-0.5 accent-[var(--green-primary)]"
-                      checked={usePoints}
-                      onChange={(e) => setUsePoints(e.target.checked)}
-                    />
+                {redeemable > 0 ? (
+                  <div className="mt-4 flex items-start gap-2 rounded-xl border border-green-primary/30 bg-green-primary/8 px-3 py-2.5 text-[13px] text-green-bright">
+                    <Coins size={15} className="mt-0.5 shrink-0" />
                     <span>
-                      {t("cart.usePoints", {
+                      {t("cart.autoPoints", {
                         n: redeemable,
-                        off: rupees(discountFromPoints(redeemable)),
+                        off: rupees(discount),
+                        left: gramPoints - redeemable,
                       })}
                     </span>
-                  </label>
+                  </div>
+                ) : (
+                  <p className="mt-4 text-[12px] text-text-muted">
+                    {t("cart.noPoints")}
+                  </p>
                 )}
 
                 <div className="mt-4 space-y-1.5 text-[13px]">
@@ -296,6 +324,9 @@ export default function MarketplaceCartCheckout() {
                     >
                       <span>
                         {o.id.slice(-6)} · {o.status}
+                        {o.pointsUsed > 0
+                          ? ` · −${o.pointsUsed} GP`
+                          : ""}
                       </span>
                       <span className="font-semibold">{rupees(o.total)}</span>
                     </li>

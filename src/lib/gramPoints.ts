@@ -71,6 +71,15 @@ export function maxRedeemablePoints(listPrice: number, balance: number) {
   return Math.floor(capped / 10) * 10; // round down to 10s for clean ₹ amounts
 }
 
+/**
+ * Cart checkout: spend as many Gram Points as the farmer has,
+ * up to the cart subtotal (1 GP ≈ ₹1).
+ */
+export function maxCartRedeemablePoints(subtotal: number, balance: number) {
+  if (subtotal <= 0 || balance <= 0) return 0;
+  return Math.min(Math.floor(balance), Math.floor(subtotal));
+}
+
 export function discountFromPoints(points: number) {
   return points * GRAM_POINTS.RUPEE_PER_POINT;
 }

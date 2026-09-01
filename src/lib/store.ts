@@ -5,6 +5,7 @@ import { persist } from "zustand/middleware";
 import { currentSeason } from "./seed/reference";
 import {
   GRAM_POINTS,
+  maxCartRedeemablePoints,
   maxRedeemablePoints,
   normalizeDay,
   type GramPointEvent,
@@ -587,12 +588,11 @@ export const useApp = create<State & Actions>()(
           return { ok: false, error: "Cart items not found." };
         }
 
-        let pointsUsed = 0;
-        let discount = 0;
-        if (usePoints) {
-          pointsUsed = maxRedeemablePoints(subtotal, s.gramPoints);
-          discount = pointsUsed * GRAM_POINTS.RUPEE_PER_POINT;
-        }
+        // Always redeem available Gram Points on cart pay (capped at subtotal).
+        const pointsUsed = usePoints
+          ? maxCartRedeemablePoints(subtotal, s.gramPoints)
+          : 0;
+        const discount = pointsUsed * GRAM_POINTS.RUPEE_PER_POINT;
         const total = Math.max(0, subtotal - discount);
         const order: ToolOrder = {
           id: `ord-${Date.now()}`,
