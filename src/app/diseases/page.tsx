@@ -126,32 +126,46 @@ export default function DiseasesPage() {
               >
                 <Link
                   href={`/diseases/${disease.slug}`}
-                  className="glass glass-hover group flex h-full flex-col p-5"
+                  className="glass glass-hover group flex h-full flex-col overflow-hidden p-0"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-green-primary/10 text-green-bright">
-                      <Leaf size={18} />
-                    </span>
-                    <Tag color={s.text} tint={s.bg}>
-                      {tSeverity(disease.severity)}
-                    </Tag>
-                  </div>
-                  <h2 className="mt-4 text-[17px] font-bold leading-snug">
-                    {view.name}
-                  </h2>
-                  <p className="mt-1 text-[12px] font-semibold text-green-bright">
-                    {tCrop(disease.crop)}
-                  </p>
-                  <p className="mt-2 flex-1 text-[13px] leading-relaxed text-text-secondary">
-                    {view.symptom}
-                  </p>
-                  <span className="mt-4 inline-flex items-center gap-1 text-[13px] font-semibold text-green-bright">
-                    {t("diseasesLib.view")}
-                    <ChevronRight
-                      size={15}
-                      className="transition group-hover:translate-x-0.5"
+                  <div className="relative h-36 w-full overflow-hidden bg-[linear-gradient(145deg,rgba(31,122,69,0.14),rgba(31,122,69,0.04))]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`/diseases/${disease.slug}.jpg`}
+                      alt={view.name}
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
                     />
-                  </span>
+                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/45 to-transparent px-3 pb-2.5 pt-8">
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-green-bright backdrop-blur-sm">
+                        <Leaf size={15} />
+                      </span>
+                      <Tag color={s.text} tint={s.bg}>
+                        {tSeverity(disease.severity)}
+                      </Tag>
+                    </div>
+                  </div>
+                  <div className="flex flex-1 flex-col p-5 pt-4">
+                    <h2 className="text-[17px] font-bold leading-snug">
+                      {view.name}
+                    </h2>
+                    <p className="mt-1 text-[12px] font-semibold text-green-bright">
+                      {tCrop(disease.crop)}
+                    </p>
+                    <p className="mt-2 flex-1 text-[13px] leading-relaxed text-text-secondary">
+                      {view.symptom}
+                    </p>
+                    <span className="mt-4 inline-flex items-center gap-1 text-[13px] font-semibold text-green-bright">
+                      {t("diseasesLib.view")}
+                      <ChevronRight
+                        size={15}
+                        className="transition group-hover:translate-x-0.5"
+                      />
+                    </span>
+                  </div>
                 </Link>
               </motion.div>
             );

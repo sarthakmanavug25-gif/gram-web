@@ -12,6 +12,8 @@ export type Disease = {
   treatment: string[];
   prevention: string[];
   season: string;
+  /** Optional catalog photo under /public/diseases */
+  image?: string;
 };
 
 export const DISEASES: Disease[] = [

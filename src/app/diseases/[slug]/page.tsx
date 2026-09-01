@@ -50,7 +50,16 @@ export default function DiseaseDetailWebsitePage() {
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="mt-6 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]"
         >
-          <article className="glass p-6 sm:p-8">
+          <article className="glass overflow-hidden p-0 sm:p-0">
+            <div className="relative h-52 w-full sm:h-64">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`/diseases/${disease.slug}.jpg`}
+                alt={view.name}
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <div className="p-6 sm:p-8">
             <div className="flex items-start gap-4">
               <span
                 className="flex h-12 w-12 items-center justify-center rounded-2xl"
@@ -104,6 +113,7 @@ export default function DiseaseDetailWebsitePage() {
             <p className="mt-6 rounded-2xl bg-amber/10 px-4 py-3 text-[12px] leading-relaxed text-amber">
               {t("disease.confirmNote")}
             </p>
+            </div>
           </article>
 
           <aside className="space-y-4">
@@ -131,10 +141,18 @@ export default function DiseaseDetailWebsitePage() {
                       <Link
                         key={r.slug}
                         href={`/diseases/${r.slug}`}
-                        className="flex items-center justify-between rounded-xl px-3 py-2.5 text-[13px] font-semibold hover-surface"
+                        className="flex items-center justify-between gap-3 rounded-xl px-2 py-2 text-[13px] font-semibold hover-surface"
                       >
-                        <span>{name}</span>
-                        <ChevronRight size={15} className="text-text-muted" />
+                        <span className="flex min-w-0 items-center gap-2.5">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={`/diseases/${r.slug}.jpg`}
+                            alt=""
+                            className="h-10 w-10 shrink-0 rounded-lg object-cover"
+                          />
+                          <span className="truncate">{name}</span>
+                        </span>
+                        <ChevronRight size={15} className="shrink-0 text-text-muted" />
                       </Link>
                     );
                   })}
