@@ -3,6 +3,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { currentSeason } from "./seed/reference";
+import {
+  GRAM_POINTS,
+  maxRedeemablePoints,
+  normalizeDay,
+  type GramPointEvent,
+  type GramPointsDay,
+} from "./gramPoints";
 
 export type Expense = {
   id: string;
@@ -168,6 +175,13 @@ type State = {
   theme: "dark" | "light";
   hasSeenWelcome: boolean;
   hasSeenGuide: boolean;
+  /** Local Gram Points balance for tool-market rewards. */
+  gramPoints: number;
+  gramPointsHistory: GramPointEvent[];
+  /** Product ids already rewarded for enquiry (anti-repeat). */
+  enquiredProductIds: string[];
+  gramPointsDay: GramPointsDay;
+  claimedMarketplaceWelcome: boolean;
 };
 
 type Actions = {
@@ -202,6 +216,17 @@ type Actions = {
   markWelcomeSeen: () => void;
   markGuideSeen: () => void;
   replayGuide: () => void;
+  claimMarketplaceWelcome: () => { earned: number };
+  recordToolEnquire: (productId: string) => {
+    earned: number;
+    already: boolean;
+    dailyCap: boolean;
+  };
+  recordCropSellIntent: () => { earned: number; alreadyToday: boolean };
+  redeemOnEnquire: (
+    productId: string,
+    listPrice: number
+  ) => { ok: boolean; spent: number; discount: number };
 };
 
 export const useApp = create<State & Actions>()(
@@ -221,6 +246,11 @@ export const useApp = create<State & Actions>()(
       theme: "light",
       hasSeenWelcome: false,
       hasSeenGuide: false,
+      gramPoints: 0,
+      gramPointsHistory: [],
+      enquiredProductIds: [],
+      gramPointsDay: { date: "", enquireCount: 0, sellIntent: false },
+      claimedMarketplaceWelcome: false,
 
       setHydrated: () => set({ hydrated: true }),
 
@@ -342,10 +372,116 @@ export const useApp = create<State & Actions>()(
       markGuideSeen: () => set({ hasSeenGuide: true }),
 
       replayGuide: () => set({ hasSeenGuide: false }),
+
+      claimMarketplaceWelcome: () => {
+        if (get().claimedMarketplaceWelcome) return { earned: 0 };
+        const earned = GRAM_POINTS.WELCOME;
+        const event: GramPointEvent = {
+          id: `gp-${Date.now()}`,
+          reason: "welcome",
+          amount: earned,
+          label: "Welcome to tool market",
+          labelHi: "औज़ार बाज़ार में स्वागत",
+          at: new Date().toISOString(),
+        };
+        set((s) => ({
+          claimedMarketplaceWelcome: true,
+          gramPoints: s.gramPoints + earned,
+          gramPointsHistory: [event, ...s.gramPointsHistory].slice(0, 40),
+        }));
+        return { earned };
+      },
+
+      recordToolEnquire: (productId) => {
+        const s = get();
+        if (s.enquiredProductIds.includes(productId)) {
+          return { earned: 0, already: true, dailyCap: false };
+        }
+        const day = normalizeDay(s.gramPointsDay);
+        if (day.enquireCount >= GRAM_POINTS.MAX_ENQUIRE_PER_DAY) {
+          return { earned: 0, already: false, dailyCap: true };
+        }
+        const earned = GRAM_POINTS.ENQUIRE;
+        const event: GramPointEvent = {
+          id: `gp-${Date.now()}`,
+          reason: "enquire",
+          amount: earned,
+          label: "Tool enquiry",
+          labelHi: "औज़ार पूछताछ",
+          productId,
+          at: new Date().toISOString(),
+        };
+        set({
+          enquiredProductIds: [...s.enquiredProductIds, productId],
+          gramPoints: s.gramPoints + earned,
+          gramPointsDay: { ...day, enquireCount: day.enquireCount + 1 },
+          gramPointsHistory: [event, ...s.gramPointsHistory].slice(0, 40),
+        });
+        return { earned, already: false, dailyCap: false };
+      },
+
+      recordCropSellIntent: () => {
+        const s = get();
+        const day = normalizeDay(s.gramPointsDay);
+        if (day.sellIntent) return { earned: 0, alreadyToday: true };
+        const earned = GRAM_POINTS.SELL_INTENT;
+        const event: GramPointEvent = {
+          id: `gp-${Date.now()}`,
+          reason: "sell_intent",
+          amount: earned,
+          label: "Crop sell intent shared",
+          labelHi: "फसल बेचने का इरादा साझा",
+          at: new Date().toISOString(),
+        };
+        set({
+          gramPoints: s.gramPoints + earned,
+          gramPointsDay: { ...day, sellIntent: true },
+          gramPointsHistory: [event, ...s.gramPointsHistory].slice(0, 40),
+        });
+        return { earned, alreadyToday: false };
+      },
+
+      redeemOnEnquire: (productId, listPrice) => {
+        const s = get();
+        const spend = maxRedeemablePoints(listPrice, s.gramPoints);
+        if (spend < GRAM_POINTS.MIN_REDEEM) {
+          return { ok: false, spent: 0, discount: 0 };
+        }
+        const discount = spend * GRAM_POINTS.RUPEE_PER_POINT;
+        const event: GramPointEvent = {
+          id: `gp-${Date.now()}`,
+          reason: "redeem",
+          amount: -spend,
+          label: "Points used on tool enquire",
+          labelHi: "औज़ार पूछताछ पर पॉइंट्स इस्तेमाल",
+          productId,
+          at: new Date().toISOString(),
+        };
+        set({
+          gramPoints: s.gramPoints - spend,
+          gramPointsHistory: [event, ...s.gramPointsHistory].slice(0, 40),
+        });
+        return { ok: true, spent: spend, discount };
+      },
     }),
     {
       name: "gramconnect-state",
-      version: 3,
+      version: 4,
+      migrate: (persisted, fromVersion) => {
+        const p = { ...(persisted as Record<string, unknown>) };
+        if (fromVersion < 4) {
+          p.gramPoints = p.gramPoints ?? 0;
+          p.gramPointsHistory = p.gramPointsHistory ?? [];
+          p.enquiredProductIds = p.enquiredProductIds ?? [];
+          p.gramPointsDay = p.gramPointsDay ?? {
+            date: "",
+            enquireCount: 0,
+            sellIntent: false,
+          };
+          p.claimedMarketplaceWelcome = p.claimedMarketplaceWelcome ?? false;
+        }
+        return p as State & Actions;
+      },
       onRehydrateStorage: () => (state) => state?.setHydrated(),
     }
   )
