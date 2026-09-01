@@ -1,17 +1,19 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo } from "react";
 
-type Blade = {
+type Leaf = {
   id: string;
   x: number;
-  h: number;
-  lean: number;
-  w: number;
-  tone: 0 | 1 | 2;
+  y: number;
+  scale: number;
+  rot: number;
+  tone: 0 | 1 | 2 | 3;
   dur: number;
   delay: number;
   amp: number;
+  flip?: boolean;
 };
 
 function seeded(n: number) {
@@ -19,130 +21,145 @@ function seeded(n: number) {
   return x - Math.floor(x);
 }
 
-function makeBlades(
-  count: number,
-  yBase: number,
-  width: number,
-  seed: number,
-  hMin: number,
-  hMax: number,
-): Blade[] {
-  const out: Blade[] = [];
-  for (let i = 0; i < count; i++) {
-    const r1 = seeded(seed + i * 3.1);
-    const r2 = seeded(seed + i * 7.7);
-    const r3 = seeded(seed + i * 11.3);
-    const r4 = seeded(seed + i * 19.9);
-    const r5 = seeded(seed + i * 29.1);
-    out.push({
-      id: `${seed}-${i}`,
-      x: (i / count) * width + (r1 - 0.5) * (width / count) * 1.4,
-      h: hMin + r2 * (hMax - hMin),
-      lean: (r3 - 0.5) * 10,
-      w: 3.4 + r4 * 3.2,
-      tone: (Math.floor(r5 * 3) % 3) as 0 | 1 | 2,
-      dur: 2.6 + r2 * 2.8,
-      delay: r1 * -4.5,
-      amp: 5 + r3 * 7,
-    });
-  }
-  return out;
-}
+const LEAF_FILL = ["#1f9a45", "#2eb854", "#3dcf63", "#168a3a"] as const;
+const LEAF_SHADOW = ["#0f6b2e", "#1a7f38", "#249644", "#0c5c26"] as const;
+const LEAF_LITE = ["#6fe08a", "#7eeba0", "#95f5b2", "#58d67a"] as const;
 
-const FILL = ["#1a7a3d", "#2e9a4f", "#4cbc66"] as const;
-const STROKE = ["#0f5c2c", "#1c7a3a", "#2a9448"] as const;
-
-function CropBlade({ b, y }: { b: Blade; y: number }) {
-  const tipX = b.lean * 0.35;
-  const midX = b.lean * 0.55;
-  const leaf = Math.max(10, b.h * 0.32);
-  const amp = b.amp;
+/** Broad leafy crop plant — matches vibrant agri illustration style */
+function LeafPlant({ leaf }: { leaf: Leaf }) {
+  const s = leaf.scale;
   return (
-    <g transform={`translate(${b.x} ${y})`}>
+    <g
+      transform={`translate(${leaf.x} ${leaf.y}) scale(${leaf.flip ? -s : s} ${s})`}
+    >
       <g>
         <animateTransform
           attributeName="transform"
           type="rotate"
-          values={`${-amp};${amp};${-amp}`}
+          values={`${-leaf.amp};${leaf.amp};${-leaf.amp}`}
           keyTimes="0;0.5;1"
-          dur={`${b.dur}s`}
-          begin={`${b.delay}s`}
+          dur={`${leaf.dur}s`}
+          begin={`${leaf.delay}s`}
           repeatCount="indefinite"
           calcMode="spline"
-          keySplines="0.45 0 0.55 1;0.45 0 0.55 1"
+          keySplines="0.42 0 0.58 1;0.42 0 0.58 1"
         />
-        {/* filled plant silhouette for clearer read */}
+        {/* stem */}
         <path
-          d={`M0 0
-             C ${-b.w * 1.2} ${-b.h * 0.35}, ${midX - b.w} ${-b.h * 0.7}, ${tipX - b.w * 0.6} ${-b.h}
-             L ${tipX + b.w * 0.6} ${-b.h}
-             C ${midX + b.w} ${-b.h * 0.7}, ${b.w * 1.2} ${-b.h * 0.35}, 0 0 Z`}
-          fill={FILL[b.tone]}
-          opacity={0.95}
+          d="M0 0 C 2 -28, -2 -55, 1 -78"
+          fill="none"
+          stroke={LEAF_SHADOW[leaf.tone]}
+          strokeWidth="3.2"
+          strokeLinecap="round"
+        />
+        {/* lower left leaf */}
+        <path
+          d="M2 -22
+             C -18 -30, -42 -28, -52 -18
+             C -38 -12, -18 -8, 2 -18 Z"
+          fill={LEAF_FILL[leaf.tone]}
         />
         <path
-          d={`M${midX * 0.2} ${-b.h * 0.38}
-             C ${midX * 0.2 - leaf} ${-b.h * 0.48}, ${midX * 0.2 - leaf * 1.2} ${-b.h * 0.62}, ${midX * 0.05} ${-b.h * 0.55}
-             C ${midX * 0.25 - leaf * 0.35} ${-b.h * 0.5}, ${midX * 0.35} ${-b.h * 0.42}, ${midX * 0.2} ${-b.h * 0.38} Z`}
-          fill={FILL[(b.tone + 1) % 3]}
+          d="M0 -20 C -16 -26, -34 -24, -44 -18"
+          fill="none"
+          stroke={LEAF_LITE[leaf.tone]}
+          strokeWidth="1.4"
+          opacity="0.55"
+        />
+        {/* lower right leaf */}
+        <path
+          d="M2 -28
+             C 22 -38, 48 -36, 58 -24
+             C 42 -18, 20 -14, 2 -24 Z"
+          fill={LEAF_SHADOW[(leaf.tone + 1) % 4]}
+        />
+        {/* mid left */}
+        <path
+          d="M0 -48
+             C -22 -62, -50 -58, -62 -42
+             C -44 -38, -20 -36, 0 -44 Z"
+          fill={LEAF_FILL[(leaf.tone + 2) % 4]}
         />
         <path
-          d={`M${midX * 0.45} ${-b.h * 0.55}
-             C ${midX * 0.45 + leaf} ${-b.h * 0.64}, ${midX * 0.45 + leaf * 1.25} ${-b.h * 0.78}, ${midX * 0.25} ${-b.h * 0.72}
-             C ${midX * 0.5 + leaf * 0.3} ${-b.h * 0.66}, ${midX * 0.55} ${-b.h * 0.58}, ${midX * 0.45} ${-b.h * 0.55} Z`}
-          fill={FILL[(b.tone + 2) % 3]}
+          d="M-2 -46 C -20 -56, -40 -54, -52 -44"
+          fill="none"
+          stroke={LEAF_LITE[(leaf.tone + 1) % 4]}
+          strokeWidth="1.5"
+          opacity="0.5"
         />
-        <ellipse
-          cx={tipX}
-          cy={-b.h + 2}
-          rx={b.w * 1.35}
-          ry={b.h * 0.08}
-          fill={STROKE[b.tone]}
-          opacity={0.85}
+        {/* mid right */}
+        <path
+          d="M2 -52
+             C 26 -68, 56 -64, 68 -46
+             C 48 -42, 22 -40, 2 -48 Z"
+          fill={LEAF_FILL[(leaf.tone + 3) % 4]}
+        />
+        {/* top leaf cluster */}
+        <path
+          d="M0 -72
+             C -16 -92, -8 -108, 2 -118
+             C 12 -108, 18 -92, 2 -72 Z"
+          fill={LEAF_LITE[leaf.tone]}
+        />
+        <path
+          d="M0 -70
+             C -28 -88, -36 -78, -28 -62
+             C -16 -66, -6 -68, 0 -70 Z"
+          fill={LEAF_FILL[leaf.tone]}
+        />
+        <path
+          d="M2 -70
+             C 30 -90, 40 -78, 32 -60
+             C 18 -64, 8 -68, 2 -70 Z"
+          fill={LEAF_SHADOW[leaf.tone]}
         />
       </g>
     </g>
   );
 }
 
-function GrassTuft({ b, y }: { b: Blade; y: number }) {
-  const amp = b.amp + 2;
+function GrassTuft({
+  x,
+  y,
+  scale,
+  dur,
+  delay,
+  amp,
+  tone,
+}: {
+  x: number;
+  y: number;
+  scale: number;
+  dur: number;
+  delay: number;
+  amp: number;
+  tone: number;
+}) {
   return (
-    <g transform={`translate(${b.x} ${y})`}>
+    <g transform={`translate(${x} ${y}) scale(${scale})`}>
       <g>
         <animateTransform
           attributeName="transform"
           type="rotate"
           values={`${-amp};${amp};${-amp}`}
           keyTimes="0;0.5;1"
-          dur={`${b.dur * 0.85}s`}
-          begin={`${b.delay}s`}
+          dur={`${dur}s`}
+          begin={`${delay}s`}
           repeatCount="indefinite"
           calcMode="spline"
           keySplines="0.4 0 0.6 1;0.4 0 0.6 1"
         />
         <path
-          d={`M0 0
-             C ${-b.w * 1.4} ${-b.h * 0.4}, ${-b.w * 0.6} ${-b.h * 0.82}, ${b.lean * 0.25} ${-b.h}
-             L ${b.lean * 0.25 + b.w * 0.55} ${-b.h * 0.9}
-             C ${b.w * 0.35} ${-b.h * 0.52}, ${b.w} ${-b.h * 0.22}, 0 0 Z`}
-          fill={FILL[b.tone]}
+          d="M0 0 C -6 -22, -2 -40, -4 -58 L 2 -56 C 4 -38, 2 -20, 0 0 Z"
+          fill={LEAF_FILL[tone % 4]}
         />
         <path
-          d={`M${b.w * 0.35} 0
-             C ${b.w * 1.2} ${-b.h * 0.38}, ${b.w * 1.45} ${-b.h * 0.72}, ${b.lean * 0.45 + b.w * 1.1} ${-b.h * 0.92}
-             L ${b.lean * 0.45 + b.w * 1.55} ${-b.h * 0.82}
-             C ${b.w * 1.7} ${-b.h * 0.42}, ${b.w * 1.05} ${-b.h * 0.18}, ${b.w * 0.35} 0 Z`}
-          fill={FILL[(b.tone + 1) % 3]}
-          opacity={0.92}
+          d="M4 0 C 10 -24, 14 -42, 18 -60 L 24 -56 C 16 -40, 10 -22, 4 0 Z"
+          fill={LEAF_SHADOW[tone % 4]}
         />
         <path
-          d={`M${-b.w * 0.15} 0
-             C ${-b.w * 0.8} ${-b.h * 0.5}, ${-b.w * 0.2} ${-b.h * 0.88}, ${b.lean * 0.1 - b.w * 0.3} ${-b.h * 1.05}
-             L ${b.lean * 0.1} ${-b.h * 0.95}
-             C ${-b.w * 0.05} ${-b.h * 0.55}, ${b.w * 0.2} ${-b.h * 0.2}, ${-b.w * 0.15} 0 Z`}
-          fill={FILL[(b.tone + 2) % 3]}
-          opacity={0.88}
+          d="M-3 0 C -14 -20, -18 -36, -22 -52 L -16 -54 C -10 -36, -6 -18, -3 0 Z"
+          fill={LEAF_LITE[tone % 4]}
         />
       </g>
     </g>
@@ -150,141 +167,138 @@ function GrassTuft({ b, y }: { b: Blade; y: number }) {
 }
 
 /**
- * Vector farm backdrop: static scenery + individually wind-swayed crops/grass.
- * Green palette only — no golden/yellow wheat look.
+ * Vibrant farm hero: illustration backdrop + animated leafy crops (wind only on plants).
+ * Style matched to the agri marketing reference — bright greens, not dull/yellow.
  */
 export default function VectorFarmScene() {
-  const farCrops = useMemo(() => makeBlades(56, 0, 1440, 11, 36, 64), []);
-  const midCrops = useMemo(() => makeBlades(72, 0, 1440, 27, 58, 100), []);
-  const nearGrass = useMemo(() => makeBlades(80, 0, 1440, 41, 85, 145), []);
-  const frontGrass = useMemo(() => makeBlades(56, 0, 1440, 63, 110, 175), []);
+  const leftPlants = useMemo<Leaf[]>(() => {
+    const out: Leaf[] = [];
+    for (let i = 0; i < 14; i++) {
+      const r1 = seeded(10 + i * 2.3);
+      const r2 = seeded(40 + i * 4.1);
+      out.push({
+        id: `L${i}`,
+        x: 40 + (i % 7) * 55 + r1 * 20,
+        y: 720 + Math.floor(i / 7) * 70 + r2 * 25,
+        scale: 1.05 + r1 * 0.55,
+        rot: 0,
+        tone: (i % 4) as 0 | 1 | 2 | 3,
+        dur: 2.8 + r2 * 2.2,
+        delay: -r1 * 3.5,
+        amp: 4 + r2 * 5,
+        flip: i % 3 === 0,
+      });
+    }
+    return out;
+  }, []);
+
+  const rightPlants = useMemo<Leaf[]>(() => {
+    const out: Leaf[] = [];
+    for (let i = 0; i < 14; i++) {
+      const r1 = seeded(70 + i * 2.7);
+      const r2 = seeded(90 + i * 3.9);
+      out.push({
+        id: `R${i}`,
+        x: 980 + (i % 7) * 58 + r1 * 22,
+        y: 710 + Math.floor(i / 7) * 75 + r2 * 28,
+        scale: 1.1 + r1 * 0.6,
+        rot: 0,
+        tone: ((i + 1) % 4) as 0 | 1 | 2 | 3,
+        dur: 2.6 + r2 * 2.4,
+        delay: -r1 * 4,
+        amp: 4.5 + r2 * 5.5,
+        flip: i % 2 === 0,
+      });
+    }
+    return out;
+  }, []);
+
+  const midPlants = useMemo<Leaf[]>(() => {
+    const out: Leaf[] = [];
+    for (let i = 0; i < 10; i++) {
+      const r1 = seeded(120 + i * 5.1);
+      const r2 = seeded(150 + i * 2.2);
+      out.push({
+        id: `M${i}`,
+        x: 320 + i * 85 + r1 * 30,
+        y: 640 + r2 * 40,
+        scale: 0.55 + r1 * 0.35,
+        rot: 0,
+        tone: ((i + 2) % 4) as 0 | 1 | 2 | 3,
+        dur: 3.2 + r2 * 2,
+        delay: -r1 * 3,
+        amp: 3 + r2 * 4,
+        flip: i % 2 === 1,
+      });
+    }
+    return out;
+  }, []);
+
+  const grasses = useMemo(() => {
+    const out = [];
+    for (let i = 0; i < 28; i++) {
+      const r1 = seeded(200 + i);
+      const r2 = seeded(300 + i * 1.7);
+      out.push({
+        id: `G${i}`,
+        x: 80 + i * 48 + r1 * 20,
+        y: 820 + r2 * 50,
+        scale: 0.7 + r1 * 0.5,
+        dur: 2.2 + r2 * 1.8,
+        delay: -r1 * 2.5,
+        amp: 6 + r2 * 6,
+        tone: i % 4,
+      });
+    }
+    return out;
+  }, []);
 
   return (
     <div className="vf-scene" aria-hidden>
+      <Image
+        src="/farm-vibrant.jpg"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="vf-backdrop object-cover object-[center_42%]"
+      />
+      {/* Cool green wash — keep scene verdant, not yellow */}
+      <div className="vf-tint" />
+
       <svg
-        className="vf-svg"
+        className="vf-svg vf-svg-overlay"
         viewBox="0 0 1440 900"
         preserveAspectRatio="xMidYMid slice"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <linearGradient id="vfSky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#8ec9b0" />
-            <stop offset="42%" stopColor="#b7dfc6" />
-            <stop offset="72%" stopColor="#d5eedd" />
-            <stop offset="100%" stopColor="#e8f6ec" />
+          <linearGradient id="vfFadeBottom" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#145a32" stopOpacity="0" />
+            <stop offset="55%" stopColor="#145a32" stopOpacity="0.05" />
+            <stop offset="100%" stopColor="#0f4a28" stopOpacity="0.22" />
           </linearGradient>
-          <linearGradient id="vfHillFar" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#2d6b4a" />
-            <stop offset="100%" stopColor="#1e4f36" />
-          </linearGradient>
-          <linearGradient id="vfHillMid" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#357a4f" />
-            <stop offset="100%" stopColor="#245c3a" />
-          </linearGradient>
-          <linearGradient id="vfField" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#3d8f55" />
-            <stop offset="55%" stopColor="#2f7a45" />
-            <stop offset="100%" stopColor="#226338" />
-          </linearGradient>
-          <linearGradient id="vfNear" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#3f9a58" />
-            <stop offset="100%" stopColor="#1d5630" />
-          </linearGradient>
-          <radialGradient id="vfSun" cx="72%" cy="28%" r="18%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.55" />
-            <stop offset="45%" stopColor="#cfe9d8" stopOpacity="0.28" />
-            <stop offset="100%" stopColor="#cfe9d8" stopOpacity="0" />
-          </radialGradient>
         </defs>
 
-        {/* —— static scenery —— */}
-        <rect width="1440" height="900" fill="url(#vfSky)" />
-        <circle cx="1040" cy="250" r="260" fill="url(#vfSun)" />
+        {/* soft depth veil so leaves sit in scene */}
+        <rect width="1440" height="900" fill="url(#vfFadeBottom)" />
 
-        {/* soft clouds — slow drift only */}
-        <g className="vf-cloud vf-cloud-a" opacity="0.55">
-          <ellipse cx="220" cy="140" rx="90" ry="28" fill="#eaf7ef" />
-          <ellipse cx="270" cy="132" rx="55" ry="22" fill="#f3fbf6" />
-          <ellipse cx="175" cy="148" rx="48" ry="18" fill="#dff0e6" />
-        </g>
-        <g className="vf-cloud vf-cloud-b" opacity="0.4">
-          <ellipse cx="1180" cy="110" rx="110" ry="30" fill="#eaf7ef" />
-          <ellipse cx="1240" cy="100" rx="60" ry="22" fill="#f3fbf6" />
-        </g>
-
-        {/* distant hills — static */}
-        <path
-          d="M0 430 C 160 390, 280 410, 420 395 C 560 380, 640 360, 780 375 C 940 392, 1080 350, 1240 370 C 1340 382, 1400 400, 1440 410 L 1440 520 L 0 520 Z"
-          fill="url(#vfHillFar)"
-          opacity="0.85"
-        />
-        <path
-          d="M0 470 C 180 445, 320 485, 480 460 C 650 430, 760 450, 920 440 C 1080 428, 1220 455, 1440 445 L 1440 560 L 0 560 Z"
-          fill="url(#vfHillMid)"
-        />
-
-        {/* tree silhouettes — static */}
-        <g opacity="0.9">
-          <rect x="180" y="400" width="10" height="48" rx="2" fill="#1a3f28" />
-          <ellipse cx="185" cy="385" rx="28" ry="34" fill="#1f5a36" />
-          <ellipse cx="168" cy="398" rx="18" ry="20" fill="#247044" />
-          <ellipse cx="202" cy="396" rx="16" ry="18" fill="#1c643c" />
-        </g>
-        <g opacity="0.85">
-          <rect x="1260" y="392" width="12" height="56" rx="2" fill="#1a3f28" />
-          <ellipse cx="1266" cy="372" rx="34" ry="40" fill="#1f5a36" />
-          <ellipse cx="1244" cy="388" rx="20" ry="22" fill="#247044" />
-          <ellipse cx="1288" cy="386" rx="18" ry="20" fill="#1c643c" />
-        </g>
-        <g opacity="0.75">
-          <rect x="980" y="410" width="8" height="36" rx="2" fill="#1a3f28" />
-          <ellipse cx="984" cy="398" rx="22" ry="26" fill="#226840" />
-        </g>
-
-        {/* mid field plane — static */}
-        <path
-          d="M0 520 C 200 505, 400 530, 640 515 C 880 500, 1100 525, 1440 510 L 1440 680 L 0 680 Z"
-          fill="url(#vfField)"
-        />
-        {/* subtle crop rows (static texture) */}
-        <g opacity="0.18" stroke="#143f26" strokeWidth="1.2" fill="none">
-          {Array.from({ length: 14 }).map((_, i) => {
-            const y = 540 + i * 10;
-            return (
-              <path
-                key={i}
-                d={`M0 ${y} Q 360 ${y - 6}, 720 ${y + 2} T 1440 ${y - 3}`}
-              />
-            );
-          })}
-        </g>
-
-        {/* near ground — static */}
-        <path
-          d="M0 640 C 240 620, 480 655, 760 635 C 1040 615, 1240 650, 1440 640 L 1440 900 L 0 900 Z"
-          fill="url(#vfNear)"
-        />
-
-        {/* —— animated crop / grass only —— */}
-        <g className="vf-layer vf-layer-far">
-          {farCrops.map((b) => (
-            <CropBlade key={b.id} b={b} y={555} />
-          ))}
-        </g>
         <g className="vf-layer vf-layer-mid">
-          {midCrops.map((b) => (
-            <CropBlade key={b.id} b={b} y={635} />
+          {midPlants.map((leaf) => (
+            <LeafPlant key={leaf.id} leaf={leaf} />
           ))}
         </g>
         <g className="vf-layer vf-layer-near">
-          {nearGrass.map((b) => (
-            <GrassTuft key={b.id} b={b} y={745} />
+          {leftPlants.map((leaf) => (
+            <LeafPlant key={leaf.id} leaf={leaf} />
+          ))}
+          {rightPlants.map((leaf) => (
+            <LeafPlant key={leaf.id} leaf={leaf} />
           ))}
         </g>
         <g className="vf-layer vf-layer-front">
-          {frontGrass.map((b) => (
-            <GrassTuft key={b.id} b={b} y={855} />
+          {grasses.map((g) => (
+            <GrassTuft key={g.id} {...g} />
           ))}
         </g>
       </svg>

@@ -84,8 +84,8 @@ export default function HomePage() {
               <Image
                 src="/phone-cutout.png"
                 alt="GramConnect mobile app"
-                width={484}
-                height={1000}
+                width={853}
+                height={1280}
                 priority
                 className="h-auto w-full drop-shadow-[0_28px_50px_rgba(0,0,0,0.38)]"
               />

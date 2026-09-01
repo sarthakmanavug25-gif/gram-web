@@ -182,7 +182,7 @@ body {
   position: relative;
   overflow: hidden;
   color: var(--hero-ink);
-  background: #cfe8d8;
+  background: #9fd4b0;
 }
 
 .hero-media {
@@ -198,10 +198,42 @@ body {
   inset: 0;
 }
 
+.vf-backdrop {
+  z-index: 0;
+  transform: scale(1.04);
+  filter: saturate(1.18) hue-rotate(-6deg) brightness(1.02);
+}
+
+.vf-tint {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(120, 190, 160, 0.18) 0%,
+      rgba(40, 120, 70, 0.08) 40%,
+      rgba(20, 80, 45, 0.12) 100%
+    ),
+    radial-gradient(
+      ellipse 80% 55% at 50% 35%,
+      rgba(180, 230, 200, 0.12),
+      transparent 70%
+    );
+}
+
 .vf-svg {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.vf-svg-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .vf-cloud {
@@ -228,7 +260,7 @@ body {
   }
 }
 
-/* Soft farm-to-page fade — green-friendly, not warm/yellow */
+/* Soft farm-to-page fade — keep greens vivid */
 .hero-media::after {
   content: "";
   position: absolute;
@@ -237,17 +269,17 @@ body {
   background:
     linear-gradient(
       90deg,
-      rgba(12, 40, 24, 0.55) 0%,
-      rgba(12, 40, 24, 0.28) 36%,
-      rgba(12, 40, 24, 0.08) 66%,
-      rgba(12, 40, 24, 0.16) 100%
+      rgba(10, 42, 24, 0.48) 0%,
+      rgba(10, 42, 24, 0.22) 34%,
+      rgba(10, 42, 24, 0.06) 62%,
+      rgba(10, 42, 24, 0.14) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(12, 40, 24, 0.1) 0%,
-      rgba(12, 40, 24, 0.02) 42%,
-      rgba(244, 250, 246, 0) 62%,
-      rgba(244, 250, 246, 0.35) 82%,
+      rgba(10, 42, 24, 0.08) 0%,
+      rgba(10, 42, 24, 0.02) 42%,
+      rgba(244, 250, 246, 0) 64%,
+      rgba(244, 250, 246, 0.32) 84%,
       var(--page-bg) 100%
     );
   pointer-events: none;
