@@ -74,34 +74,21 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 28, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ delay: 0.18, duration: 0.75, ease }}
-            className="mx-auto w-full max-w-[340px]"
+            className="mx-auto w-full max-w-[280px] sm:max-w-[300px]"
           >
             <motion.div
-              animate={{ y: [0, -8, 0] }}
+              animate={{ y: [0, -10, 0] }}
               transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
-              className="overflow-hidden rounded-[28px] border border-white/35 bg-white/18 shadow-[0_30px_80px_rgba(0,0,0,0.35)] backdrop-blur-2xl"
+              className="relative"
             >
-              <div className="bg-[linear-gradient(160deg,#163821_0%,#1f5a38_55%,#2a6b44_100%)] px-5 pb-4 pt-5 text-white">
-                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/70">
-                  GramConnect
-                </p>
-                <p className="mt-1 text-2xl font-semibold tracking-tight">
-                  {t("showcase.phone.title")}
-                </p>
-                <p className="mt-1 text-[13px] text-white/75">{t("showcase.phone.sub")}</p>
-              </div>
-              <div className="bg-white/55 p-3">
-                <div className="relative overflow-hidden rounded-[18px] border border-white/50 shadow-sm">
-                  <Image
-                    src="/app-phone.jpg"
-                    alt="GramConnect mobile app"
-                    width={853}
-                    height={1280}
-                    priority
-                    className="h-auto w-full object-cover object-top"
-                  />
-                </div>
-              </div>
+              <Image
+                src="/phone-cutout.png"
+                alt="GramConnect mobile app"
+                width={484}
+                height={1000}
+                priority
+                className="h-auto w-full drop-shadow-[0_28px_50px_rgba(0,0,0,0.38)]"
+              />
             </motion.div>
           </motion.div>
         </div>
