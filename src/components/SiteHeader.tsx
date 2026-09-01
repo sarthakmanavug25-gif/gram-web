@@ -15,6 +15,7 @@ const NAV = [
   { href: "/diseases", labelKey: "site.nav.diseases" as const },
   { href: "/schemes", labelKey: "site.nav.schemes" as const },
   { href: "/marketplace", labelKey: "site.nav.marketplace" as const },
+  { href: "/help", labelKey: "site.nav.help" as const },
 ];
 
 export default function SiteHeader() {

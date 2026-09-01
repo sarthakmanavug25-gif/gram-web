@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
+  Headphones,
   Landmark,
   Smartphone,
   Stethoscope,
@@ -143,6 +144,32 @@ export default function HomePage() {
               </div>
               <span className="btn-apple inline-flex items-center gap-2 self-start rounded-full bg-green-primary px-5 py-3 text-[14px] font-semibold text-white sm:self-center">
                 {t("diseasesLib.homeCta")} <ArrowRight size={16} />
+              </span>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="py-2">
+        <div className="mx-auto w-full max-w-site px-4 sm:px-6 lg:px-8">
+          <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.99 }} transition={{ type: "spring", stiffness: 380, damping: 28 }}>
+            <Link
+              href="/help"
+              className="glass group flex flex-col gap-6 p-7 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="max-w-2xl">
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-green-primary/12 text-green-bright">
+                  <Headphones size={20} />
+                </div>
+                <h2 className="mt-4 text-2xl font-semibold tracking-tight sm:text-3xl">
+                  {t("showcase.help.title")}
+                </h2>
+                <p className="mt-2 text-[14px] leading-relaxed text-text-secondary">
+                  {t("showcase.help.body")}
+                </p>
+              </div>
+              <span className="btn-apple inline-flex items-center gap-2 self-start rounded-full bg-green-primary px-5 py-3 text-[14px] font-semibold text-white sm:self-center">
+                {t("showcase.help.cta")} <ArrowRight size={16} />
               </span>
             </Link>
           </motion.div>
