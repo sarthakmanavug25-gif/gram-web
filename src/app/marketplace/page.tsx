@@ -6,11 +6,13 @@ import {
   Coins,
   MapPin,
   MessageCircle,
+  ShoppingCart,
   Sprout,
   Store,
   Wrench,
 } from "lucide-react";
 import MarketingShell from "@/components/MarketingShell";
+import MarketplaceCartCheckout from "@/components/MarketplaceCartCheckout";
 import { MARKET_CATEGORIES, MARKET_PRODUCTS } from "@/lib/seed/marketplace";
 import {
   GRAM_POINTS,
@@ -32,6 +34,7 @@ export default function MarketplacePage() {
   const redeemOnEnquire = useApp((s) => s.redeemOnEnquire);
   const claimedWelcome = useApp((s) => s.claimedMarketplaceWelcome);
   const hydrated = useApp((s) => s.hydrated);
+  const addToCart = useApp((s) => s.addToCart);
 
   const [category, setCategory] = useState<string>("all");
   const [enquiry, setEnquiry] = useState<string | null>(null);
@@ -270,7 +273,7 @@ export default function MarketplacePage() {
                   {product.seller} · {product.location}
                 </p>
 
-                <div className="mt-4 flex items-end justify-between gap-3">
+                <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
                   <div>
                     <p className="text-[20px] font-bold text-green-bright">
                       {rupees(effective)}
@@ -285,14 +288,27 @@ export default function MarketplacePage() {
                       <p className="text-[11px] text-text-muted">/{product.unit}</p>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleEnquire(product.id, product.price)}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-green-primary px-3.5 py-2 text-[12.5px] font-semibold text-white transition hover:bg-green-dark"
-                  >
-                    <MessageCircle size={14} />
-                    {t("marketPlace.enquire")}
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        addToCart(product.id);
+                        flashMsg(t("cart.added"));
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-green-primary/40 bg-green-primary/10 px-3.5 py-2 text-[12.5px] font-semibold text-green-bright transition hover:bg-green-primary/16"
+                    >
+                      <ShoppingCart size={14} />
+                      {t("cart.add")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleEnquire(product.id, product.price)}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-green-primary px-3.5 py-2 text-[12.5px] font-semibold text-white transition hover:bg-green-dark"
+                    >
+                      <MessageCircle size={14} />
+                      {t("marketPlace.enquire")}
+                    </button>
+                  </div>
                 </div>
 
                 {redeemable >= GRAM_POINTS.MIN_REDEEM && (
@@ -353,6 +369,8 @@ export default function MarketplacePage() {
           </section>
         )}
       </div>
+      <div className="h-20" aria-hidden />
+      <MarketplaceCartCheckout />
     </MarketingShell>
   );
 }

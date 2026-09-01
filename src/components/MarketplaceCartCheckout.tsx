@@ -1,0 +1,311 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import Image from "next/image";
+import {
+  CreditCard,
+  Minus,
+  Plus,
+  ShoppingCart,
+  Smartphone,
+  Trash2,
+  Wallet,
+  X,
+} from "lucide-react";
+import { MARKET_PRODUCTS } from "@/lib/seed/marketplace";
+import {
+  GRAM_POINTS,
+  discountFromPoints,
+  maxRedeemablePoints,
+} from "@/lib/gramPoints";
+import { useApp } from "@/lib/store";
+import { useT } from "@/lib/i18n";
+import { rupees } from "@/lib/format";
+
+type PayMethod = "upi" | "card" | "cod";
+
+export default function MarketplaceCartCheckout() {
+  const { t } = useT();
+  const lang = useApp((s) => s.language);
+  const cart = useApp((s) => s.cart);
+  const gramPoints = useApp((s) => s.gramPoints);
+  const setCartQty = useApp((s) => s.setCartQty);
+  const removeFromCart = useApp((s) => s.removeFromCart);
+  const checkoutCart = useApp((s) => s.checkoutCart);
+  const toolOrders = useApp((s) => s.toolOrders);
+
+  const [open, setOpen] = useState(false);
+  const [method, setMethod] = useState<PayMethod>("upi");
+  const [usePoints, setUsePoints] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [receipt, setReceipt] = useState<string | null>(null);
+  const [error, setError] = useState("");
+
+  const lines = useMemo(
+    () =>
+      cart
+        .map((c) => {
+          const product = MARKET_PRODUCTS.find((p) => p.id === c.productId);
+          if (!product) return null;
+          return { ...c, product };
+        })
+        .filter(Boolean) as {
+        productId: string;
+        qty: number;
+        product: (typeof MARKET_PRODUCTS)[number];
+      }[],
+    [cart]
+  );
+
+  const subtotal = lines.reduce((sum, l) => sum + l.product.price * l.qty, 0);
+  const redeemable = maxRedeemablePoints(subtotal, gramPoints);
+  const discount = usePoints ? discountFromPoints(redeemable) : 0;
+  const total = Math.max(0, subtotal - discount);
+  const count = lines.reduce((n, l) => n + l.qty, 0);
+
+  function pay() {
+    setBusy(true);
+    setError("");
+    const catalog = MARKET_PRODUCTS.map((p) => ({
+      id: p.id,
+      name: lang === "hi" ? p.nameHi : p.name,
+      price: p.price,
+    }));
+    const result = checkoutCart({
+      method,
+      usePoints: usePoints && redeemable >= GRAM_POINTS.MIN_REDEEM,
+      catalog,
+    });
+    setBusy(false);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setReceipt(result.order.id);
+    setUsePoints(false);
+  }
+
+  if (count === 0 && !open && !receipt) return null;
+
+  return (
+    <>
+      {count > 0 && !open && (
+        <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4 sm:px-6">
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(true);
+              setReceipt(null);
+            }}
+            className="mx-auto flex w-full max-w-site items-center justify-between gap-3 rounded-2xl bg-green-primary px-5 py-3.5 text-white shadow-[0_16px_40px_rgba(16,55,30,0.35)]"
+          >
+            <span className="inline-flex items-center gap-2 text-[14px] font-semibold">
+              <ShoppingCart size={18} />
+              {t("cart.bar", { n: count })}
+            </span>
+            <span className="text-[14px] font-bold">{rupees(subtotal)}</span>
+          </button>
+        </div>
+      )}
+
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45 sm:items-center sm:px-4">
+          <div className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-[28px] bg-[var(--sheet-bg)] p-5 shadow-2xl backdrop-blur-xl sm:rounded-[28px] sm:p-6">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h2 className="font-display text-xl font-bold text-text-primary">
+                {t("cart.title")}
+              </h2>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded-full p-2 text-text-muted hover:bg-black/5"
+                aria-label="Close"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {receipt ? (
+              <div className="space-y-3 rounded-2xl bg-green-primary/10 p-4">
+                <p className="text-[16px] font-bold text-green-bright">
+                  {t("cart.success")}
+                </p>
+                <p className="text-[13px] text-text-secondary">
+                  {t("cart.successBody", { id: receipt })}
+                </p>
+                <p className="text-[12px] text-text-muted">{t("cart.demoNote")}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReceipt(null);
+                    setOpen(false);
+                  }}
+                  className="mt-2 w-full rounded-full bg-green-primary px-4 py-3 text-[14px] font-semibold text-white"
+                >
+                  {t("cart.done")}
+                </button>
+              </div>
+            ) : lines.length === 0 ? (
+              <p className="text-[14px] text-text-secondary">{t("cart.empty")}</p>
+            ) : (
+              <>
+                <ul className="space-y-3">
+                  {lines.map(({ product, qty, productId }) => (
+                    <li
+                      key={productId}
+                      className="flex gap-3 rounded-2xl border border-[var(--hairline-edge)] bg-[var(--surface-2)] p-3"
+                    >
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl">
+                        <Image
+                          src={product.image}
+                          alt=""
+                          fill
+                          className="object-cover"
+                          sizes="64px"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[14px] font-semibold text-text-primary">
+                          {lang === "hi" ? product.nameHi : product.name}
+                        </p>
+                        <p className="text-[12px] text-text-muted">
+                          {rupees(product.price)}
+                        </p>
+                        <div className="mt-2 flex items-center gap-2">
+                          <button
+                            type="button"
+                            className="rounded-full border border-[var(--hairline-edge)] p-1"
+                            onClick={() => setCartQty(productId, qty - 1)}
+                          >
+                            <Minus size={14} />
+                          </button>
+                          <span className="min-w-[1.5rem] text-center text-[13px] font-semibold">
+                            {qty}
+                          </span>
+                          <button
+                            type="button"
+                            className="rounded-full border border-[var(--hairline-edge)] p-1"
+                            onClick={() => setCartQty(productId, qty + 1)}
+                          >
+                            <Plus size={14} />
+                          </button>
+                          <button
+                            type="button"
+                            className="ml-auto text-text-muted"
+                            onClick={() => removeFromCart(productId)}
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                {redeemable >= GRAM_POINTS.MIN_REDEEM && (
+                  <label className="mt-4 flex cursor-pointer items-start gap-2 rounded-xl border border-[var(--hairline-edge)] px-3 py-2.5 text-[13px] text-text-secondary">
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 accent-[var(--green-primary)]"
+                      checked={usePoints}
+                      onChange={(e) => setUsePoints(e.target.checked)}
+                    />
+                    <span>
+                      {t("cart.usePoints", {
+                        n: redeemable,
+                        off: rupees(discountFromPoints(redeemable)),
+                      })}
+                    </span>
+                  </label>
+                )}
+
+                <div className="mt-4 space-y-1.5 text-[13px]">
+                  <div className="flex justify-between text-text-secondary">
+                    <span>{t("cart.subtotal")}</span>
+                    <span>{rupees(subtotal)}</span>
+                  </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-green-bright">
+                      <span>{t("cart.discount")}</span>
+                      <span>−{rupees(discount)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-[16px] font-bold text-text-primary">
+                    <span>{t("cart.total")}</span>
+                    <span>{rupees(total)}</span>
+                  </div>
+                </div>
+
+                <p className="mt-4 text-[12px] font-semibold text-text-primary">
+                  {t("cart.payMethod")}
+                </p>
+                <div className="mt-2 grid grid-cols-3 gap-2">
+                  {(
+                    [
+                      ["upi", Smartphone, t("cart.upi")],
+                      ["card", CreditCard, t("cart.card")],
+                      ["cod", Wallet, t("cart.cod")],
+                    ] as const
+                  ).map(([id, Icon, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setMethod(id)}
+                      className={`rounded-xl border px-2 py-3 text-[12px] font-semibold ${
+                        method === id
+                          ? "border-green-primary bg-green-primary/10 text-green-bright"
+                          : "border-[var(--hairline-edge)] text-text-secondary"
+                      }`}
+                    >
+                      <Icon size={16} className="mx-auto mb-1" />
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                {error && (
+                  <p className="mt-3 text-[12px] text-critical">{error}</p>
+                )}
+
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={pay}
+                  className="mt-5 w-full rounded-full bg-green-primary px-4 py-3.5 text-[15px] font-semibold text-white disabled:opacity-60"
+                >
+                  {busy
+                    ? t("cart.paying")
+                    : t("cart.payNow", { amount: rupees(total) })}
+                </button>
+                <p className="mt-2 text-center text-[11px] text-text-muted">
+                  {t("cart.demoNote")}
+                </p>
+              </>
+            )}
+
+            {toolOrders.length > 0 && !receipt && (
+              <div className="mt-6 border-t border-[var(--hairline-edge)] pt-4">
+                <p className="text-[13px] font-bold text-text-primary">
+                  {t("cart.recentOrders")}
+                </p>
+                <ul className="mt-2 space-y-2">
+                  {toolOrders.slice(0, 3).map((o) => (
+                    <li
+                      key={o.id}
+                      className="flex justify-between text-[12px] text-text-secondary"
+                    >
+                      <span>
+                        {o.id.slice(-6)} · {o.status}
+                      </span>
+                      <span className="font-semibold">{rupees(o.total)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

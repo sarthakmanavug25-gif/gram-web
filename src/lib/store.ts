@@ -64,6 +64,23 @@ export type DroneBooking = {
   createdAt: string;
 };
 
+export type CartItem = {
+  productId: string;
+  qty: number;
+};
+
+export type ToolOrder = {
+  id: string;
+  items: { productId: string; name: string; qty: number; unitPrice: number }[];
+  subtotal: number;
+  pointsUsed: number;
+  discount: number;
+  total: number;
+  method: "upi" | "card" | "cod";
+  status: "Paid" | "COD pending";
+  createdAt: string;
+};
+
 export type Account = {
   id: string;
   name: string;
@@ -185,6 +202,8 @@ type State = {
   claimedMarketplaceWelcome: boolean;
   claimedFirstLoginBonus: boolean;
   pendingLoginReward: PendingLoginReward;
+  cart: CartItem[];
+  toolOrders: ToolOrder[];
 };
 
 type Actions = {
@@ -233,6 +252,15 @@ type Actions = {
   /** Award +100 GP on login (once per day). Returns reward for bubble UI. */
   claimLoginBonus: () => PendingLoginReward;
   clearLoginReward: () => void;
+  addToCart: (productId: string, qty?: number) => void;
+  setCartQty: (productId: string, qty: number) => void;
+  removeFromCart: (productId: string) => void;
+  clearCart: () => void;
+  checkoutCart: (input: {
+    method: ToolOrder["method"];
+    usePoints: boolean;
+    catalog: { id: string; name: string; price: number }[];
+  }) => { ok: true; order: ToolOrder } | { ok: false; error: string };
 };
 
 export const useApp = create<State & Actions>()(
@@ -259,6 +287,8 @@ export const useApp = create<State & Actions>()(
       claimedMarketplaceWelcome: false,
       claimedFirstLoginBonus: false,
       pendingLoginReward: null,
+      cart: [],
+      toolOrders: [],
 
       setHydrated: () => set({ hydrated: true }),
 
@@ -502,10 +532,104 @@ export const useApp = create<State & Actions>()(
       },
 
       clearLoginReward: () => set({ pendingLoginReward: null }),
+
+      addToCart: (productId, qty = 1) => {
+        const add = Math.max(1, Math.floor(qty));
+        set((s) => {
+          const existing = s.cart.find((c) => c.productId === productId);
+          if (existing) {
+            return {
+              cart: s.cart.map((c) =>
+                c.productId === productId ? { ...c, qty: c.qty + add } : c
+              ),
+            };
+          }
+          return { cart: [...s.cart, { productId, qty: add }] };
+        });
+      },
+
+      setCartQty: (productId, qty) => {
+        const next = Math.floor(qty);
+        set((s) => ({
+          cart:
+            next <= 0
+              ? s.cart.filter((c) => c.productId !== productId)
+              : s.cart.map((c) =>
+                  c.productId === productId ? { ...c, qty: next } : c
+                ),
+        }));
+      },
+
+      removeFromCart: (productId) =>
+        set((s) => ({ cart: s.cart.filter((c) => c.productId !== productId) })),
+
+      clearCart: () => set({ cart: [] }),
+
+      checkoutCart: ({ method, usePoints, catalog }) => {
+        const s = get();
+        if (s.cart.length === 0) {
+          return { ok: false, error: "Cart is empty." };
+        }
+        const items = [];
+        let subtotal = 0;
+        for (const line of s.cart) {
+          const product = catalog.find((p) => p.id === line.productId);
+          if (!product) continue;
+          items.push({
+            productId: product.id,
+            name: product.name,
+            qty: line.qty,
+            unitPrice: product.price,
+          });
+          subtotal += product.price * line.qty;
+        }
+        if (items.length === 0) {
+          return { ok: false, error: "Cart items not found." };
+        }
+
+        let pointsUsed = 0;
+        let discount = 0;
+        if (usePoints) {
+          pointsUsed = maxRedeemablePoints(subtotal, s.gramPoints);
+          discount = pointsUsed * GRAM_POINTS.RUPEE_PER_POINT;
+        }
+        const total = Math.max(0, subtotal - discount);
+        const order: ToolOrder = {
+          id: `ord-${Date.now()}`,
+          items,
+          subtotal,
+          pointsUsed,
+          discount,
+          total,
+          method,
+          status: method === "cod" ? "COD pending" : "Paid",
+          createdAt: new Date().toISOString(),
+        };
+
+        const historyExtra: GramPointEvent[] = [];
+        if (pointsUsed > 0) {
+          historyExtra.push({
+            id: `gp-${Date.now()}`,
+            reason: "redeem",
+            amount: -pointsUsed,
+            label: "Points used on tool purchase",
+            labelHi: "औज़ार खरीद पर पॉइंट्स इस्तेमाल",
+            at: new Date().toISOString(),
+          });
+        }
+
+        set({
+          cart: [],
+          toolOrders: [order, ...s.toolOrders].slice(0, 20),
+          gramPoints: s.gramPoints - pointsUsed,
+          gramPointsHistory: [...historyExtra, ...s.gramPointsHistory].slice(0, 40),
+        });
+        return { ok: true, order };
+      },
     }),
     {
       name: "gramconnect-state",
-      version: 5,
+      version: 6,
       migrate: (persisted, fromVersion) => {
         const p = {
           ...((persisted ?? {}) as Record<string, unknown>),
@@ -536,6 +660,10 @@ export const useApp = create<State & Actions>()(
           };
           if (p.claimedFirstLoginBonus == null) p.claimedFirstLoginBonus = false;
           p.pendingLoginReward = null;
+        }
+        if (fromVersion < 6) {
+          if (p.cart == null) p.cart = [];
+          if (p.toolOrders == null) p.toolOrders = [];
         }
         return p;
       },

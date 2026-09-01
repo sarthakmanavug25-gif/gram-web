@@ -47,6 +47,11 @@ export default function SiteFooter() {
                 {t("site.nav.marketplace")}
               </Link>
             </li>
+            <li>
+              <Link href="/drone" className="hover:opacity-100">
+                {t("site.nav.drone")}
+              </Link>
+            </li>
           </ul>
         </div>
 
