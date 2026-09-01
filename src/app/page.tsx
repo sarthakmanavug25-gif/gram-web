@@ -1,445 +1,212 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
-  Bell,
-  Bug,
+  BadgeIndianRupee,
   Camera,
-  ChevronRight,
   CloudSun,
-  Droplets,
-  IndianRupee,
-  LayoutGrid,
-  Lightbulb,
-  Settings,
-  ShoppingCart,
-  Sparkles,
+  HandCoins,
+  Landmark,
+  Smartphone,
   Store,
-  Sun,
-  Users,
+  Wrench,
 } from "lucide-react";
-import AppShell from "@/components/AppShell";
-import ScreenHeader, { HeaderIconButton } from "@/components/ScreenHeader";
-import {
-  Card,
-  IconTile,
-  SectionLabel,
-  Skeleton,
-  Tag,
-} from "@/components/ui/primitives";
-import { useApp } from "@/lib/store";
-import { useWeather } from "@/lib/useWeather";
-import { sprinklerAdvice } from "@/lib/weather";
-import { categoryMeta } from "@/lib/seed/categories";
-import {
-  FIELD_TIPS,
-  FIELD_TIPS_HI,
-  MSP_PRICES,
-  PRIORITIES,
-  SEASON_CROPS,
-} from "@/lib/seed/reference";
-import { DISEASES } from "@/lib/seed/diseases";
-import { greeting, isThisMonth, rupees, shortDate, todayLong } from "@/lib/format";
+import MarketingShell from "@/components/MarketingShell";
 import { useT } from "@/lib/i18n";
-import CategoryIcon from "@/components/CategoryIcon";
+
+const APP_FEATURES = [
+  { key: "crop", icon: Camera },
+  { key: "weather", icon: CloudSun },
+  { key: "expense", icon: BadgeIndianRupee },
+  { key: "market", icon: Store },
+] as const;
+
+const GUIDE_STEPS = ["scan", "weather", "spend", "ask"] as const;
 
 export default function HomePage() {
-  return (
-    <AppShell>
-      <HomeContent />
-    </AppShell>
-  );
-}
-
-function HomeContent() {
-  const profile = useApp((s) => s.profile);
-  const expenses = useApp((s) => s.expenses);
-  const sprinklerAuto = useApp((s) => s.sprinklerAuto);
-  const storedSprinkler = useApp((s) => s.sprinklerPercent);
-  const { weather, loading } = useWeather();
-  const { t, lang, tCrop, tSeason, tCategory, tWeather } = useT();
-
-  const monthSpend = useMemo(
-    () =>
-      expenses
-        .filter((e) => isThisMonth(e.date))
-        .reduce((sum, e) => sum + e.amount, 0),
-    [expenses]
-  );
-
-  const sprinkler = weather ? sprinklerAdvice(weather) : null;
-  const sprinklerPercent = sprinklerAuto
-    ? (sprinkler?.percent ?? storedSprinkler)
-    : storedSprinkler;
-
-  const tips = lang === "hi" ? FIELD_TIPS_HI : FIELD_TIPS;
-  const tip = tips[new Date().getDate() % tips.length];
-  const recent = expenses.slice(0, 3);
+  const { t } = useT();
 
   return (
-    <div className="space-y-6">
-      <ScreenHeader
-        title={t("home.title")}
-        subtitle={`${greeting(t)}, ${profile.name} · ${todayLong(new Date(), lang)}`}
-        action={
-          <Link href="/settings" aria-label={t("common.settings")}>
-            <HeaderIconButton label={t("common.settings")}>
-              <Settings size={18} />
-            </HeaderIconButton>
-          </Link>
-        }
-      />
-
-      <div className="grid gap-4 lg:grid-cols-[1.35fr_1fr]">
-        <Card>
-          <SectionLabel icon={<Sparkles size={14} />}>{t("app.name")}</SectionLabel>
-          <h2 className="font-display text-[28px] font-semibold leading-tight sm:text-[32px]">
-            {greeting(t)}, {profile.name}!
-          </h2>
-          <p className="mt-1 text-[13px] text-text-secondary">
-            {todayLong(new Date(), lang)}
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <MiniPill
-              label={tSeason(profile.season)}
-              tint="rgba(34,197,94,0.14)"
-              color="var(--green-bright)"
-            />
-            <MiniPill
-              label={t("common.acres", { n: profile.farmSizeAcres.toFixed(1) })}
-              tint="rgba(59,130,246,0.14)"
-              color="#2563eb"
-            />
-            <MiniPill
-              label={t("home.guides", { n: DISEASES.length })}
-              tint="rgba(245,158,11,0.14)"
-              color="#b45309"
-            />
-          </div>
-        </Card>
-
-        {loading || !weather ? (
-          <Skeleton className="h-full min-h-[140px] w-full" />
-        ) : (
-          <Card>
-            <div className="flex h-full items-center gap-3">
-              <IconTile color="var(--amber)" tint="rgba(245,158,11,0.14)" size={46}>
-                {weather.condition.toLowerCase().includes("clear") ? (
-                  <Sun size={24} />
-                ) : (
-                  <CloudSun size={24} />
-                )}
-              </IconTile>
-              <div className="min-w-0 flex-1">
-                <p className="text-[26px] font-bold leading-none">
-                  {weather.temperature}°C
-                </p>
-                <p className="truncate text-[13px] text-text-secondary">
-                  {tWeather(weather.condition)}
-                </p>
-                <p className="mt-0.5 text-[12px] text-text-muted">
-                  {t("home.rainHumidity", {
-                    rain: weather.rainChance,
-                    humidity: weather.humidity,
-                  })}
-                </p>
-              </div>
-              <Link
-                href="/advisor"
-                className="shrink-0 rounded-full bg-green-primary px-3.5 py-2 text-[13px] font-bold text-white transition hover:bg-green-dark"
+    <MarketingShell>
+      <section className="hero-panel relative min-h-[78vh] w-full">
+        <div className="hero-field" aria-hidden />
+        <div className="relative z-10 mx-auto grid min-h-[78vh] w-full max-w-site items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:px-8">
+          <div>
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl"
+            >
+              {t("site.hero.brand")}
+            </motion.p>
+            <motion.h1
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.08 }}
+              className="mt-5 max-w-xl text-xl font-medium leading-snug text-white/92 sm:text-2xl"
+            >
+              {t("showcase.hero.headline")}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.16 }}
+              className="mt-4 max-w-lg text-[15px] leading-relaxed text-white/75"
+            >
+              {t("showcase.hero.sub")}
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.24 }}
+              className="mt-8 flex flex-wrap gap-3"
+            >
+              <a
+                href="#get-app"
+                className="rounded-full bg-white px-6 py-3 text-[15px] font-semibold text-[#102318] transition hover:bg-[#e8f2eb]"
               >
-                {t("home.advisor")}
+                {t("showcase.hero.ctaApp")}
+              </a>
+              <Link
+                href="/schemes"
+                className="rounded-full border border-white/35 bg-white/10 px-6 py-3 text-[15px] font-semibold text-white backdrop-blur transition hover:bg-white/18"
+              >
+                {t("showcase.hero.ctaSchemes")}
               </Link>
-            </div>
-          </Card>
-        )}
-      </div>
+            </motion.div>
+          </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <StatPill
-          icon={<Droplets size={15} />}
-          value={`${sprinklerPercent}%`}
-          label={t("home.autoSprinkler")}
-          color="var(--blue-info)"
-        />
-        <StatPill
-          icon={<IndianRupee size={15} />}
-          value={rupees(monthSpend, { compact: true })}
-          label={t("home.thisMonth")}
-          color="var(--green-primary)"
-        />
-        <StatPill
-          icon={<Users size={15} />}
-          value="12"
-          label={t("home.buyers")}
-          color="var(--purple-labor)"
-        />
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <section>
-          <SectionLabel icon={<Bell size={14} />} color="var(--amber)">
-            {t("home.priorities")}
-          </SectionLabel>
-          <div className="space-y-2.5">
-            {PRIORITIES.map((p) => {
-              const tone =
-                p.tone === "warning"
-                  ? { color: "var(--amber)", tint: "rgba(245,158,11,0.14)" }
-                  : p.tone === "info"
-                    ? { color: "var(--blue-info)", tint: "rgba(59,130,246,0.14)" }
-                    : {
-                        color: "var(--green-primary)",
-                        tint: "rgba(34,197,94,0.14)",
-                      };
-              const Icon =
-                p.icon === "bug" ? Bug : p.icon === "droplet" ? Droplets : Sun;
-              return (
-                <Card key={p.id} className="flex items-start gap-3">
-                  <IconTile color={tone.color} tint={tone.tint} size={38}>
-                    <Icon size={18} />
-                  </IconTile>
-                  <div className="min-w-0">
-                    <p
-                      className="text-[14px] font-semibold"
-                      style={{ color: tone.color }}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.18, duration: 0.55 }}
+            className="float-soft mx-auto w-full max-w-[280px]"
+          >
+            <div className="rounded-[2rem] border border-white/20 bg-[#0c1f15]/70 p-3 shadow-[0_30px_80px_rgba(0,0,0,0.35)] backdrop-blur">
+              <div className="overflow-hidden rounded-[1.55rem] bg-[#f4faf5] text-[#102318]">
+                <div className="bg-[#1f7a45] px-4 py-5 text-white">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">
+                    {t("app.name")}
+                  </p>
+                  <p className="mt-2 font-display text-2xl font-semibold">
+                    {t("showcase.phone.title")}
+                  </p>
+                  <p className="mt-1 text-[12px] text-white/75">
+                    {t("showcase.phone.sub")}
+                  </p>
+                </div>
+                <div className="space-y-2.5 p-4">
+                  {APP_FEATURES.map(({ key, icon: Icon }) => (
+                    <div
+                      key={key}
+                      className="flex items-center gap-3 rounded-xl bg-[#e8f2eb] px-3 py-2.5"
                     >
-                      {lang === "hi" ? p.titleHi : p.title}
-                    </p>
-                    <p className="mt-0.5 text-[13px] leading-snug text-text-secondary">
-                      {lang === "hi" ? p.bodyHi : p.body}
-                    </p>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        </section>
-
-        <section>
-          <SectionLabel icon={<LayoutGrid size={14} />}>
-            {t("home.quickActions")}
-          </SectionLabel>
-          <div className="grid grid-cols-2 gap-2.5">
-            <QuickAction
-              href="/crop-doctor"
-              icon={<Camera size={20} />}
-              label={t("nav.cropDoctor")}
-              color="var(--green-primary)"
-              tint="rgba(34,197,94,0.14)"
-            />
-            <QuickAction
-              href="/advisor"
-              icon={<CloudSun size={20} />}
-              label={t("home.weather")}
-              color="var(--orange)"
-              tint="rgba(251,146,60,0.14)"
-            />
-            <QuickAction
-              href="/expenses"
-              icon={<IndianRupee size={20} />}
-              label={t("nav.expenses")}
-              color="var(--amber)"
-              tint="rgba(245,158,11,0.14)"
-            />
-            <QuickAction
-              href="/market"
-              icon={<ShoppingCart size={20} />}
-              label={t("home.market")}
-              color="var(--blue-info)"
-              tint="rgba(59,130,246,0.14)"
-            />
-          </div>
-        </section>
-      </div>
-
-      <section>
-        <SectionLabel icon={<Sparkles size={14} />} color="var(--blue-info)">
-          {t("home.cropsToGrow", { season: tSeason(profile.season) })}
-        </SectionLabel>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {SEASON_CROPS.map((c) => (
-            <div key={c.name} className="card p-4">
-              <div className="flex items-center gap-2">
-                <span className="text-[20px]">{c.emoji}</span>
-                <p className="text-[15px] font-bold">{tCrop(c.name)}</p>
+                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-[#1f7a45]">
+                        <Icon size={16} />
+                      </span>
+                      <span className="text-[13px] font-semibold">
+                        {t(`showcase.feature.${key}` as "showcase.feature.crop")}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <p className="mt-1 text-[12px] text-text-secondary">
-                {lang === "hi" ? c.windowHi : c.window}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <section id="app-guide" className="mx-auto w-full max-w-site px-4 py-16 sm:px-6 lg:px-8">
+        <div className="max-w-2xl">
+          <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+            {t("showcase.guide.title")}
+          </h2>
+          <p className="mt-3 text-[15px] text-text-secondary">{t("showcase.guide.sub")}</p>
+        </div>
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {GUIDE_STEPS.map((step, i) => (
+            <div key={step} className="rounded-2xl border border-[var(--hairline)] bg-[var(--card-bg)] p-5">
+              <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-green-bright">
+                {t("showcase.guide.step", { n: i + 1 })}
               </p>
-              <div className="mt-2.5 flex flex-wrap gap-1.5">
-                <Tag color="#c2410c" tint="rgba(251,146,60,0.16)">
-                  {c.avgTemp}
-                </Tag>
-                <Tag color="#1d4ed8" tint="rgba(59,130,246,0.16)">
-                  {c.rainfall}
-                </Tag>
-              </div>
-              <p className="mt-2.5 text-[12px] leading-snug text-text-muted">
-                {lang === "hi" ? c.noteHi : c.note}
+              <h3 className="mt-3 text-[17px] font-bold">
+                {t(`showcase.guide.${step}.title` as "showcase.guide.scan.title")}
+              </h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-text-secondary">
+                {t(`showcase.guide.${step}.body` as "showcase.guide.scan.body")}
               </p>
             </div>
           ))}
         </div>
-        <p className="mt-2 text-[12px] text-text-muted">{t("home.climateLine")}</p>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section>
-          <div className="mb-2 flex items-center justify-between">
-            <SectionLabel icon={<Store size={14} />} color="var(--green-bright)">
-              {t("home.msp")}
-            </SectionLabel>
-            <span className="pb-2 text-[11px] text-text-muted">{t("home.govt")}</span>
-          </div>
-          <Card className="p-0">
-            {MSP_PRICES.map((m, i) => (
-              <div
-                key={m.crop}
-                className={`flex items-center justify-between px-4 py-3 ${
-                  i > 0 ? "divider-t" : ""
-                }`}
-              >
-                <span className="text-[14px] font-medium">{tCrop(m.crop)}</span>
-                <span className="flex items-baseline gap-2">
-                  <span className="text-[14px] font-bold text-green-bright">
-                    ₹{m.price.toLocaleString("en-IN")}/{m.unit}
-                  </span>
-                  <span className="text-[11px] text-text-muted">+{m.change}%</span>
-                </span>
-              </div>
-            ))}
-            <Link
-              href="/market"
-              className="flex items-center justify-center gap-1.5 divider-t py-3 text-[13px] font-semibold text-green-bright"
-            >
-              {t("home.compareBuyers")} <ArrowRight size={14} />
-            </Link>
-          </Card>
-        </section>
+      <section className="border-y border-[var(--hairline)] bg-[var(--surface)] py-16">
+        <div className="mx-auto grid w-full max-w-site gap-6 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+          <Link
+            href="/schemes"
+            className="group overflow-hidden rounded-[28px] bg-[linear-gradient(145deg,#143526_0%,#1f5a38_60%,#2a6b44_100%)] p-7 text-white transition hover:-translate-y-0.5"
+          >
+            <Landmark className="h-8 w-8 text-white/85" />
+            <h2 className="mt-5 font-display text-2xl font-semibold sm:text-3xl">
+              {t("showcase.schemes.title")}
+            </h2>
+            <p className="mt-3 max-w-md text-[14px] leading-relaxed text-white/75">
+              {t("showcase.schemes.body")}
+            </p>
+            <span className="mt-6 inline-flex items-center gap-2 text-[14px] font-semibold">
+              {t("showcase.schemes.cta")} <ArrowRight size={16} />
+            </span>
+          </Link>
 
-        <section>
-          <div className="mb-2 flex items-center justify-between">
-            <SectionLabel icon={<IndianRupee size={14} />}>
-              {t("home.recentExpenses")}
-            </SectionLabel>
-            <Link
-              href="/expenses"
-              className="pb-2 text-[12px] font-semibold text-green-bright"
-            >
-              {t("common.seeAll")}
-            </Link>
-          </div>
-          <Card className="p-0">
-            {recent.length === 0 ? (
-              <p className="px-4 py-6 text-center text-[13px] text-text-secondary">
-                {t("home.noExpenses")}
-              </p>
-            ) : (
-              recent.map((e, i) => {
-                const meta = categoryMeta(e.category);
-                return (
-                  <Link
-                    href="/expenses"
-                    key={e.id}
-                    className={`flex items-center gap-3 px-4 py-3 ${
-                      i > 0 ? "divider-t" : ""
-                    }`}
-                  >
-                    <IconTile color={meta.color} tint={meta.tint} size={36}>
-                      <CategoryIcon name={meta.icon} size={17} />
-                    </IconTile>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[14px] font-semibold">
-                        {tCategory(e.category)}
-                      </p>
-                      <p className="text-[12px] text-text-muted">
-                        {tCrop(e.crop)} · {shortDate(e.date, lang)}
-                      </p>
-                    </div>
-                    <span className="text-[14px] font-bold">{rupees(e.amount)}</span>
-                    <ChevronRight size={16} className="text-text-muted" />
-                  </Link>
-                );
-              })
-            )}
-          </Card>
-        </section>
-      </div>
-
-      <Card className="flex items-start gap-3">
-        <IconTile color="var(--amber)" tint="rgba(245,158,11,0.14)" size={38}>
-          <Lightbulb size={18} />
-        </IconTile>
-        <div>
-          <p className="text-[14px] font-semibold text-amber">{t("home.fieldTip")}</p>
-          <p className="mt-0.5 text-[13px] leading-snug text-text-secondary">{tip}</p>
+          <Link
+            href="/marketplace"
+            className="group overflow-hidden rounded-[28px] border border-[var(--hairline)] bg-[var(--card-bg)] p-7 transition hover:-translate-y-0.5"
+          >
+            <Wrench className="h-8 w-8 text-green-bright" />
+            <h2 className="mt-5 font-display text-2xl font-semibold sm:text-3xl">
+              {t("showcase.market.title")}
+            </h2>
+            <p className="mt-3 max-w-md text-[14px] leading-relaxed text-text-secondary">
+              {t("showcase.market.body")}
+            </p>
+            <span className="mt-6 inline-flex items-center gap-2 text-[14px] font-semibold text-green-bright">
+              {t("showcase.market.cta")} <ArrowRight size={16} />
+            </span>
+          </Link>
         </div>
-      </Card>
-    </div>
-  );
-}
+      </section>
 
-function MiniPill({
-  label,
-  tint,
-  color,
-}: {
-  label: string;
-  tint: string;
-  color: string;
-}) {
-  return (
-    <span
-      className="rounded-full px-2.5 py-1 text-[12px] font-semibold"
-      style={{ backgroundColor: tint, color }}
-    >
-      {label}
-    </span>
-  );
-}
-
-function StatPill({
-  icon,
-  value,
-  label,
-  color,
-}: {
-  icon: React.ReactNode;
-  value: string;
-  label: string;
-  color: string;
-}) {
-  return (
-    <div className="card flex flex-col gap-1 p-4">
-      <span style={{ color }}>{icon}</span>
-      <span className="text-[17px] font-bold leading-none">{value}</span>
-      <span className="text-[11px] text-text-muted">{label}</span>
-    </div>
-  );
-}
-
-function QuickAction({
-  href,
-  icon,
-  label,
-  color,
-  tint,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  label: string;
-  color: string;
-  tint: string;
-}) {
-  return (
-    <Link href={href} className="card hover-surface flex items-center gap-3 p-4 transition">
-      <IconTile color={color} tint={tint} size={40}>
-        {icon}
-      </IconTile>
-      <span className="text-[14px] font-semibold">{label}</span>
-    </Link>
+      <section id="get-app" className="mx-auto w-full max-w-site px-4 py-16 sm:px-6 lg:px-8">
+        <div className="rounded-[28px] border border-[var(--hairline)] bg-[var(--card-bg)] px-6 py-10 sm:px-10">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-xl">
+              <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-green-primary/12 text-green-bright">
+                <Smartphone size={22} />
+              </div>
+              <h2 className="mt-4 font-display text-3xl font-semibold tracking-tight">
+                {t("showcase.apps.title")}
+              </h2>
+              <p className="mt-3 text-[15px] leading-relaxed text-text-secondary">
+                {t("showcase.apps.sub")}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <span className="rounded-full border border-[var(--hairline)] px-5 py-3 text-[14px] font-semibold">
+                {t("site.apps.ios")}
+              </span>
+              <span className="rounded-full border border-[var(--hairline)] px-5 py-3 text-[14px] font-semibold">
+                {t("site.apps.android")}
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-green-primary px-5 py-3 text-[14px] font-semibold text-white">
+                <HandCoins size={16} />
+                {t("showcase.apps.webNote")}
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </MarketingShell>
   );
 }

@@ -54,7 +54,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="site-bg flex min-h-dvh flex-col">
-      <SiteHeader variant="app" />
+      <SiteHeader />
       <motion.main
         key={pathname}
         initial={{ opacity: 0, y: 10 }}
