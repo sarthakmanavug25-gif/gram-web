@@ -23,170 +23,142 @@ const LEAF = ["#12a344", "#1db954", "#2ad468", "#0d8f38"] as const;
 const LEAF_DK = ["#0a7a30", "#128a3a", "#1aa048", "#086828"] as const;
 const LEAF_LT = ["#5ce87e", "#6ef290", "#84ff9f", "#48dc6c"] as const;
 
-/** Detailed utility tractor — blue body, real proportions */
+/** Detailed utility tractor — real proportions, blue body */
 function Tractor({ x, y, scale = 1 }: { x: number; y: number; scale?: number }) {
   return (
     <g transform={`translate(${x} ${y}) scale(${scale})`} className="vf-tractor">
-      {/* ground shadow */}
-      <ellipse cx="70" cy="118" rx="78" ry="10" fill="#0a3d1c" opacity="0.28" />
+      <ellipse cx="78" cy="132" rx="92" ry="11" fill="#063018" opacity="0.3" />
 
-      {/* —— rear wheel (large) —— */}
-      <g transform="translate(28 78)">
-        <circle cx="0" cy="0" r="38" fill="#1a1a1a" />
-        <circle cx="0" cy="0" r="33" fill="#2a2a2a" />
-        {/* tire tread notches */}
-        {Array.from({ length: 12 }).map((_, i) => {
-          const a = (i / 12) * Math.PI * 2;
-          const x1 = Math.cos(a) * 30;
-          const y1 = Math.sin(a) * 30;
-          const x2 = Math.cos(a) * 38;
-          const y2 = Math.sin(a) * 38;
+      {/* rear tire */}
+      <g transform="translate(32 88)">
+        <circle r="44" fill="#111" />
+        <circle r="38" fill="#222" />
+        {Array.from({ length: 14 }).map((_, i) => {
+          const a = (i / 14) * Math.PI * 2;
           return (
             <line
               key={i}
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke="#0d0d0d"
-              strokeWidth="5"
+              x1={Math.cos(a) * 34}
+              y1={Math.sin(a) * 34}
+              x2={Math.cos(a) * 44}
+              y2={Math.sin(a) * 44}
+              stroke="#0a0a0a"
+              strokeWidth="6"
               strokeLinecap="round"
             />
           );
         })}
-        <circle cx="0" cy="0" r="18" fill="#c4a35a" />
-        <circle cx="0" cy="0" r="12" fill="#a8863f" />
-        <circle cx="0" cy="0" r="5" fill="#5c4a22" />
-        {/* hub bolts */}
-        {[0, 72, 144, 216, 288].map((deg) => {
+        <circle r="20" fill="#d4b06a" />
+        <circle r="14" fill="#b89248" />
+        <circle r="11" fill="#8a6a30" />
+        {[0, 60, 120, 180, 240, 300].map((deg) => {
           const a = (deg * Math.PI) / 180;
-          return (
-            <circle
-              key={deg}
-              cx={Math.cos(a) * 8}
-              cy={Math.sin(a) * 8}
-              r="1.6"
-              fill="#6b5828"
-            />
-          );
+          return <circle key={deg} cx={Math.cos(a) * 7.5} cy={Math.sin(a) * 7.5} r="1.8" fill="#5c4820" />;
         })}
+        <circle r="4" fill="#3a3018" />
       </g>
 
-      {/* —— front wheel (smaller) —— */}
-      <g transform="translate(118 92)">
-        <circle cx="0" cy="0" r="22" fill="#1a1a1a" />
-        <circle cx="0" cy="0" r="18" fill="#2a2a2a" />
-        {Array.from({ length: 10 }).map((_, i) => {
-          const a = (i / 10) * Math.PI * 2;
+      {/* front tire */}
+      <g transform="translate(138 104)">
+        <circle r="26" fill="#111" />
+        <circle r="21" fill="#222" />
+        {Array.from({ length: 11 }).map((_, i) => {
+          const a = (i / 11) * Math.PI * 2;
           return (
             <line
               key={i}
-              x1={Math.cos(a) * 15}
-              y1={Math.sin(a) * 15}
-              x2={Math.cos(a) * 22}
-              y2={Math.sin(a) * 22}
-              stroke="#0d0d0d"
-              strokeWidth="3.5"
+              x1={Math.cos(a) * 18}
+              y1={Math.sin(a) * 18}
+              x2={Math.cos(a) * 26}
+              y2={Math.sin(a) * 26}
+              stroke="#0a0a0a"
+              strokeWidth="4"
               strokeLinecap="round"
             />
           );
         })}
-        <circle cx="0" cy="0" r="10" fill="#c4a35a" />
-        <circle cx="0" cy="0" r="6" fill="#a8863f" />
-        <circle cx="0" cy="0" r="2.5" fill="#5c4a22" />
+        <circle r="11" fill="#d4b06a" />
+        <circle r="7" fill="#b89248" />
+        <circle r="3" fill="#3a3018" />
       </g>
 
-      {/* chassis / axle bar */}
-      <rect x="40" y="88" width="78" height="8" rx="2" fill="#1e3a28" />
-      <rect x="48" y="84" width="55" height="6" rx="1.5" fill="#2d5a40" />
+      {/* axle / frame */}
+      <path d="M48 98 H 130 V 108 H 48 Z" fill="#1a3324" />
+      <path d="M55 94 H 118 V 100 H 55 Z" fill="#2a4a36" />
 
       {/* rear fender */}
       <path
-        d="M8 70 C 8 48, 48 42, 58 58 L 58 78 C 40 86, 12 86, 8 70 Z"
-        fill="#1e6fd0"
+        d="M6 78 C 4 48, 52 40, 64 58 L 66 90 C 44 102, 10 100, 6 78 Z"
+        fill="#1a6fd4"
       />
       <path
-        d="M12 68 C 14 52, 44 48, 52 60"
+        d="M14 74 C 16 54, 48 50, 56 64"
         fill="none"
-        stroke="#5a9eef"
-        strokeWidth="2"
-        opacity="0.55"
+        stroke="#6aaff5"
+        strokeWidth="2.5"
+        opacity="0.6"
       />
 
-      {/* main body / hood */}
+      {/* engine hood */}
       <path
-        d="M52 78 L 52 48 C 52 42, 58 38, 68 38 L 118 42 C 128 44, 132 50, 132 56
-           L 132 78 L 120 82 L 58 82 Z"
-        fill="#2178e0"
+        d="M58 90 L 58 52 C 58 44, 66 38, 78 38 L 138 44 C 150 46, 156 54, 156 62
+           L 156 90 L 140 96 L 66 96 Z"
+        fill="#1f7ae8"
       />
-      {/* hood top highlight */}
       <path
-        d="M68 40 L 116 44 C 122 45, 126 48, 126 52 L 68 48 Z"
-        fill="#4a9af0"
-        opacity="0.85"
+        d="M78 40 L 136 46 C 146 48, 150 52, 150 58 L 78 52 Z"
+        fill="#4ea0f5"
       />
-      {/* side panel shade */}
-      <path
-        d="M52 78 L 52 55 L 68 48 L 68 78 Z"
-        fill="#1a5fbc"
-        opacity="0.55"
-      />
-      {/* grille */}
-      <rect x="118" y="52" width="12" height="22" rx="2" fill="#152030" />
-      {[56, 60, 64, 68].map((gy) => (
-        <line key={gy} x1="120" y1={gy} x2="128" y2={gy} stroke="#6a7a8a" strokeWidth="1.2" />
+      <path d="M58 90 L 58 58 L 78 50 L 78 90 Z" fill="#155fbf" opacity="0.65" />
+      {/* hood vents */}
+      {[56, 62, 68, 74].map((vy) => (
+        <rect key={vy} x="88" y={vy} width="28" height="2.2" rx="1" fill="#0f4a9a" opacity="0.55" />
       ))}
-      {/* headlight */}
-      <circle cx="130" cy="58" r="4.5" fill="#ffe9a8" />
-      <circle cx="130" cy="58" r="2.5" fill="#fff6d0" />
+      {/* grille */}
+      <rect x="140" y="56" width="14" height="28" rx="2.5" fill="#121820" />
+      {[60, 65, 70, 75, 80].map((gy) => (
+        <line key={gy} x1="142" y1={gy} x2="152" y2={gy} stroke="#7a8898" strokeWidth="1.4" />
+      ))}
+      <circle cx="154" cy="62" r="5" fill="#ffe6a0" />
+      <circle cx="154" cy="62" r="2.8" fill="#fff8d8" />
 
       {/* cabin */}
       <path
-        d="M58 48 L 58 22 C 58 16, 64 12, 72 12 L 98 12 C 106 12, 110 18, 110 24
-           L 110 48 Z"
-        fill="#1c6fd4"
+        d="M66 52 L 66 18 C 66 10, 74 4, 84 4 L 116 4 C 126 4, 132 12, 132 20
+           L 132 52 Z"
+        fill="#1a6fd4"
       />
-      {/* cabin roof */}
+      {/* roof */}
       <path
-        d="M56 22 L 56 16 C 56 12, 62 8, 72 8 L 100 8 C 108 8, 114 12, 114 18 L 112 24 Z"
-        fill="#1558b0"
+        d="M62 20 L 62 12 C 62 6, 72 0, 84 0 L 120 0 C 130 0, 138 6, 138 14 L 134 22 Z"
+        fill="#124e9e"
       />
-      <path
-        d="M62 10 L 98 10 C 104 10, 108 13, 108 16 L 64 16 C 62 16, 60 14, 60 12 Z"
-        fill="#3d8ae8"
-        opacity="0.7"
-      />
+      <path d="M70 4 H 122 V 12 H 74 Z" fill="#3d8ee8" opacity="0.75" />
       {/* windshield */}
-      <path
-        d="M74 18 L 104 18 L 104 44 L 74 44 Z"
-        fill="#b8e4ff"
-        opacity="0.92"
-      />
-      <path
-        d="M74 18 L 104 18 L 104 28 L 74 36 Z"
-        fill="#ffffff"
-        opacity="0.35"
-      />
+      <path d="M88 12 H 124 V 48 H 88 Z" fill="#c5ecff" />
+      <path d="M88 12 H 124 V 26 H 88 Z" fill="#ffffff" opacity="0.4" />
       {/* side window */}
-      <path
-        d="M62 20 L 72 20 L 72 44 L 62 44 Z"
-        fill="#9ad4f5"
-        opacity="0.85"
-      />
-      {/* door line */}
-      <line x1="72" y1="18" x2="72" y2="48" stroke="#0f4a9a" strokeWidth="1.5" />
+      <path d="M70 16 H 86 V 48 H 70 Z" fill="#9ad8f8" />
+      <line x1="86" y1="12" x2="86" y2="52" stroke="#0d3f88" strokeWidth="2" />
+      {/* mirror */}
+      <rect x="128" y="22" width="8" height="5" rx="1" fill="#2a2a2a" />
+      <line x1="128" y1="24" x2="122" y2="28" stroke="#2a2a2a" strokeWidth="1.5" />
 
-      {/* exhaust stack */}
-      <rect x="100" y="0" width="6" height="28" rx="1.5" fill="#3a3a3a" />
-      <rect x="98" y="-4" width="10" height="8" rx="2" fill="#2a2a2a" />
-      <rect x="100" y="-2" width="6" height="3" rx="1" fill="#555" />
+      {/* seat hint */}
+      <rect x="92" y="40" width="14" height="10" rx="2" fill="#1a3a28" opacity="0.5" />
 
-      {/* front weight / bumper */}
-      <rect x="128" y="72" width="10" height="12" rx="2" fill="#1a4a8a" />
-      <circle cx="133" cy="78" r="2" fill="#c4a35a" />
+      {/* exhaust */}
+      <rect x="118" y="-8" width="7" height="36" rx="2" fill="#333" />
+      <rect x="115" y="-14" width="13" height="10" rx="2.5" fill="#222" />
+      <rect x="117" y="-12" width="9" height="4" rx="1" fill="#555" />
 
-      {/* step */}
-      <rect x="54" y="78" width="14" height="4" rx="1" fill="#1a4a8a" />
+      {/* front ballast */}
+      <rect x="152" y="82" width="12" height="16" rx="2" fill="#1558b0" />
+      <circle cx="158" cy="90" r="2.5" fill="#d4b06a" />
+
+      {/* step + handrail */}
+      <rect x="62" y="88" width="16" height="5" rx="1" fill="#1558b0" />
+      <path d="M78 52 V 88" stroke="#0d3f88" strokeWidth="2" />
     </g>
   );
 }
@@ -588,7 +560,7 @@ export default function VectorFarmScene() {
         </g>
 
         {/* tractor on path */}
-        <Tractor x={640} y={545} scale={1.15} />
+        <Tractor x={610} y={520} scale={1.45} />
 
         {/* near leafy plants — wind */}
         <g className="vf-layer">
