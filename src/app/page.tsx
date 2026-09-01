@@ -88,14 +88,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="app-guide" className="mx-auto w-full max-w-site px-4 py-16 sm:px-6 lg:px-8">
+      <section id="app-guide" className="mx-auto w-full max-w-site px-4 py-10 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
           <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             {t("showcase.guide.title")}
           </h2>
           <p className="mt-3 text-[15px] text-text-secondary">{t("showcase.guide.sub")}</p>
         </div>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {GUIDE_STEPS.map((step, i) => (
             <motion.div
               key={step}
@@ -123,7 +123,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-4">
+      <section className="py-2">
         <div className="mx-auto w-full max-w-site px-4 sm:px-6 lg:px-8">
           <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.99 }} transition={{ type: "spring", stiffness: 380, damping: 28 }}>
             <Link
@@ -149,8 +149,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-[var(--hairline-edge)] py-16">
-        <div className="mx-auto grid w-full max-w-site gap-6 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
+      <section className="border-y border-[var(--hairline-edge)] py-6">
+        <div className="mx-auto grid w-full max-w-site gap-3 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <motion.div whileHover={{ y: -4 }} whileTap={{ scale: 0.985 }} transition={{ type: "spring", stiffness: 380, damping: 28 }}>
             <Link
               href="/schemes"
@@ -189,7 +189,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="get-app" className="mx-auto w-full max-w-site px-4 py-16 sm:px-6 lg:px-8">
+      <section id="get-app" className="mx-auto w-full max-w-site px-4 py-10 sm:px-6 lg:px-8">
         <div className="rounded-[28px] glass px-6 py-10 sm:px-10">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-xl">
