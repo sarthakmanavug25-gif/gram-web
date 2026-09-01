@@ -468,21 +468,34 @@ export const useApp = create<State & Actions>()(
       name: "gramconnect-state",
       version: 4,
       migrate: (persisted, fromVersion) => {
-        const p = { ...(persisted as Record<string, unknown>) };
+        const p = {
+          ...((persisted ?? {}) as Record<string, unknown>),
+        };
         if (fromVersion < 4) {
-          p.gramPoints = p.gramPoints ?? 0;
-          p.gramPointsHistory = p.gramPointsHistory ?? [];
-          p.enquiredProductIds = p.enquiredProductIds ?? [];
-          p.gramPointsDay = p.gramPointsDay ?? {
-            date: "",
-            enquireCount: 0,
-            sellIntent: false,
-          };
-          p.claimedMarketplaceWelcome = p.claimedMarketplaceWelcome ?? false;
+          if (p.gramPoints == null) p.gramPoints = 0;
+          if (p.gramPointsHistory == null) p.gramPointsHistory = [];
+          if (p.enquiredProductIds == null) p.enquiredProductIds = [];
+          if (p.gramPointsDay == null) {
+            p.gramPointsDay = {
+              date: "",
+              enquireCount: 0,
+              sellIntent: false,
+            };
+          }
+          if (p.claimedMarketplaceWelcome == null) {
+            p.claimedMarketplaceWelcome = false;
+          }
         }
-        return p as State & Actions;
+        return p;
       },
-      onRehydrateStorage: () => (state) => state?.setHydrated(),
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.error("gramconnect persist rehydrate failed", error);
+        }
+        // Prefer the rehydrated store instance; fall back after create() finishes.
+        if (state) state.setHydrated();
+        else queueMicrotask(() => useApp.getState().setHydrated());
+      },
     }
   )
 );

@@ -48,6 +48,14 @@ export default function MarketplacePage() {
     }
   }, [hydrated, claimWelcome, t]);
 
+  // Safety: if persist never finishes, still allow earning after a beat.
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      if (!useApp.getState().hydrated) useApp.getState().setHydrated();
+    }, 1200);
+    return () => window.clearTimeout(id);
+  }, []);
+
   const list = useMemo(
     () =>
       category === "all"
