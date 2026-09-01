@@ -218,7 +218,7 @@ export const useApp = create<State & Actions>()(
       sprinklerPercent: 74,
       sprinklerAuto: true,
       language: "en",
-      theme: "dark",
+      theme: "light",
       hasSeenWelcome: false,
       hasSeenGuide: false,
 

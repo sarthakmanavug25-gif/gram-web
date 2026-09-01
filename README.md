@@ -1,14 +1,12 @@
 # GramConnect
 
-A smart farming assistant for Indian farmers, built as a mobile-first web app: crop
-disease guides, live weather advisory with an auto-sprinkler recommendation, and a
-farm expense ledger — plus an in-app assistant that answers in English, हिंदी or
-Hinglish.
+Official GramConnect website for Indian farmers — crop disease guides, live weather
+advisory, mandi prices, farm expenses, crop calendar and drone spray booking.
+Companion to the existing iOS and Android apps, built for phone, tablet and laptop.
 
-The app runs **with zero configuration**. Without any environment variables it uses
-local device storage for accounts and expenses, and a rule-based assistant. Adding
-Supabase and Anthropic keys upgrades it to real cloud auth, a real database and a
-real LLM.
+The site runs **with zero configuration**. Without environment variables it uses
+local device storage and a rule-based assistant. Adding Supabase and Anthropic keys
+upgrades auth, sync and chat.
 
 ## Run locally
 
@@ -24,7 +22,7 @@ with other projects.
 
 | Route | What it does |
 | --- | --- |
-| `/welcome` | Entry screen — Continue as guest, or sign in with a phone number |
+| `/welcome` | Official marketing homepage — features, tools and dashboard entry |
 | `/login` | Phone + password login and signup with validation and error states |
 | `/` | Home dashboard: greeting, live weather, priorities, quick actions, season crops, MSP table, recent expenses, field tip |
 | `/crop-doctor` | Scan tab (camera/library upload → disease estimate) and a searchable, filterable library of 25 diseases |

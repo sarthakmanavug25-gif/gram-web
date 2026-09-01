@@ -37,6 +37,11 @@ const config: Config = {
       },
       maxWidth: {
         phone: "480px",
+        site: "1180px",
+      },
+      fontFamily: {
+        display: ["var(--font-display)", "Georgia", "serif"],
+        sans: ["var(--font-body)", "Segoe UI", "sans-serif"],
       },
       fontSize: {
         screen: ["30px", { lineHeight: "34px", fontWeight: "700" }],

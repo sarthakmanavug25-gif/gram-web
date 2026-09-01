@@ -150,7 +150,7 @@ export default function ChatAssistant() {
         type="button"
         aria-label={t("chat.title")}
         onClick={() => setOpen(true)}
-        className="fixed bottom-[104px] right-[max(16px,calc(50vw-232px))] z-40 flex h-14 w-14 items-center justify-center rounded-full bg-green-primary text-white shadow-glow transition hover:bg-green-dark"
+        className="fixed bottom-6 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-green-primary text-white shadow-glow transition hover:bg-green-dark sm:bottom-8 sm:right-8"
       >
         <MessageCircle size={24} strokeWidth={2.2} />
       </button>
@@ -170,7 +170,7 @@ export default function ChatAssistant() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="fixed inset-x-0 bottom-0 z-50 mx-auto flex h-[78dvh] w-full max-w-phone flex-col rounded-t-[26px] hairline sheet-surface sm:right-4 sm:top-4 sm:mx-0 sm:h-auto sm:w-[380px] sm:rounded-[26px] sm:left-auto"
+              className="fixed inset-x-0 bottom-0 z-50 mx-auto flex h-[78dvh] w-full max-w-lg flex-col rounded-t-[26px] hairline sheet-surface sm:inset-auto sm:bottom-8 sm:right-8 sm:h-[min(640px,80vh)] sm:w-[400px] sm:rounded-[22px]"
             >
               <div className="flex items-center justify-between divider-b px-4 py-3.5">
                 <div className="flex items-center gap-2">
