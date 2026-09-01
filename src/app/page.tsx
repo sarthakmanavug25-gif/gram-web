@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import MarketingShell from "@/components/MarketingShell";
 import { MotionLink } from "@/components/MotionButton";
+import VectorFarmScene from "@/components/VectorFarmScene";
 import { useT } from "@/lib/i18n";
 
 const GUIDE_STEPS = ["scan", "weather", "spend", "ask"] as const;
@@ -25,76 +26,7 @@ export default function HomePage() {
     <MarketingShell>
       <section className="hero-panel relative min-h-[86vh] w-full overflow-hidden pb-8">
         <div className="hero-media" aria-hidden>
-          <Image
-            src="/farm-field.jpg"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="farm-wind-photo object-cover object-[center_40%]"
-          />
-          <div className="farm-wind-crop">
-            <Image
-              src="/farm-field.jpg"
-              alt=""
-              fill
-              sizes="100vw"
-              className="object-cover object-[center_72%]"
-            />
-          </div>
-          <div className="farm-wind-layer farm-wind-a" />
-          <div className="farm-wind-layer farm-wind-b" />
-          <div className="farm-wind-layer farm-wind-c" />
-          <svg className="farm-grass" viewBox="0 0 1440 180" preserveAspectRatio="none" aria-hidden>
-            <g className="farm-grass-row farm-grass-back">
-              {Array.from({ length: 48 }).map((_, i) => {
-                const x = i * 30 + 8;
-                const h = 70 + ((i * 17) % 55);
-                return (
-                  <path
-                    key={`b-${i}`}
-                    d={`M${x} 180 Q${x - 6} ${180 - h / 2} ${x + ((i % 3) - 1) * 4} ${180 - h}`}
-                    fill="none"
-                    stroke="rgba(55,130,55,0.45)"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                  />
-                );
-              })}
-            </g>
-            <g className="farm-grass-row farm-grass-mid">
-              {Array.from({ length: 40 }).map((_, i) => {
-                const x = i * 36 + 18;
-                const h = 90 + ((i * 23) % 60);
-                return (
-                  <path
-                    key={`m-${i}`}
-                    d={`M${x} 180 Q${x + 8} ${180 - h / 2} ${x + ((i % 2) * 10 - 5)} ${180 - h}`}
-                    fill="none"
-                    stroke="rgba(70,150,60,0.55)"
-                    strokeWidth="2.6"
-                    strokeLinecap="round"
-                  />
-                );
-              })}
-            </g>
-            <g className="farm-grass-row farm-grass-front">
-              {Array.from({ length: 36 }).map((_, i) => {
-                const x = i * 40 + 4;
-                const h = 110 + ((i * 19) % 50);
-                return (
-                  <path
-                    key={`f-${i}`}
-                    d={`M${x} 180 Q${x - 10} ${180 - h / 2} ${x + ((i % 3) - 1) * 8} ${180 - h}`}
-                    fill="none"
-                    stroke="rgba(95,170,70,0.62)"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
-                );
-              })}
-            </g>
-          </svg>
+          <VectorFarmScene />
         </div>
 
         <div className="relative z-10 mx-auto grid min-h-[86vh] w-full max-w-site items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
