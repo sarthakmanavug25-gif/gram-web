@@ -33,6 +33,11 @@ export default function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/diseases" className="hover:opacity-100">
+                {t("site.nav.diseases")}
+              </Link>
+            </li>
+            <li>
               <Link href="/schemes" className="hover:opacity-100">
                 {t("site.nav.schemes")}
               </Link>

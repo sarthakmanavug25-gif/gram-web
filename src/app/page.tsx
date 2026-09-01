@@ -10,6 +10,7 @@ import {
   HandCoins,
   Landmark,
   Smartphone,
+  Stethoscope,
   Store,
   Wrench,
 } from "lucide-react";
@@ -127,7 +128,18 @@ export default function HomePage() {
         </div>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {GUIDE_STEPS.map((step, i) => (
-            <div key={step} className="rounded-2xl border border-[var(--hairline)] bg-[var(--card-bg)] p-5">
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{
+                duration: 0.5,
+                delay: i * 0.06,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="glass glass-hover p-5"
+            >
               <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-green-bright">
                 {t("showcase.guide.step", { n: i + 1 })}
               </p>
@@ -137,16 +149,40 @@ export default function HomePage() {
               <p className="mt-2 text-[14px] leading-relaxed text-text-secondary">
                 {t(`showcase.guide.${step}.body` as "showcase.guide.scan.body")}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
 
-      <section className="border-y border-[var(--hairline)] bg-[var(--surface)] py-16">
+      <section className="py-4">
+        <div className="mx-auto w-full max-w-site px-4 sm:px-6 lg:px-8">
+          <Link
+            href="/diseases"
+            className="glass glass-hover group flex flex-col gap-6 p-7 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div className="max-w-2xl">
+              <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-green-primary/12 text-green-bright">
+                <Stethoscope size={20} />
+              </div>
+              <h2 className="mt-4 font-display text-2xl font-semibold sm:text-3xl">
+                {t("diseasesLib.homeTitle")}
+              </h2>
+              <p className="mt-2 text-[14px] leading-relaxed text-text-secondary">
+                {t("diseasesLib.homeBody")}
+              </p>
+            </div>
+            <span className="inline-flex items-center gap-2 self-start rounded-full bg-green-primary px-5 py-3 text-[14px] font-semibold text-white sm:self-center">
+              {t("diseasesLib.homeCta")} <ArrowRight size={16} />
+            </span>
+          </Link>
+        </div>
+      </section>
+
+      <section className="border-y border-[var(--hairline-edge)] py-16">
         <div className="mx-auto grid w-full max-w-site gap-6 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <Link
             href="/schemes"
-            className="group overflow-hidden rounded-[28px] bg-[linear-gradient(145deg,#143526_0%,#1f5a38_60%,#2a6b44_100%)] p-7 text-white transition hover:-translate-y-0.5"
+            className="group overflow-hidden rounded-[28px] bg-[linear-gradient(145deg,#143526_0%,#1f5a38_60%,#2a6b44_100%)] p-7 text-white transition duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(16,55,30,0.28)]"
           >
             <Landmark className="h-8 w-8 text-white/85" />
             <h2 className="mt-5 font-display text-2xl font-semibold sm:text-3xl">
@@ -162,7 +198,7 @@ export default function HomePage() {
 
           <Link
             href="/marketplace"
-            className="group overflow-hidden rounded-[28px] border border-[var(--hairline)] bg-[var(--card-bg)] p-7 transition hover:-translate-y-0.5"
+            className="glass glass-hover group overflow-hidden rounded-[28px] p-7"
           >
             <Wrench className="h-8 w-8 text-green-bright" />
             <h2 className="mt-5 font-display text-2xl font-semibold sm:text-3xl">
@@ -179,7 +215,7 @@ export default function HomePage() {
       </section>
 
       <section id="get-app" className="mx-auto w-full max-w-site px-4 py-16 sm:px-6 lg:px-8">
-        <div className="rounded-[28px] border border-[var(--hairline)] bg-[var(--card-bg)] px-6 py-10 sm:px-10">
+        <div className="rounded-[28px] glass px-6 py-10 sm:px-10">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-xl">
               <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-green-primary/12 text-green-bright">

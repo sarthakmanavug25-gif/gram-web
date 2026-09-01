@@ -11,6 +11,7 @@ import { useT } from "@/lib/i18n";
 const NAV = [
   { href: "/", labelKey: "site.nav.home" as const },
   { href: "/#app-guide", labelKey: "site.nav.guide" as const },
+  { href: "/diseases", labelKey: "site.nav.diseases" as const },
   { href: "/schemes", labelKey: "site.nav.schemes" as const },
   { href: "/marketplace", labelKey: "site.nav.marketplace" as const },
 ];

@@ -28,6 +28,7 @@ const EN = {
 
   "site.nav.home": "Home",
   "site.nav.guide": "App guide",
+  "site.nav.diseases": "Disease library",
   "site.nav.schemes": "Govt schemes",
   "site.nav.marketplace": "Tool market",
   "site.nav.getApp": "Get the app",
@@ -115,6 +116,26 @@ const EN = {
   "marketPlace.sellerNote": "Companies can list products here. Contact GramConnect to join the marketplace.",
   "marketPlace.enquire": "Enquire",
   "marketPlace.enquireDone": "Enquiry noted for {seller}. They can reach you once seller chat is connected.",
+
+  "diseasesLib.title": "Crop Doctor disease library",
+  "diseasesLib.sub":
+    "{n} diseases trained into the GramConnect Crop Doctor ML model — symptoms, causes, treatment and prevention.",
+  "diseasesLib.search": "Search disease, crop or symptom",
+  "diseasesLib.allCrops": "All crops",
+  "diseasesLib.allLevels": "All risk levels",
+  "diseasesLib.count": "{n} diseases",
+  "diseasesLib.view": "View details",
+  "diseasesLib.empty": "No diseases match this search. Try another crop or keyword.",
+  "diseasesLib.note":
+    "Guidance only. Confirm spray dosage with your local agriculture officer before treating a field.",
+  "diseasesLib.back": "All diseases",
+  "diseasesLib.fromModel": "From Crop Doctor ML",
+  "diseasesLib.fromModelBody":
+    "This entry is part of the disease set used by the GramConnect mobile Crop Doctor model for leaf scan matching.",
+  "diseasesLib.homeTitle": "Disease library",
+  "diseasesLib.homeBody":
+    "Browse every crop disease packed into Crop Doctor — the same reference farmers see in the app.",
+  "diseasesLib.homeCta": "Open library",
 
   "welcome.title": "Welcome Farmer 🌾",
   "welcome.subtitle": "Continue to your dashboard or sign in to sync data.",
@@ -445,6 +466,7 @@ const HI: Record<keyof typeof EN, string> = {
 
   "site.nav.home": "होम",
   "site.nav.guide": "ऐप गाइड",
+  "site.nav.diseases": "रोग लाइब्रेरी",
   "site.nav.schemes": "सरकारी योजनाएँ",
   "site.nav.marketplace": "औज़ार बाज़ार",
   "site.nav.getApp": "ऐप लें",
@@ -532,6 +554,26 @@ const HI: Record<keyof typeof EN, string> = {
   "marketPlace.sellerNote": "कंपनियाँ यहाँ उत्पाद सूचीबद्ध कर सकती हैं। बाज़ार में शामिल होने के लिए ग्रामकनेक्ट से संपर्क करें।",
   "marketPlace.enquire": "पूछताछ",
   "marketPlace.enquireDone": "{seller} के लिए पूछताछ नोट हो गई। विक्रेता चैट जुड़ने पर संपर्क हो सकेगा।",
+
+  "diseasesLib.title": "फसल डॉक्टर रोग लाइब्रेरी",
+  "diseasesLib.sub":
+    "ग्रामकनेक्ट फसल डॉक्टर ML मॉडल में प्रशिक्षित {n} रोग — लक्षण, कारण, उपचार और रोकथाम।",
+  "diseasesLib.search": "रोग, फसल या लक्षण खोजें",
+  "diseasesLib.allCrops": "सभी फसलें",
+  "diseasesLib.allLevels": "सभी जोखिम स्तर",
+  "diseasesLib.count": "{n} रोग",
+  "diseasesLib.view": "विवरण देखें",
+  "diseasesLib.empty": "इस खोज से कोई रोग नहीं मिला। दूसरी फसल या शब्द आज़माएँ।",
+  "diseasesLib.note":
+    "यह मार्गदर्शन है। छिड़काव से पहले स्थानीय कृषि अधिकारी से मात्रा की पुष्टि करें।",
+  "diseasesLib.back": "सभी रोग",
+  "diseasesLib.fromModel": "फसल डॉक्टर ML से",
+  "diseasesLib.fromModelBody":
+    "यह प्रविष्टि ग्रामकनेक्ट मोबाइल फसल डॉक्टर मॉडल के पत्ती-स्कैन मिलान सेट का हिस्सा है।",
+  "diseasesLib.homeTitle": "रोग लाइब्रेरी",
+  "diseasesLib.homeBody":
+    "फसल डॉक्टर में भरे हर रोग को देखें — वही संदर्भ जो ऐप में किसानों को मिलता है।",
+  "diseasesLib.homeCta": "लाइब्रेरी खोलें",
 
   "welcome.title": "स्वागत है किसान 🌾",
   "welcome.subtitle":

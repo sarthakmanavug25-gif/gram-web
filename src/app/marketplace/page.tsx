@@ -37,7 +37,7 @@ export default function MarketplacePage() {
               {t("marketPlace.sub")}
             </p>
           </div>
-          <div className="rounded-2xl border border-[var(--hairline)] bg-[var(--card-bg)] px-4 py-3 text-[13px] text-text-secondary">
+          <div className="rounded-2xl glass px-4 py-3 text-[13px] text-text-secondary">
             <p className="flex items-center gap-2 font-semibold text-text-primary">
               <Store size={15} />
               {t("marketPlace.sellerCta")}
@@ -67,7 +67,7 @@ export default function MarketplacePage() {
           {list.map((product) => (
             <article
               key={product.id}
-              className="flex flex-col rounded-2xl border border-[var(--hairline)] bg-[var(--card-bg)] p-5 shadow-[var(--card-shadow)]"
+              className="flex flex-col rounded-2xl glass glass-hover p-5"
             >
               <div className="flex h-28 items-end rounded-xl bg-[linear-gradient(145deg,rgba(31,122,69,0.16),rgba(31,122,69,0.04))] p-4">
                 <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-green-bright">

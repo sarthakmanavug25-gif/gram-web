@@ -56,7 +56,7 @@ export default function SchemesPage() {
           {list.map((scheme) => (
             <article
               key={scheme.id}
-              className="flex flex-col rounded-2xl border border-[var(--hairline)] bg-[var(--card-bg)] p-5 shadow-[var(--card-shadow)]"
+              className="flex flex-col rounded-2xl glass glass-hover p-5"
             >
               <h2 className="text-[18px] font-bold">
                 {lang === "hi" ? scheme.nameHi : scheme.name}
