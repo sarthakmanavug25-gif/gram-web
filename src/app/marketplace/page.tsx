@@ -273,42 +273,41 @@ export default function MarketplacePage() {
                   {product.seller} · {product.location}
                 </p>
 
-                <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
-                  <div>
-                    <p className="text-[20px] font-bold text-green-bright">
-                      {rupees(effective)}
+                <div className="mt-4">
+                  <p className="text-[20px] font-bold text-green-bright">
+                    {rupees(effective)}
+                  </p>
+                  {discount > 0 ? (
+                    <p className="text-[11px] text-text-muted">
+                      <span className="line-through">{rupees(product.price)}</span>
+                      {" · "}
+                      {t("marketPlace.points.off", { off: rupees(discount) })}
                     </p>
-                    {discount > 0 ? (
-                      <p className="text-[11px] text-text-muted">
-                        <span className="line-through">{rupees(product.price)}</span>
-                        {" · "}
-                        {t("marketPlace.points.off", { off: rupees(discount) })}
-                      </p>
-                    ) : (
-                      <p className="text-[11px] text-text-muted">/{product.unit}</p>
-                    )}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        addToCart(product.id);
-                        flashMsg(t("cart.added"));
-                      }}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-green-primary/40 bg-green-primary/10 px-3.5 py-2 text-[12.5px] font-semibold text-green-bright transition hover:bg-green-primary/16"
-                    >
-                      <ShoppingCart size={14} />
-                      {t("cart.add")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleEnquire(product.id, product.price)}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-green-primary px-3.5 py-2 text-[12.5px] font-semibold text-white transition hover:bg-green-dark"
-                    >
-                      <MessageCircle size={14} />
-                      {t("marketPlace.enquire")}
-                    </button>
-                  </div>
+                  ) : (
+                    <p className="text-[11px] text-text-muted">/{product.unit}</p>
+                  )}
+                </div>
+
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      addToCart(product.id);
+                      flashMsg(t("cart.added"));
+                    }}
+                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border-2 border-green-primary bg-green-primary/12 px-3 py-2.5 text-[13px] font-bold text-green-bright transition hover:bg-green-primary/20"
+                  >
+                    <ShoppingCart size={15} />
+                    {t("cart.add")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleEnquire(product.id, product.price)}
+                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-green-primary px-3 py-2.5 text-[13px] font-bold text-white transition hover:bg-green-dark"
+                  >
+                    <MessageCircle size={15} />
+                    {t("marketPlace.enquire")}
+                  </button>
                 </div>
 
                 {redeemable >= GRAM_POINTS.MIN_REDEEM && (
