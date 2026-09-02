@@ -17,6 +17,7 @@ import { MARKET_CATEGORIES, MARKET_PRODUCTS } from "@/lib/seed/marketplace";
 import {
   GRAM_POINTS,
   discountFromPoints,
+  maxCartRedeemablePoints,
   maxRedeemablePoints,
 } from "@/lib/gramPoints";
 import { useT } from "@/lib/i18n";
@@ -237,9 +238,14 @@ export default function MarketplacePage() {
         <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {list.map((product) => {
             const redeemable = maxRedeemablePoints(product.price, gramPoints);
+            const cartPoints = maxCartRedeemablePoints(product.price, gramPoints);
             const apply = usePointsFor === product.id && redeemable > 0;
-            const discount = apply ? discountFromPoints(redeemable) : 0;
-            const effective = product.price - discount;
+            const enquireDiscount = apply ? discountFromPoints(redeemable) : 0;
+            const cartDiscount = discountFromPoints(cartPoints);
+            const showCartDeal = cartDiscount > 0;
+            const effective = showCartDeal
+              ? product.price - cartDiscount
+              : product.price - enquireDiscount;
 
             return (
               <article
@@ -277,11 +283,24 @@ export default function MarketplacePage() {
                   <p className="text-[20px] font-bold text-green-bright">
                     {rupees(effective)}
                   </p>
-                  {discount > 0 ? (
+                  {showCartDeal ? (
+                    <p className="mt-1 text-[12px] font-medium text-green-bright">
+                      <span className="text-text-muted line-through">
+                        {rupees(product.price)}
+                      </span>
+                      {" · "}
+                      {t("cart.cardDeal", {
+                        n: cartPoints,
+                        off: rupees(cartDiscount),
+                      })}
+                    </p>
+                  ) : enquireDiscount > 0 ? (
                     <p className="text-[11px] text-text-muted">
                       <span className="line-through">{rupees(product.price)}</span>
                       {" · "}
-                      {t("marketPlace.points.off", { off: rupees(discount) })}
+                      {t("marketPlace.points.off", {
+                        off: rupees(enquireDiscount),
+                      })}
                     </p>
                   ) : (
                     <p className="text-[11px] text-text-muted">/{product.unit}</p>
@@ -293,7 +312,14 @@ export default function MarketplacePage() {
                     type="button"
                     onClick={() => {
                       addToCart(product.id);
-                      flashMsg(t("cart.added"));
+                      flashMsg(
+                        showCartDeal
+                          ? t("cart.addedWithPoints", {
+                              n: cartPoints,
+                              off: rupees(cartDiscount),
+                            })
+                          : t("cart.added")
+                      );
                     }}
                     className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border-2 border-green-primary bg-green-primary/12 px-3 py-2.5 text-[13px] font-bold text-green-bright transition hover:bg-green-primary/20"
                   >

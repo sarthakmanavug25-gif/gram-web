@@ -24,6 +24,15 @@ import { rupees } from "@/lib/format";
 
 type PayMethod = "upi" | "card" | "cod";
 
+function onlyDigits(value: string, max: number) {
+  return value.replace(/\D/g, "").slice(0, max);
+}
+
+function formatCardNumber(value: string) {
+  const digits = onlyDigits(value, 16);
+  return digits.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+}
+
 export default function MarketplaceCartCheckout() {
   const { t } = useT();
   const lang = useApp((s) => s.language);
@@ -35,11 +44,16 @@ export default function MarketplaceCartCheckout() {
   const toolOrders = useApp((s) => s.toolOrders);
 
   const [open, setOpen] = useState(false);
-  const [method, setMethod] = useState<PayMethod>("upi");
+  const [method, setMethod] = useState<PayMethod>("card");
   const [busy, setBusy] = useState(false);
   const [receipt, setReceipt] = useState<string | null>(null);
   const [pointsSpent, setPointsSpent] = useState(0);
   const [error, setError] = useState("");
+  const [cardName, setCardName] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvv, setCardCvv] = useState("");
+  const [upiId, setUpiId] = useState("");
 
   const lines = useMemo(
     () =>
@@ -58,13 +72,39 @@ export default function MarketplaceCartCheckout() {
   );
 
   const subtotal = lines.reduce((sum, l) => sum + l.product.price * l.qty, 0);
-  // Auto-apply every available Gram Point against cart total.
   const redeemable = maxCartRedeemablePoints(subtotal, gramPoints);
   const discount = discountFromPoints(redeemable);
   const total = Math.max(0, subtotal - discount);
   const count = lines.reduce((n, l) => n + l.qty, 0);
 
+  function validatePay() {
+    if (method === "card") {
+      const digits = onlyDigits(cardNumber, 16);
+      if (cardName.trim().length < 2) {
+        return t("cart.cardErrorName");
+      }
+      if (digits.length < 16) {
+        return t("cart.cardErrorNumber");
+      }
+      if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
+        return t("cart.cardErrorExpiry");
+      }
+      if (cardCvv.length < 3) {
+        return t("cart.cardErrorCvv");
+      }
+    }
+    if (method === "upi" && upiId.trim().length < 3) {
+      return t("cart.upiError");
+    }
+    return "";
+  }
+
   function pay() {
+    const validation = validatePay();
+    if (validation) {
+      setError(validation);
+      return;
+    }
     setBusy(true);
     setError("");
     const catalog = MARKET_PRODUCTS.map((p) => ({
@@ -84,6 +124,11 @@ export default function MarketplaceCartCheckout() {
     }
     setPointsSpent(result.order.pointsUsed);
     setReceipt(result.order.id);
+    setCardNumber("");
+    setCardCvv("");
+    setCardExpiry("");
+    setCardName("");
+    setUpiId("");
   }
 
   if (count === 0 && !open && !receipt) return null;
@@ -231,15 +276,18 @@ export default function MarketplaceCartCheckout() {
                 </ul>
 
                 {redeemable > 0 ? (
-                  <div className="mt-4 flex items-start gap-2 rounded-xl border border-green-primary/30 bg-green-primary/8 px-3 py-2.5 text-[13px] text-green-bright">
-                    <Coins size={15} className="mt-0.5 shrink-0" />
-                    <span>
+                  <div className="mt-4 rounded-xl border border-green-primary/30 bg-green-primary/8 px-3 py-3 text-[13px] text-green-bright">
+                    <p className="inline-flex items-center gap-1.5 font-semibold">
+                      <Coins size={15} />
+                      {t("cart.discountApplied")}
+                    </p>
+                    <p className="mt-1">
                       {t("cart.autoPoints", {
                         n: redeemable,
                         off: rupees(discount),
                         left: gramPoints - redeemable,
                       })}
-                    </span>
+                    </p>
                   </div>
                 ) : (
                   <p className="mt-4 text-[12px] text-text-muted">
@@ -253,7 +301,7 @@ export default function MarketplaceCartCheckout() {
                     <span>{rupees(subtotal)}</span>
                   </div>
                   {discount > 0 && (
-                    <div className="flex justify-between text-green-bright">
+                    <div className="flex justify-between font-semibold text-green-bright">
                       <span>{t("cart.discount")}</span>
                       <span>−{rupees(discount)}</span>
                     </div>
@@ -264,24 +312,27 @@ export default function MarketplaceCartCheckout() {
                   </div>
                 </div>
 
-                <p className="mt-4 text-[12px] font-semibold text-text-primary">
+                <p className="mt-5 text-[12px] font-semibold text-text-primary">
                   {t("cart.payMethod")}
                 </p>
                 <div className="mt-2 grid grid-cols-3 gap-2">
                   {(
                     [
-                      ["upi", Smartphone, t("cart.upi")],
                       ["card", CreditCard, t("cart.card")],
+                      ["upi", Smartphone, t("cart.upi")],
                       ["cod", Wallet, t("cart.cod")],
                     ] as const
                   ).map(([id, Icon, label]) => (
                     <button
                       key={id}
                       type="button"
-                      onClick={() => setMethod(id)}
+                      onClick={() => {
+                        setMethod(id);
+                        setError("");
+                      }}
                       className={`rounded-xl border px-2 py-3 text-[12px] font-semibold ${
                         method === id
-                          ? "border-green-primary bg-green-primary/10 text-green-bright"
+                          ? "border-green-primary bg-green-primary/10 text-green-bright shadow-[0_0_0_1px_rgba(31,122,69,0.35)]"
                           : "border-[var(--hairline-edge)] text-text-secondary"
                       }`}
                     >
@@ -290,6 +341,90 @@ export default function MarketplaceCartCheckout() {
                     </button>
                   ))}
                 </div>
+
+                {method === "card" && (
+                  <div className="mt-4 space-y-3 rounded-2xl border border-[var(--hairline-edge)] bg-[var(--surface-2)] p-4">
+                    <p className="inline-flex items-center gap-1.5 text-[13px] font-bold text-text-primary">
+                      <CreditCard size={15} />
+                      {t("cart.cardTitle")}
+                    </p>
+                    <label className="block text-[12px] font-semibold text-text-muted">
+                      {t("cart.cardName")}
+                      <input
+                        value={cardName}
+                        onChange={(e) => setCardName(e.target.value)}
+                        placeholder={t("cart.cardNamePh")}
+                        className="mt-1.5 w-full rounded-xl border border-[var(--hairline-edge)] bg-[var(--input-bg)] px-3 py-2.5 text-[14px] text-text-primary outline-none focus:border-green-primary"
+                      />
+                    </label>
+                    <label className="block text-[12px] font-semibold text-text-muted">
+                      {t("cart.cardNumber")}
+                      <input
+                        inputMode="numeric"
+                        autoComplete="cc-number"
+                        value={cardNumber}
+                        onChange={(e) =>
+                          setCardNumber(formatCardNumber(e.target.value))
+                        }
+                        placeholder="XXXX XXXX XXXX XXXX"
+                        className="mt-1.5 w-full rounded-xl border border-[var(--hairline-edge)] bg-[var(--input-bg)] px-3 py-2.5 text-[14px] tracking-wider text-text-primary outline-none focus:border-green-primary"
+                      />
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <label className="block text-[12px] font-semibold text-text-muted">
+                        {t("cart.cardExpiry")}
+                        <input
+                          inputMode="numeric"
+                          value={cardExpiry}
+                          onChange={(e) => {
+                            const raw = onlyDigits(e.target.value, 4);
+                            const formatted =
+                              raw.length > 2
+                                ? `${raw.slice(0, 2)}/${raw.slice(2)}`
+                                : raw;
+                            setCardExpiry(formatted);
+                          }}
+                          placeholder="MM/YY"
+                          className="mt-1.5 w-full rounded-xl border border-[var(--hairline-edge)] bg-[var(--input-bg)] px-3 py-2.5 text-[14px] text-text-primary outline-none focus:border-green-primary"
+                        />
+                      </label>
+                      <label className="block text-[12px] font-semibold text-text-muted">
+                        {t("cart.cardCvv")}
+                        <input
+                          inputMode="numeric"
+                          type="password"
+                          value={cardCvv}
+                          onChange={(e) =>
+                            setCardCvv(onlyDigits(e.target.value, 4))
+                          }
+                          placeholder="***"
+                          className="mt-1.5 w-full rounded-xl border border-[var(--hairline-edge)] bg-[var(--input-bg)] px-3 py-2.5 text-[14px] text-text-primary outline-none focus:border-green-primary"
+                        />
+                      </label>
+                    </div>
+                    <p className="text-[11px] text-text-muted">
+                      {t("cart.cardDemoHint")}
+                    </p>
+                  </div>
+                )}
+
+                {method === "upi" && (
+                  <label className="mt-4 block rounded-2xl border border-[var(--hairline-edge)] bg-[var(--surface-2)] p-4 text-[12px] font-semibold text-text-muted">
+                    {t("cart.upiId")}
+                    <input
+                      value={upiId}
+                      onChange={(e) => setUpiId(e.target.value)}
+                      placeholder="name@upi"
+                      className="mt-1.5 w-full rounded-xl border border-[var(--hairline-edge)] bg-[var(--input-bg)] px-3 py-2.5 text-[14px] font-normal text-text-primary outline-none focus:border-green-primary"
+                    />
+                  </label>
+                )}
+
+                {method === "cod" && (
+                  <p className="mt-4 rounded-xl border border-[var(--hairline-edge)] bg-[var(--surface-2)] px-3 py-2.5 text-[12px] text-text-secondary">
+                    {t("cart.codNote")}
+                  </p>
+                )}
 
                 {error && (
                   <p className="mt-3 text-[12px] text-critical">{error}</p>
@@ -303,7 +438,9 @@ export default function MarketplaceCartCheckout() {
                 >
                   {busy
                     ? t("cart.paying")
-                    : t("cart.payNow", { amount: rupees(total) })}
+                    : method === "card"
+                      ? t("cart.payCard", { amount: rupees(total) })
+                      : t("cart.payNow", { amount: rupees(total) })}
                 </button>
                 <p className="mt-2 text-center text-[11px] text-text-muted">
                   {t("cart.demoNote")}
@@ -323,10 +460,8 @@ export default function MarketplaceCartCheckout() {
                       className="flex justify-between text-[12px] text-text-secondary"
                     >
                       <span>
-                        {o.id.slice(-6)} · {o.status}
-                        {o.pointsUsed > 0
-                          ? ` · −${o.pointsUsed} GP`
-                          : ""}
+                        {o.id.slice(-6)} · {o.method.toUpperCase()} · {o.status}
+                        {o.pointsUsed > 0 ? ` · −${o.pointsUsed} GP` : ""}
                       </span>
                       <span className="font-semibold">{rupees(o.total)}</span>
                     </li>
