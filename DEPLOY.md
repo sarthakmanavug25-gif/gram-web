@@ -1,25 +1,22 @@
 # Permanent hosting (Vercel)
 
-## Make the link permanent (do this once — ~2 minutes)
+## If Vercel says “request blocked”
 
-1. Open this claim link:  
-   https://vercel.com/claim-deployment?code=2ee0f589-5adb-4486-8b78-46ee2c0b615d
-2. Sign up / log in with a **free** Vercel account (Google / GitHub / email)
-3. Click **Claim** / transfer into your account
-4. After claim, open your Vercel dashboard → the project URL  
-   (example shape: `https://your-project-name.vercel.app`)  
-   **That URL stays online permanently** — no laptop / agent needed
+Use this Cloudflare tunnel (works while the agent session is running):
 
-## Current preview (works now, expires ~60 min if not claimed)
+https://spell-limousines-jessica-reader.trycloudflare.com
+
+- Marketplace: https://spell-limousines-jessica-reader.trycloudflare.com/marketplace  
+- Drone: https://spell-limousines-jessica-reader.trycloudflare.com/drone  
+
+Backup bore tunnel: http://bore.pub:49874
+
+## Make a permanent Vercel link (best fix)
+
+1. Open: https://vercel.com/claim-deployment?code=2ee0f589-5adb-4486-8b78-46ee2c0b615d  
+2. Free Vercel login → **Claim**  
+3. After claim you get a stable `*.vercel.app` that usually is NOT blocked like anonymous temporary links.
+
+## Latest temporary Vercel (may be blocked on some networks)
 
 https://temporary-instant-monsoon-rhzga9l.vercel.app
-
-- Marketplace: https://temporary-instant-monsoon-rhzga9l.vercel.app/marketplace  
-- Drone spray: https://temporary-instant-monsoon-rhzga9l.vercel.app/drone  
-- Diseases: https://temporary-instant-monsoon-rhzga9l.vercel.app/diseases  
-- Help: https://temporary-instant-monsoon-rhzga9l.vercel.app/help  
-- Login: https://temporary-instant-monsoon-rhzga9l.vercel.app/login
-
-## Optional: keep auto-updating from Cursor
-
-Add a Vercel token as secret `VERCEL_TOKEN` in Cursor so future deploys can push to your claimed project automatically.
