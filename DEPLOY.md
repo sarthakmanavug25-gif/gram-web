@@ -3,7 +3,7 @@
 ## Make the link permanent (do this once — ~2 minutes)
 
 1. Open this claim link:  
-   https://vercel.com/claim-deployment?code=1a5e734e-09e9-42a9-801e-a62fdc61ad7c
+   https://vercel.com/claim-deployment?code=2ee0f589-5adb-4486-8b78-46ee2c0b615d
 2. Sign up / log in with a **free** Vercel account (Google / GitHub / email)
 3. Click **Claim** / transfer into your account
 4. After claim, open your Vercel dashboard → the project URL  
@@ -12,13 +12,13 @@
 
 ## Current preview (works now, expires ~60 min if not claimed)
 
-https://temporary-sonic-garnet-tmpw9we.vercel.app
+https://temporary-instant-monsoon-rhzga9l.vercel.app
 
-- Marketplace: https://temporary-sonic-garnet-tmpw9we.vercel.app/marketplace  
-- Drone spray: https://temporary-sonic-garnet-tmpw9we.vercel.app/drone  
-- Diseases: https://temporary-sonic-garnet-tmpw9we.vercel.app/diseases  
-- Help: https://temporary-sonic-garnet-tmpw9we.vercel.app/help  
-- Login: https://temporary-sonic-garnet-tmpw9we.vercel.app/login
+- Marketplace: https://temporary-instant-monsoon-rhzga9l.vercel.app/marketplace  
+- Drone spray: https://temporary-instant-monsoon-rhzga9l.vercel.app/drone  
+- Diseases: https://temporary-instant-monsoon-rhzga9l.vercel.app/diseases  
+- Help: https://temporary-instant-monsoon-rhzga9l.vercel.app/help  
+- Login: https://temporary-instant-monsoon-rhzga9l.vercel.app/login
 
 ## Optional: keep auto-updating from Cursor
 
